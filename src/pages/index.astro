@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
@@ -58,7 +59,7 @@ const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
       <p class="manifesto__text" data-scrub-words>
         Most people put off the dentist because the last one made them feel rushed or judged. Linden is built around the opposite. We book longer appointments, explain before we touch anything, stop when you raise a hand, and tell you the price before you agree to it.
       </p>
-      <a class="link-arrow manifesto__link" href="/about/" data-reveal>How we work <Icon name="arrow-right" /></a>
+      <a class="link-arrow manifesto__link" href={url('/about/')} data-reveal>How we work <Icon name="arrow-right" /></a>
     </div>
   </section>
 
@@ -70,7 +71,7 @@ const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
         <ul>
           {services.map((s) => (
             <li data-hover-row data-reveal>
-              <a href={`/services/${s.id}/`} class="svc">
+              <a href={url(`/services/${s.id}/`)} class="svc">
                 <span class="svc__thumb frame"><Image src={s.data.photo} alt="" width={160} height={160} /></span>
                 <span class="svc__icon"><Icon name={s.data.icon} /></span>
                 <span class="svc__title">{s.data.title}</span>
@@ -116,7 +117,7 @@ const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
       <div class="team__lead" data-reveal>
         <h2 id="team-title" data-split>The same four faces, every visit.</h2>
         <p class="muted">No rotating locums. The people who know your teeth are the people who see you.</p>
-        <a class="link-arrow" href="/about/#team">Meet the team <Icon name="arrow-right" /></a>
+        <a class="link-arrow" href={url('/about/#team')}>Meet the team <Icon name="arrow-right" /></a>
       </div>
       {team.map((m, i) => (
         <figure class={`team__cell team__cell--${bentoAreas[i]}`} data-reveal>
@@ -150,10 +151,10 @@ const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
     <div class="wrap">
       <div class="journal__head">
         <h2 id="journal-title" data-split>Straight answers, written by the team.</h2>
-        <a class="link-arrow" href="/journal/" data-reveal>Read the journal <Icon name="arrow-right" /></a>
+        <a class="link-arrow" href={url('/journal/')} data-reveal>Read the journal <Icon name="arrow-right" /></a>
       </div>
       <div class="journal__grid">
-        <a class="post post--feature" href={`/journal/${feature.id}/`} data-reveal>
+        <a class="post post--feature" href={url(`/journal/${feature.id}/`)} data-reveal>
           <div class="frame post__img"><Image src={feature.data.cover} alt={feature.data.coverAlt} width={960} height={720} /></div>
           <p class="post__meta">{feature.data.tag} <span aria-hidden="true">/</span> {feature.data.readMinutes} min read</p>
           <h3>{feature.data.title}</h3>
@@ -161,7 +162,7 @@ const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
         </a>
         <div class="journal__more">
           {more.map((p) => (
-            <a class="post post--row" href={`/journal/${p.id}/`} data-reveal>
+            <a class="post post--row" href={url(`/journal/${p.id}/`)} data-reveal>
               <div class="frame post__thumb"><Image src={p.data.cover} alt={p.data.coverAlt} width={360} height={360} /></div>
               <div>
                 <p class="post__meta">{p.data.tag} <span aria-hidden="true">/</span> {fmt(p.data.date)}</p>

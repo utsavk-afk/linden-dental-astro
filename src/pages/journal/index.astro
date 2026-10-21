@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
@@ -17,7 +18,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'long', day: 'nu
   </section>
 
   <section class="wrap feature-wrap">
-    <a class="feature" href={`/journal/${feature.id}/`} data-reveal>
+    <a class="feature" href={url(`/journal/${feature.id}/`)} data-reveal>
       <div class="frame feature__img"><Image src={feature.data.cover} alt={feature.data.coverAlt} width={1200} height={900} loading="eager" /></div>
       <div class="feature__copy">
         <p class="meta">{feature.data.tag} <span aria-hidden="true">/</span> {feature.data.readMinutes} min read</p>
@@ -34,7 +35,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'long', day: 'nu
       <ul class="list">
         {rest.map((p) => (
           <li data-reveal>
-            <a href={`/journal/${p.id}/`} class="row">
+            <a href={url(`/journal/${p.id}/`)} class="row">
               <div class="frame row__img"><Image src={p.data.cover} alt={p.data.coverAlt} width={480} height={360} /></div>
               <div class="row__copy">
                 <p class="meta">{p.data.tag} <span aria-hidden="true">/</span> {p.data.readMinutes} min read</p>

@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import Logo from '../components/Logo.astro';
@@ -74,9 +75,9 @@ const scale = [
           <Logo />
         </div>
         <div class="components__cell" data-reveal>
-          <a class="btn" href="/book/">Book a visit <Icon name="arrow-right" /></a>
-          <a class="btn btn--ghost" href="/design/"><Icon name="phone" /> Secondary</a>
-          <a class="link-arrow" href="/design/">Text link <Icon name="arrow-right" /></a>
+          <a class="btn" href={url('/book/')}>Book a visit <Icon name="arrow-right" /></a>
+          <a class="btn btn--ghost" href={url('/design/')}><Icon name="phone" /> Secondary</a>
+          <a class="link-arrow" href={url('/design/')}>Text link <Icon name="arrow-right" /></a>
         </div>
         <div class="components__cell components__cell--radii" data-reveal>
           <span style="border-radius:var(--r-lg)">28</span><span style="border-radius:var(--r-md)">18</span><span style="border-radius:var(--r-sm)">12</span><span style="border-radius:var(--pill)">pill</span>

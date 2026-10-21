@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 ---
@@ -8,8 +9,8 @@ import Icon from '../components/Icon.astro';
       <h1>This page has gone missing.</h1>
       <p class="lede">The link may be old, or the page may have moved. The rest of the site is still here.</p>
       <div class="nf__actions">
-        <a class="btn btn--lg" href="/">Back to home <Icon name="arrow-right" /></a>
-        <a class="link-arrow" href="/services/">See our services <Icon name="arrow-right" /></a>
+        <a class="btn btn--lg" href={url('/')}>Back to home <Icon name="arrow-right" /></a>
+        <a class="link-arrow" href={url('/services/')}>See our services <Icon name="arrow-right" /></a>
       </div>
     </div>
   </section>

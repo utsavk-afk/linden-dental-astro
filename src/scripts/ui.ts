@@ -94,8 +94,35 @@ function bookingForm() {
     if (bad.length) { bad[0].focus(); return; }
     const submit = form.querySelector<HTMLButtonElement>('button[type=submit]');
     if (submit) { submit.disabled = true; submit.dataset.loading = 'true'; }
-    // Concept site: no backend. Swap this for a real endpoint (Formspree, Netlify Forms, practice software).
-    await new Promise((r) => setTimeout(r, 900));
+    const formError = form.querySelector<HTMLElement>('[data-form-error]');
+    if (formError) formError.hidden = true;
+    const endpoint = form.dataset.endpoint;
+    if (endpoint) {
+      const data = new FormData(form);
+      const payload = {
+        who: data.get('who'), name: data.get('name'), phone: data.get('phone'), email: data.get('email'),
+        reason: data.get('reason'), days: data.getAll('days'), nervous: data.get('nervous') === 'on',
+        notes: data.get('notes'), company: data.get('company'),
+      };
+      try {
+        const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.error || 'We could not send that just now.');
+        }
+      } catch (err) {
+        if (submit) { submit.disabled = false; delete submit.dataset.loading; }
+        if (formError) {
+          formError.textContent = `${err instanceof Error ? err.message : 'We could not send that just now.'} Please try again, or call us.`;
+          formError.hidden = false;
+          formError.focus?.();
+        }
+        return;
+      }
+    } else {
+      // Concept build: no backend configured, so simulate the send.
+      await new Promise((r) => setTimeout(r, 900));
+    }
     const first = (form.elements.namedItem('name') as HTMLInputElement).value.split(' ')[0];
     form.hidden = true;
     if (success) {

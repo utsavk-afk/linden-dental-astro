@@ -1,10 +1,13 @@
 ---
+import { url } from '../lib/url';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { site } from '../data/site';
 
 const reasons = ['Check-up and clean', "Kids’ check-up", 'Toothache or something broken', 'Filling or crown', 'Clear aligners consult', 'Whitening', 'Not sure yet'];
 const days = ['Weekday mornings', 'Weekday afternoons', 'Saturday morning'];
+// Set at build time for the staging backend; empty means the form only simulates a send.
+const endpoint = import.meta.env.PUBLIC_BOOKING_ENDPOINT || '';
 ---
 <Base title="Book a visit" description="Request an appointment at Linden Dental Studio. We reply within one working day with a time and the full price.">
   <section class="book">
@@ -24,7 +27,8 @@ const days = ['Weekday mornings', 'Weekday afternoons', 'Saturday morning'];
       </div>
 
       <div class="panel" data-reveal>
-        <form class="form" data-book-form novalidate>
+        <form class="form" data-book-form data-endpoint={endpoint} novalidate>
+          <div class="hp" aria-hidden="true"><label for="company">Company</label><input id="company" name="company" type="text" tabindex="-1" autocomplete="off" /></div>
           <fieldset class="seg">
             <legend>Who is the visit for?</legend>
             <div class="seg__opts">
@@ -84,14 +88,15 @@ const days = ['Weekday mornings', 'Weekday afternoons', 'Saturday morning'];
           </div>
 
           <button class="btn btn--lg submit" type="submit"><span class="submit__label">Send request</span><span class="submit__busy">Sending</span> <Icon name="arrow-right" /></button>
-          <p class="fine">This is a concept site, so requests are not sent anywhere.</p>
+          <p class="form-error" data-form-error role="alert" hidden></p>
+          <p class="fine">{endpoint ? 'Staging: requests are saved to the Linden demo backend. Please use test details only.' : 'This is a concept site, so requests are not sent anywhere.'}</p>
         </form>
 
         <div class="success" data-book-success hidden tabindex="-1">
           <span class="success__icon"><Icon name="check" size="1.6rem" /></span>
           <h2>Thanks, <span data-first-name></span>.</h2>
           <p class="muted">June will email you within one working day with a time and the full price. If it is urgent, call {site.phone}.</p>
-          <a class="link-arrow" href="/journal/">While you wait, read the journal <Icon name="arrow-right" /></a>
+          <a class="link-arrow" href={url('/journal/')}>While you wait, read the journal <Icon name="arrow-right" /></a>
         </div>
       </div>
     </div>
@@ -153,6 +158,8 @@ const days = ['Weekday mornings', 'Weekday afternoons', 'Saturday morning'];
   :global(:root[data-theme='dark']) .toggle input:checked + .toggle__ui::after { background: var(--on-accent); }
 
   .submit { justify-self: start; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .form-error { color: var(--danger); font-weight: 600; }
   .submit__busy { display: none; }
   .submit[data-loading='true'] { opacity: 0.75; cursor: progress; }
   .submit[data-loading='true'] .submit__label { display: none; }

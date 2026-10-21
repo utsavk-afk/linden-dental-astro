@@ -1,3 +1,4 @@
+import { url } from '../lib/url';
 // Linden Dental Studio is a fictional practice. Phone uses the reserved 555-01xx range.
 export const site = {
   name: 'Linden Dental Studio',
@@ -14,9 +15,9 @@ export const site = {
     { days: 'Saturday', time: '8:00 am to 1:00 pm' },
   ],
   nav: [
-    { href: '/about/', label: 'About' },
-    { href: '/services/', label: 'Services' },
-    { href: '/journal/', label: 'Journal' },
+    { href: url('/about/'), label: 'About' },
+    { href: url('/services/'), label: 'Services' },
+    { href: url('/journal/'), label: 'Journal' },
   ],
-  cta: { href: '/book/', label: 'Book a visit' },
+  cta: { href: url('/book/'), label: 'Book a visit' },
 };
