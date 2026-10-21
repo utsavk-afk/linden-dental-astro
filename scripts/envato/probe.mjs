@@ -1,0 +1,10 @@
+import { createRequire } from 'node:module';
+const require = createRequire('C:/Users/khamb/ad-library/package.json');
+const { chromium } = require('playwright');
+const ctx = await chromium.launchPersistentContext('C:/Users/khamb/.envato-chrome', { channel:'chrome', headless:false, viewport:{width:1440,height:900}, acceptDownloads:true });
+const page = ctx.pages()[0] || await ctx.newPage();
+await page.goto(process.argv[2], { waitUntil:'domcontentloaded' });
+await page.waitForTimeout(12000);
+console.log(await page.evaluate(()=>[...document.querySelectorAll('button, a[role=button]')].map(b=>b.innerText.trim()).filter(Boolean).slice(0,40).join(' | ')));
+await page.screenshot({ path: process.argv[3] });
+await ctx.close();

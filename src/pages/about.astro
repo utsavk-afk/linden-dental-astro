@@ -1,0 +1,106 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import CtaBand from '../components/CtaBand.astro';
+import studio from '../assets/photos/studio-room.jpg';
+
+const team = (await getCollection('team')).sort((a, b) => a.data.order - b.data.order);
+const principles = [
+  { icon: 'clock', title: 'Longer appointments', body: 'An hour for a check-up, double time for nervous patients. We see fewer people a day so nobody is rushed.' },
+  { icon: 'wallet', title: 'Prices before treatment', body: 'You get the full cost in writing before you agree to anything, including what insurance should cover.' },
+  { icon: 'hand-waving', title: 'A stop signal you control', body: 'Raise your left hand and we stop. Every time, no questions, no sighing.' },
+  { icon: 'chat-circle', title: 'Explain, never lecture', body: 'We show you what we see on screen and tell you what can wait. Flossing guilt is not part of the service.' },
+];
+---
+<Base title="About us" description="Linden Dental Studio is a small family practice in Sellwood, Portland, built around longer appointments, clear prices and no judgement.">
+  <section class="intro">
+    <div class="wrap">
+      <h1 data-split>A small practice, on purpose.</h1>
+      <p class="lede" data-reveal>Four people, two treatment rooms and appointments long enough to talk properly. That is the whole idea.</p>
+    </div>
+    <div class="wrap">
+      <div class="frame intro__img" data-parallax="6"><Image src={studio} alt="A calm, sunlit treatment room with a single dental chair." layout="full-width" loading="eager" /></div>
+    </div>
+  </section>
+
+  <section class="section story">
+    <div class="wrap story__grid">
+      <h2 data-split>Why Linden exists</h2>
+      <div class="story__body measure" data-reveal>
+        <p>Ana spent nine years in a downtown group practice where every check-up was booked into fifteen minutes. She liked the people. She did not like watching patients leave confused about what had just happened in their own mouths.</p>
+        <p>In 2016 she took over a tired single-chair surgery on SE Tacoma Street, knocked through to the empty shop next door, and opened Linden with a simple rule: book less, explain more.</p>
+        <p>Ten years on, most new patients find us through a neighbour. A lot of them have not seen a dentist in years. We think that says more about how dentistry is usually delivered than about them.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="principles">
+    <div class="wrap">
+      <h2 class="principles__title" data-split>What you can hold us to</h2>
+      <ul class="principles__list">
+        {principles.map((p) => (
+          <li data-reveal>
+            <span class="principles__icon"><Icon name={p.icon} size="1.5rem" /></span>
+            <h3>{p.title}</h3>
+            <p class="muted">{p.body}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="team" aria-labelledby="team-title">
+    <div class="wrap">
+      <h2 id="team-title" data-split>The team</h2>
+      <div class="people">
+        {team.map((m) => (
+          <article class="person" data-reveal>
+            <div class="frame person__img" data-parallax="4"><Image src={m.data.photo} alt={`Portrait of ${m.data.name}`} width={720} height={860} /></div>
+            <div class="person__copy">
+              <h3>{m.data.name}</h3>
+              <p class="person__role">{m.data.role}</p>
+              <p>{m.data.bio}</p>
+              <p class="person__outside"><Icon name="leaf" /> {m.data.outside}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title="Come and meet us." body="New patients are welcome most weeks. Book online, or call June and ask her anything first." />
+</Base>
+
+<style>
+  .intro { padding-block: clamp(2rem, 1rem + 4vw, 5rem) 0; }
+  .intro h1 { max-width: 12ch; }
+  .intro .lede { margin-top: 1.5rem; }
+  .intro__img { height: clamp(300px, 56vw, 640px); margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem); }
+
+  .story__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: clamp(2rem, 1rem + 4vw, 5rem); align-items: start; }
+  .story__grid h2 { font-size: var(--step-4); position: sticky; top: 7rem; }
+  .story__body { display: grid; gap: 1.25rem; font-size: var(--step-1); line-height: 1.55; }
+
+  .principles { background: var(--bg-2); padding-block: var(--section); }
+  .principles__title { font-size: var(--step-4); margin-bottom: clamp(2rem, 1rem + 3vw, 4rem); max-width: 14ch; }
+  .principles__list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(2rem, 1rem + 3vw, 4rem) clamp(2rem, 1rem + 4vw, 6rem); }
+  .principles__list li { display: grid; gap: 0.75rem; align-content: start; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+  .principles__icon { display: grid; place-items: center; width: 3.25rem; height: 3.25rem; border-radius: var(--pill); background: var(--surface); color: var(--accent); margin-bottom: 0.5rem; }
+
+  .people { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(2.5rem, 1.5rem + 3vw, 5rem) clamp(1.5rem, 1rem + 3vw, 4rem); margin-top: clamp(2rem, 1rem + 3vw, 4rem); }
+  .person { display: grid; gap: 1.5rem; }
+  .person:nth-child(even) { margin-top: clamp(0rem, -2rem + 10vw, 8rem); }
+  .person__img { aspect-ratio: 6 / 7; }
+  .person__copy { display: grid; gap: 0.6rem; max-width: 48ch; }
+  .person__role { color: var(--accent); font-weight: 600; }
+  .person__outside { display: flex; gap: 0.5rem; align-items: start; color: var(--ink-2); font-size: var(--step--1); }
+  .person__outside :global(svg) { flex: none; margin-top: 0.25em; color: var(--accent); }
+
+  @media (max-width: 860px) {
+    .story__grid, .principles__list, .people { grid-template-columns: 1fr; }
+    .story__grid h2 { position: static; }
+    .person:nth-child(even) { margin-top: 0; }
+  }
+</style>

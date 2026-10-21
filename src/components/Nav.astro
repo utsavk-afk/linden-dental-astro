@@ -1,0 +1,99 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { site } from '../data/site';
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => path.startsWith(href);
+---
+<header class="nav" data-nav>
+  <div class="wrap nav__inner">
+    <a href="/" class="nav__brand" aria-label={`${site.name}, home`}><Logo /></a>
+
+    <nav aria-label="Main" class="nav__links">
+      <ul>
+        {site.nav.map((l) => (
+          <li><a href={l.href} aria-current={isCurrent(l.href) ? 'page' : undefined}>{l.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="nav__actions">
+      <a class="nav__phone" href={site.phoneHref}><Icon name="phone" /> {site.phone}</a>
+      <button class="nav__icon" type="button" data-theme-toggle aria-label="Dark theme">
+        <span class="i-sun"><Icon name="sun" /></span><span class="i-moon"><Icon name="moon" /></span>
+      </button>
+      <a class="btn nav__cta" href={site.cta.href}>{site.cta.label}</a>
+      <button class="nav__icon nav__menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="menu-sheet">
+        <span class="visually-hidden">Menu</span>
+        <span class="i-open"><Icon name="list" size="1.4em" /></span><span class="i-close"><Icon name="x" size="1.4em" /></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="menu" id="menu-sheet" data-menu hidden>
+    <ul class="wrap">
+      {site.nav.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      <li><a href={site.cta.href}>{site.cta.label}</a></li>
+    </ul>
+    <div class="wrap menu__foot">
+      <a class="btn btn--ghost" href={site.phoneHref}><Icon name="phone" /> {site.phone}</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky; top: 0; z-index: var(--z-nav);
+    transition: transform 0.45s var(--ease-out), background-color 0.3s, border-color 0.3s;
+    border-bottom: 1px solid transparent;
+  }
+  .nav:global(.is-scrolled) {
+    background: color-mix(in oklab, var(--bg) 86%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-bottom-color: var(--line);
+  }
+  .nav:global(.is-hidden) { transform: translateY(-100%); }
+  .nav__inner { display: flex; align-items: center; gap: 1.5rem; height: 72px; }
+  .nav__brand { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; margin-right: auto; }
+  .nav__links ul { display: flex; gap: 0.25rem; list-style: none; padding: 0; }
+  .nav__links a {
+    display: block; padding: 0.5rem 0.9rem; border-radius: var(--pill); text-decoration: none; font-weight: 500;
+    transition: background-color 0.2s;
+  }
+  .nav__links a:hover { background: var(--bg-2); }
+  .nav__links a[aria-current='page'] { background: var(--bg-2); color: var(--accent); }
+  .nav__actions { display: flex; align-items: center; gap: 0.5rem; }
+  .nav__phone { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 500; text-decoration: none; padding: 0.5rem 0.75rem; color: var(--ink-2); }
+  .nav__phone:hover { color: var(--ink); }
+  .nav__icon {
+    display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--pill);
+    border: 1px solid var(--line); background: transparent; cursor: pointer;
+  }
+  .nav__icon:hover { background: var(--bg-2); }
+  .i-moon, .i-close { display: none; }
+  :global([data-theme='dark']) .i-sun { display: none; }
+  :global([data-theme='dark']) .i-moon { display: block; }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .i-sun { display: none; }
+    :global(:root:not([data-theme='light'])) .i-moon { display: block; }
+  }
+  .nav:global(.menu-open) .i-open { display: none; }
+  .nav:global(.menu-open) .i-close { display: block; }
+  .nav__menu-btn { display: none; }
+
+  .menu { border-top: 1px solid var(--line); background: var(--bg); height: calc(100dvh - 72px); overflow-y: auto; }
+  .menu ul { list-style: none; padding: 1.5rem 0; }
+  .menu li a {
+    display: block; padding: 0.7rem 0; font-family: var(--font-display); font-size: var(--step-3);
+    font-weight: 560; letter-spacing: -0.02em; text-decoration: none; border-bottom: 1px solid var(--line);
+  }
+  .menu__foot { padding-bottom: 2rem; }
+
+  @media (max-width: 1100px) { .nav__phone { display: none; } }
+  @media (max-width: 860px) {
+    .nav__links, .nav__cta { display: none; }
+    .nav__menu-btn { display: grid; }
+    .nav__inner { height: 64px; }
+    .menu { height: calc(100dvh - 64px); }
+  }
+</style>

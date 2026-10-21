@@ -1,0 +1,159 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Logo from '../components/Logo.astro';
+import { palette, inspirations, motion } from '../data/design';
+
+const scale = [
+  { step: '--step-5', label: 'Display', sample: 'The family dentist' },
+  { step: '--step-4', label: 'Section', sample: 'Come and see us.' },
+  { step: '--step-3', label: 'Feature', sample: 'Check-ups and cleanings' },
+  { step: '--step-2', label: 'Card', sample: 'Leave with a written plan' },
+  { step: '--step-1', label: 'Lede', sample: 'Prices up front, no lectures.' },
+  { step: '--step-0', label: 'Body', sample: 'We book longer appointments and explain before we touch anything.' },
+];
+---
+<Base title="Design language" description="The design system behind the Linden Dental Studio concept site: colour, type, shape, motion and the UK/US work that inspired it.">
+  <section class="head">
+    <div class="wrap">
+      <h1 data-split>Design language</h1>
+      <p class="lede" data-reveal>Warm minimal, for a family dentist. Calm enough for a nervous adult, friendly enough for a four-year-old, and specific enough to feel like a real neighbourhood practice.</p>
+    </div>
+  </section>
+
+  <section class="section block">
+    <div class="wrap">
+      <h2>Principles</h2>
+      <ul class="principles">
+        <li data-reveal><h3>Calm over clinical</h3><p class="muted">No hospital blue, no stock tooth renders. Paper tones, forest ink and real people.</p></li>
+        <li data-reveal><h3>Say the price</h3><p class="muted">Copy is plain and specific. Real prices, real times, no "starting from".</p></li>
+        <li data-reveal><h3>Motion explains</h3><p class="muted">Every animation reveals order or depth. Nothing loops for show, and reduced motion turns it all off.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section block">
+    <div class="wrap">
+      <h2>Colour</h2>
+      <p class="muted measure">One accent. Bloom is a tint, used once per section at most, never on a control. Each theme is designed on its own terms.</p>
+      <div class="swatches">
+        {palette.map((c) => (
+          <div class="swatch" data-reveal>
+            <div class="swatch__chips"><span style={`background:${c.light}`}></span><span style={`background:${c.dark}`}></span></div>
+            <strong>{c.name}</strong>
+            <code>{c.token.slice(2)}</code>
+            <span class="muted swatch__hex">{c.light} / {c.dark}</span>
+            <p class="muted">{c.use}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section block">
+    <div class="wrap">
+      <h2>Type</h2>
+      <p class="muted measure">Bricolage Grotesque for display: warm, slightly irregular, with optical sizes. Figtree for text: round and very readable. Emphasis uses colour, never italics.</p>
+      <div class="specimen">
+        {scale.map((s) => (
+          <div class="specimen__row" data-reveal>
+            <span class="specimen__meta"><strong>{s.label}</strong><code>{s.step.slice(2)}</code></span>
+            <span class={s.step === '--step-0' || s.step === '--step-1' ? 'specimen__text specimen__text--body' : 'specimen__text'} style={`font-size:var(${s.step})`}>{s.sample}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section block">
+    <div class="wrap">
+      <h2>Shape and components</h2>
+      <p class="muted measure">Media and panels use soft corners (28px for photos, 18px for cards). Every interactive control is a pill. That rule holds on every page.</p>
+      <div class="components">
+        <div class="components__cell" data-reveal>
+          <Logo />
+        </div>
+        <div class="components__cell" data-reveal>
+          <a class="btn" href="/book/">Book a visit <Icon name="arrow-right" /></a>
+          <a class="btn btn--ghost" href="/design/"><Icon name="phone" /> Secondary</a>
+          <a class="link-arrow" href="/design/">Text link <Icon name="arrow-right" /></a>
+        </div>
+        <div class="components__cell components__cell--radii" data-reveal>
+          <span style="border-radius:var(--r-lg)">28</span><span style="border-radius:var(--r-md)">18</span><span style="border-radius:var(--r-sm)">12</span><span style="border-radius:var(--pill)">pill</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section block">
+    <div class="wrap">
+      <h2>Motion</h2>
+      <p class="muted measure">GSAP with ScrollTrigger and SplitText. Each effect is opt-in by data attribute, moves only position and opacity, and switches off for anyone who prefers reduced motion.</p>
+      <dl class="motion">
+        {motion.map((m) => (
+          <div data-reveal>
+            <dt>{m.name}</dt>
+            <dd><p>{m.why}</p><p class="muted">{m.how}</p></dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <section class="section block">
+    <div class="wrap">
+      <h2>Inspiration</h2>
+      <p class="muted measure">UK and US studios only. We studied each one and took a single idea from it.</p>
+      <ul class="refs">
+        {inspirations.map((r) => (
+          <li data-reveal>
+            <a href={r.url} rel="noopener">
+              <span class="refs__who"><strong>{r.who}</strong><span class="muted">{r.where}</span></span>
+              <span class="refs__title">{r.title} <Icon name="arrow-up-right" /></span>
+              <span class="muted refs__took">{r.took}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .head { padding-block: clamp(2rem, 1rem + 4vw, 5rem) clamp(2.5rem, 1.5rem + 3vw, 4rem); }
+  .head .lede { margin-top: 1.25rem; max-width: 56ch; }
+  .block { border-top: 1px solid var(--line); padding-block: clamp(3rem, 2rem + 4vw, 6rem); }
+  .block h2 { font-size: var(--step-3); margin-bottom: 1rem; }
+  .principles { list-style: none; padding: 0; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+  .principles li { background: var(--surface); border-radius: var(--r-md); padding: 1.75rem; display: grid; gap: 0.5rem; align-content: start; }
+  .principles li:first-child { background: var(--bloom); color: var(--bloom-ink); }
+  .principles li:first-child .muted { color: color-mix(in oklab, var(--bloom-ink) 78%, transparent); }
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 1.5rem 1rem; margin-top: 2rem; }
+  .swatch { display: grid; gap: 0.3rem; align-content: start; }
+  .swatch__chips { display: grid; grid-template-columns: 1fr 1fr; height: 96px; border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--line); margin-bottom: 0.5rem; }
+  .swatch code, .specimen__meta code { font-family: var(--font-text); font-weight: 600; font-size: var(--step--1); color: var(--accent); } /* two families only: no browser monospace */
+  .swatch__hex { font-size: var(--step--1); }
+  .swatch p { font-size: var(--step--1); }
+  .specimen { margin-top: 2rem; display: grid; }
+  .specimen__row { display: grid; grid-template-columns: 9rem 1fr; gap: 1.5rem; align-items: baseline; padding-block: 1.25rem; border-top: 1px solid var(--line); }
+  .specimen__meta { display: grid; font-size: var(--step--1); }
+  .specimen__text { font-family: var(--font-display); font-weight: 560; letter-spacing: -0.025em; line-height: 1.05; }
+  .specimen__text--body { font-family: var(--font-text); font-weight: 400; letter-spacing: 0; line-height: 1.5; }
+  .components { display: grid; grid-template-columns: 1fr 2fr 1.2fr; gap: 1rem; margin-top: 2rem; }
+  .components__cell { background: var(--surface); border-radius: var(--r-md); padding: 2rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+  .components__cell--radii span { display: grid; place-items: center; width: 4.5rem; height: 4.5rem; background: var(--bg-2); border: 1px solid var(--line); font-size: var(--step--1); font-weight: 600; }
+  .motion { display: grid; margin-top: 2rem; }
+  .motion div { display: grid; grid-template-columns: 14rem 1fr; gap: 1.5rem; padding-block: 1.25rem; border-top: 1px solid var(--line); }
+  .motion dt { font-weight: 600; }
+  .motion dd { display: grid; gap: 0.25rem; }
+  .refs { list-style: none; padding: 0; margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .refs a { display: grid; gap: 0.6rem; padding: 1.5rem; border: 1px solid var(--line); border-radius: var(--r-md); text-decoration: none; height: 100%; transition: background-color 0.3s, border-color 0.3s; }
+  .refs a:hover { background: var(--surface); border-color: var(--ink-2); }
+  .refs__who { display: flex; justify-content: space-between; gap: 1rem; font-size: var(--step--1); }
+  .refs__title { font-family: var(--font-display); font-size: var(--step-1); font-weight: 560; letter-spacing: -0.01em; display: flex; gap: 0.4rem; align-items: center; }
+  .refs__took { font-size: var(--step--1); }
+  @media (max-width: 860px) {
+    .principles, .components, .refs { grid-template-columns: 1fr; }
+    .specimen__row, .motion div { grid-template-columns: 1fr; gap: 0.5rem; }
+  }
+</style>

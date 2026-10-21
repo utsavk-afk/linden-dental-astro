@@ -1,0 +1,23 @@
+---
+// Wordmark: a Phosphor leaf (the linden) in a pill badge, set beside the name in the display face.
+import Icon from './Icon.astro';
+interface Props { compact?: boolean }
+const { compact = false } = Astro.props;
+---
+<span class="logo">
+  <span class="logo__mark"><Icon name="leaf" size="1.05em" /></span>
+  <span class="logo__word">Linden{!compact && ' '}{!compact && <span class="logo__sub">Dental Studio</span>}</span>
+</span>
+
+<style>
+  .logo { display: inline-flex; align-items: center; gap: 0.6rem; }
+  .logo__mark {
+    display: grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: var(--pill);
+    background: var(--accent); color: var(--on-accent); font-size: 1.15rem;
+  }
+  .logo__word {
+    display: flex; flex-direction: column; font-family: var(--font-display); font-weight: 650;
+    font-size: 1.3rem; letter-spacing: -0.03em; line-height: 0.95;
+  }
+  .logo__sub { font-family: var(--font-text); font-weight: 500; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); margin-top: 0.25rem; }
+</style>

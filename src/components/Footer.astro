@@ -1,0 +1,65 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { site } from '../data/site';
+const year = new Date().getFullYear();
+---
+<footer class="footer">
+  <div class="wrap footer__grid">
+    <div class="footer__brand">
+      <Logo />
+      <p class="muted">{site.tagline}. Check-ups, kids’ visits and same-week emergencies, without the lecture.</p>
+    </div>
+
+    <div>
+      <h2 class="footer__h">Visit</h2>
+      <address>
+        {site.address.map((l) => <span>{l}</span>)}
+      </address>
+      <a class="link-arrow" href={site.mapHref}>Get directions <Icon name="arrow-up-right" /></a>
+    </div>
+
+    <div>
+      <h2 class="footer__h">Hours</h2>
+      <dl class="footer__hours">
+        {site.hours.map((h) => (<><dt>{h.days}</dt><dd>{h.time}</dd></>))}
+      </dl>
+    </div>
+
+    <div>
+      <h2 class="footer__h">Contact</h2>
+      <ul class="footer__list">
+        <li><a href={site.phoneHref}>{site.phone}</a></li>
+        <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+        {site.nav.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+        <li><a href="/design/">Design language</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="wrap footer__base">
+    <p>&copy; {year} {site.name}</p>
+    <p>A fictional practice. Concept site built with Astro and GSAP.</p>
+  </div>
+</footer>
+
+<style>
+  .footer { background: var(--bg-2); padding-block: clamp(3.5rem, 2rem + 4vw, 6rem) 2rem; }
+  .footer__grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 2.5rem; }
+  .footer__brand p { margin-top: 1.25rem; max-width: 30ch; }
+  .footer__h { font-family: var(--font-text); font-size: var(--step--1); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 1rem; }
+  address { font-style: normal; display: grid; margin-bottom: 0.75rem; }
+  .footer__hours { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; }
+  .footer__hours dt { color: var(--ink-2); }
+  .footer__list { list-style: none; padding: 0; display: grid; gap: 0.35rem; }
+  .footer__list a { text-decoration: none; }
+  .footer__list a:hover { text-decoration: underline; }
+  .footer__base { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--line); font-size: var(--step--1); color: var(--ink-2); }
+  @media (max-width: 960px) { .footer__grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .footer__grid { grid-template-columns: 1fr; } }
+  /* touch: give each footer link a 44px row */
+  @media (max-width: 860px), (pointer: coarse) {
+    .footer__list { gap: 0; }
+    .footer__list a { display: inline-flex; align-items: center; min-height: 44px; }
+  }
+</style>

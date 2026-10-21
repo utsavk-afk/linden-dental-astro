@@ -1,0 +1,141 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { site } from '../../data/site';
+
+export async function getStaticPaths() {
+  const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+  return services.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, others: [1, 2, 3].map((n) => services[(i + n) % services.length]) },
+  }));
+}
+const { entry, others } = Astro.props;
+const { Content } = await render(entry);
+const s = entry.data;
+---
+<Base title={s.title} description={s.summary}>
+  <section class="hero">
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <a class="back" href="/services/"><Icon name="arrow-left" /> All services</a>
+        <span class="hero__icon" data-reveal><Icon name={s.icon} size="1.6rem" /></span>
+        <h1 data-split>{s.title}</h1>
+        <p class="lede" data-reveal>{s.summary}</p>
+        <dl class="facts" data-reveal>
+          <div><dt>Cost</dt><dd>{s.price}</dd></div>
+          <div><dt>Time</dt><dd>{s.duration}</dd></div>
+        </dl>
+        <div class="actions" data-reveal>
+          <a class="btn btn--lg" href={site.cta.href}>{site.cta.label} <Icon name="arrow-right" /></a>
+        </div>
+      </div>
+      <div class="frame hero__img" data-parallax="6"><Image src={s.photo} alt={s.photoAlt} layout="full-width" loading="eager" /></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap detail">
+      <div class="detail__intro prose" data-reveal><Content /></div>
+      <div class="steps">
+        <h2 class="steps__title" data-split>What happens</h2>
+        <ol>
+          {s.steps.map((st, i) => (
+            <li data-reveal>
+              <span class="steps__n" aria-hidden="true">{i + 1}</span>
+              <div><h3>{st.title}</h3><p class="muted">{st.body}</p></div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  {s.faqs.length > 0 && (
+    <section class="faq">
+      <div class="wrap faq__grid">
+        <h2 data-split>Questions people ask</h2>
+        <div class="faq__list">
+          {s.faqs.map((f) => (
+            <details data-reveal>
+              <summary>{f.q}<span class="faq__plus"><Icon name="plus" /></span></summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section more">
+    <div class="wrap">
+      <h2 class="more__title">Also at Linden</h2>
+      <ul class="more__list">
+        {others.map((o) => (
+          <li data-reveal>
+            <a href={`/services/${o.id}/`}>
+              <span class="more__icon"><Icon name={o.data.icon} /></span>
+              <span><strong>{o.data.title}</strong><span class="muted">{o.data.duration}</span></span>
+              <Icon name="arrow-right" class="more__go" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>
+
+<style>
+  .hero { padding-block: clamp(1.5rem, 1rem + 3vw, 4rem) 0; }
+  .hero__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 1rem + 4vw, 5rem); align-items: center; }
+  .back { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; text-decoration: none; color: var(--ink-2); font-weight: 500; margin-bottom: 1.5rem; }
+  .back:hover { color: var(--ink); }
+  .hero__copy { display: grid; justify-items: start; }
+  .hero__icon { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: var(--pill); background: var(--bloom); color: var(--bloom-ink); margin-bottom: 1.5rem; }
+  .hero h1 { font-size: var(--step-5); max-width: 11ch; }
+  .hero .lede { margin-top: 1.25rem; }
+  .facts { display: grid; gap: 0.9rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line); width: 100%; max-width: 46ch; }
+  .facts div { display: grid; grid-template-columns: 4.5rem 1fr; gap: 1rem; }
+  .facts dt { color: var(--ink-2); font-weight: 600; font-size: var(--step--1); padding-top: 0.15em; }
+  .actions { margin-top: 2rem; }
+  .hero__img { height: clamp(360px, 62dvh, 640px); }
+
+  .detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(2rem, 1rem + 5vw, 7rem); align-items: start; }
+  .prose { display: grid; gap: 1.25rem; font-size: var(--step-1); line-height: 1.55; max-width: 46ch; position: sticky; top: 7rem; }
+  .steps__title { font-size: var(--step-3); margin-bottom: 2rem; }
+  .steps ol { list-style: none; padding: 0; display: grid; }
+  .steps li { display: grid; grid-template-columns: 3rem 1fr; gap: 1.25rem; padding-block: 1.5rem; border-top: 1px solid var(--line); }
+  .steps__n { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: var(--pill); border: 1px solid var(--line); font-family: var(--font-display); font-weight: 600; color: var(--accent); }
+  .steps h3 { font-size: var(--step-1); margin-bottom: 0.3rem; }
+
+  .faq { background: var(--bg-2); padding-block: var(--section); }
+  .faq__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: clamp(2rem, 1rem + 4vw, 5rem); }
+  .faq h2 { font-size: var(--step-4); max-width: 10ch; }
+  .faq__list { display: grid; gap: 0.75rem; }
+  details { background: var(--surface); border-radius: var(--r-md); padding: 0 1.5rem; }
+  summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding-block: 1.25rem; font-weight: 600; font-size: var(--step-1); }
+  summary::-webkit-details-marker { display: none; }
+  .faq__plus { display: grid; place-items: center; flex: none; width: 2.25rem; height: 2.25rem; border-radius: var(--pill); background: var(--bg-2); transition: transform 0.4s var(--ease-out), background-color 0.3s; }
+  details[open] .faq__plus { transform: rotate(45deg); background: var(--accent); color: var(--on-accent); }
+  details p { padding-bottom: 1.5rem; color: var(--ink-2); max-width: 60ch; }
+
+  .more__title { font-size: var(--step-2); margin-bottom: 1.5rem; }
+  .more__list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .more__list a { display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: center; padding: 1.25rem; border: 1px solid var(--line); border-radius: var(--r-md); text-decoration: none; transition: background-color 0.3s, border-color 0.3s; }
+  .more__list a:hover { background: var(--surface); border-color: var(--ink-2); }
+  .more__list a > span:nth-child(2) { display: grid; }
+  .more__icon { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--pill); background: var(--bg-2); color: var(--accent); }
+  .more__list :global(.more__go) { transition: transform 0.3s var(--ease-out); }
+  .more__list a:hover :global(.more__go) { transform: translateX(4px); }
+
+  @media (max-width: 900px) {
+    .hero__grid, .detail, .faq__grid { grid-template-columns: 1fr; }
+    .prose { position: static; }
+    .more__list { grid-template-columns: 1fr; }
+  }
+</style>

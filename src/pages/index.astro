@@ -1,0 +1,382 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import { reviews } from '../data/reviews';
+
+import heroImg from '../assets/photos/hero-family.jpg';
+import reception from '../assets/photos/reception.jpg';
+import talk from '../assets/photos/consult-talk.jpg';
+import kidMirror from '../assets/photos/kid-mirror.jpg';
+import explain from '../assets/photos/consult-explain.jpg';
+import studio from '../assets/photos/studio-room.jpg';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const team = (await getCollection('team')).sort((a, b) => a.data.order - b.data.order);
+const posts = (await getCollection('journal')).sort((a, b) => +b.data.date - +a.data.date).slice(0, 3);
+const [feature, ...more] = posts;
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+const steps = [
+  { title: 'Book in two minutes', body: 'Online or by phone. Tick the box if you are nervous and we book you double time.', icon: 'calendar-blank' },
+  { title: 'Arrive to a quiet room', body: 'No TV blaring, no clipboard pile. June has your paperwork ready and the kettle on.', img: studio, alt: 'A calm, sunlit treatment room with a single dental chair.' },
+  { title: 'Talk before anything', body: 'You stay sitting up while we talk through what is bothering you and what you want from the visit.', img: talk, alt: 'A dentist chatting with a patient before her exam.' },
+  { title: 'A gentle check-up', body: 'We explain each step before it happens and stop the moment you raise your hand.', img: kidMirror, alt: 'A child smiling at her teeth in a hand mirror.' },
+  { title: 'Leave with a written plan', body: 'What we found, what can wait, and what anything would cost. No surprises on the bill.', img: explain, alt: 'A dentist walking a patient through her x-rays on a tablet.' },
+];
+const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
+---
+<Base>
+  <!-- HERO -->
+  <section class="hero" data-hero>
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <h1 data-split>The family dentist <span class="accent-word">nobody dreads.</span></h1>
+        <p class="lede" data-hero-fade>Unhurried check-ups, gentle kids’ visits and same-week emergencies in Sellwood, Portland. Prices up front, no lectures.</p>
+        <div class="hero__actions" data-hero-fade>
+          <a class="btn btn--lg" href={site.cta.href}>{site.cta.label} <Icon name="arrow-right" /></a>
+          <a class="btn btn--ghost btn--lg" href={site.phoneHref}><Icon name="phone" /> {site.phone}</a>
+        </div>
+      </div>
+      <div class="hero__media">
+        <div class="frame hero__frame" data-hero-frame>
+          <Image src={heroImg} alt="A young girl smiling up at her dentist from the chair while her mother sits beside her." layout="full-width" loading="eager" fetchpriority="high" />
+        </div>
+        <div class="hero__card" data-hero-card>
+          <span class="hero__card-icon"><Icon name="clock" /></span>
+          <p><strong>Open Saturday mornings</strong><span>8 am to 1 pm, for school kids and nine-to-fivers.</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section class="section manifesto">
+    <div class="wrap">
+      <p class="manifesto__text" data-scrub-words>
+        Most people put off the dentist because the last one made them feel rushed or judged. Linden is built around the opposite. We book longer appointments, explain before we touch anything, stop when you raise a hand, and tell you the price before you agree to it.
+      </p>
+      <a class="link-arrow manifesto__link" href="/about/" data-reveal>How we work <Icon name="arrow-right" /></a>
+    </div>
+  </section>
+
+  <!-- SERVICES INDEX -->
+  <section class="section services" aria-labelledby="services-title">
+    <div class="wrap">
+      <h2 id="services-title" data-split>What we do</h2>
+      <div class="services__list" data-hover-reveal>
+        <ul>
+          {services.map((s) => (
+            <li data-hover-row data-reveal>
+              <a href={`/services/${s.id}/`} class="svc">
+                <span class="svc__thumb frame"><Image src={s.data.photo} alt="" width={160} height={160} /></span>
+                <span class="svc__icon"><Icon name={s.data.icon} /></span>
+                <span class="svc__title">{s.data.title}</span>
+                <span class="svc__summary">{s.data.summary}</span>
+                <span class="svc__go"><Icon name="arrow-right" /></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div class="services__media" data-hover-media aria-hidden="true">
+          {services.map((s) => <Image src={s.data.photo} alt="" width={420} height={520} data-hover-img />)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FIRST VISIT (pinned horizontal pan on desktop) -->
+  <section class="visit" data-hpan aria-labelledby="visit-title">
+    <div class="visit__track" data-hpan-track tabindex="0" role="group" aria-labelledby="visit-title" style={`--steps:${steps.length}`}>
+      <div class="visit__intro">
+        <h2 id="visit-title">Your first visit, start to finish.</h2>
+        <p class="lede">Five steps, about an hour. Here is exactly what happens, so nothing comes as a surprise.</p>
+      </div>
+      {steps.map((st, i) => (
+        <article class={`visit__step ${st.img ? '' : 'visit__step--tint'}`} data-hpan-step>
+          {st.img ? (
+            <div class="frame visit__img" data-hpan-in><Image src={st.img} alt={st.alt} width={720} height={540} /></div>
+          ) : (
+            <div class="visit__icon" data-hpan-in><Icon name={st.icon!} size="2.4rem" /></div>
+          )}
+          <p class="visit__n" data-hpan-in>Step {i + 1} of {steps.length}</p>
+          <h3 data-hpan-in>{st.title}</h3>
+          <p class="muted" data-hpan-in>{st.body}</p>
+        </article>
+      ))}
+    </div>
+    <div class="wrap visit__rail" aria-hidden="true"><span data-hpan-bar></span></div>
+  </section>
+
+  <!-- TEAM BENTO -->
+  <section class="section team" aria-labelledby="team-title">
+    <div class="wrap team__grid">
+      <div class="team__lead" data-reveal>
+        <h2 id="team-title" data-split>The same four faces, every visit.</h2>
+        <p class="muted">No rotating locums. The people who know your teeth are the people who see you.</p>
+        <a class="link-arrow" href="/about/#team">Meet the team <Icon name="arrow-right" /></a>
+      </div>
+      {team.map((m, i) => (
+        <figure class={`team__cell team__cell--${bentoAreas[i]}`} data-reveal>
+          <div class="frame team__img" data-parallax="5"><Image src={m.data.photo} alt={`Portrait of ${m.data.name}`} width={640} height={800} /></div>
+          <figcaption><strong>{m.data.name}</strong><span>{m.data.role}</span></figcaption>
+        </figure>
+      ))}
+    </div>
+  </section>
+
+  <!-- REVIEWS MARQUEE -->
+  <section class="reviews" aria-labelledby="reviews-title">
+    <div class="wrap reviews__head">
+      <h2 id="reviews-title" class="reviews__title" data-split>What patients tell us</h2>
+      <button class="btn btn--ghost reviews__pause" type="button" data-marquee-toggle aria-pressed="false"><span class="reviews__pause-label">Pause</span></button>
+    </div>
+    <div class="marquee" tabindex="0" role="group" aria-label="Patient reviews">
+      <div class="marquee__track">
+        {[...reviews, ...reviews].map((r, i) => (
+          <figure class="review" aria-hidden={i >= reviews.length ? 'true' : undefined}>
+            <blockquote>&ldquo;{r.quote}&rdquo;</blockquote>
+            <figcaption>{r.name}, {r.where}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- JOURNAL -->
+  <section class="section journal" aria-labelledby="journal-title">
+    <div class="wrap">
+      <div class="journal__head">
+        <h2 id="journal-title" data-split>Straight answers, written by the team.</h2>
+        <a class="link-arrow" href="/journal/" data-reveal>Read the journal <Icon name="arrow-right" /></a>
+      </div>
+      <div class="journal__grid">
+        <a class="post post--feature" href={`/journal/${feature.id}/`} data-reveal>
+          <div class="frame post__img"><Image src={feature.data.cover} alt={feature.data.coverAlt} width={960} height={720} /></div>
+          <p class="post__meta">{feature.data.tag} <span aria-hidden="true">/</span> {feature.data.readMinutes} min read</p>
+          <h3>{feature.data.title}</h3>
+          <p class="muted">{feature.data.description}</p>
+        </a>
+        <div class="journal__more">
+          {more.map((p) => (
+            <a class="post post--row" href={`/journal/${p.id}/`} data-reveal>
+              <div class="frame post__thumb"><Image src={p.data.cover} alt={p.data.coverAlt} width={360} height={360} /></div>
+              <div>
+                <p class="post__meta">{p.data.tag} <span aria-hidden="true">/</span> {fmt(p.data.date)}</p>
+                <h3>{p.data.title}</h3>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISIT US -->
+  <section class="section find" aria-labelledby="find-title">
+    <div class="wrap find__grid">
+      <div class="frame find__img" data-parallax="7"><Image src={reception} alt="A patient checking in at the wooden front desk with a smiling coordinator." width={1100} height={1200} /></div>
+      <div class="find__copy">
+        <h2 id="find-title" data-split>Come and see us.</h2>
+        <address data-reveal>{site.address.map((l) => <span>{l}</span>)}</address>
+        <dl class="find__hours" data-reveal>
+          {site.hours.map((h) => (<div><dt>{h.days}</dt><dd>{h.time}</dd></div>))}
+        </dl>
+        <ul class="find__facts" data-reveal>
+          <li><Icon name="wallet" /> Most PPO plans, plus Oregon Health Plan for kids. No insurance? Membership is $29 a month.</li>
+          <li><Icon name="car" /> Free parking behind the building on SE 15th.</li>
+          <li><Icon name="wheelchair" /> Step-free entrance and an accessible treatment room.</li>
+        </ul>
+        <div class="find__actions" data-reveal>
+          <a class="btn btn--lg" href={site.cta.href}>{site.cta.label} <Icon name="arrow-right" /></a>
+          <a class="link-arrow" href={site.mapHref}>Get directions <Icon name="arrow-up-right" /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- hero ---------- */
+  .hero { padding-block: clamp(1.5rem, 1rem + 3vw, 4rem) clamp(3rem, 2rem + 4vw, 6rem); }
+  .hero__grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(2rem, 1rem + 3vw, 4rem); align-items: center; }
+  .hero h1 { font-size: clamp(2.6rem, 1.5rem + 3.2vw, 4.4rem); line-height: 1; max-width: 18ch; }
+  .hero .lede { margin-top: 1.5rem; }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+  .hero__media { position: relative; }
+  .hero__frame { height: clamp(420px, 72dvh, 720px); }
+  .hero__frame :global(img) { object-position: 38% 50%; }
+  .hero__card {
+    position: absolute; left: clamp(-2.5rem, -3vw, -1rem); bottom: 2rem; display: flex; gap: 0.9rem; align-items: center;
+    background: var(--surface); border-radius: var(--r-md); padding: 1rem 1.25rem 1rem 1rem; box-shadow: var(--shadow); max-width: 300px;
+  }
+  .hero__card-icon { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: var(--pill); background: var(--bloom); color: var(--bloom-ink); }
+  .hero__card p { display: grid; font-size: var(--step--1); line-height: 1.4; }
+  .hero__card span { color: var(--ink-2); }
+
+  /* ---------- manifesto ---------- */
+  .manifesto { padding-block: clamp(4rem, 2rem + 8vw, 10rem); }
+  .manifesto__text {
+    font-family: var(--font-display); font-size: var(--step-3); font-weight: 480; line-height: 1.18;
+    letter-spacing: -0.02em; max-width: 30ch; margin-inline: auto; text-align: center; text-wrap: balance;
+  }
+  .manifesto__link { display: flex; width: fit-content; margin: 2.5rem auto 0; }
+
+  /* ---------- services index ---------- */
+  .services { padding-top: 0; }
+  .services h2 { margin-bottom: clamp(2rem, 1rem + 3vw, 4rem); }
+  .services__list { position: relative; }
+  .services__list ul { list-style: none; padding: 0; border-top: 1px solid var(--line); }
+  .svc {
+    display: grid; grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 1.1fr) 3rem; align-items: center; gap: 1.5rem;
+    padding: clamp(1.1rem, 0.8rem + 1vw, 1.75rem) 0; border-bottom: 1px solid var(--line); text-decoration: none;
+  }
+  .svc__thumb { display: none; }
+  .svc__icon { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: var(--pill); background: var(--bg-2); color: var(--accent); font-size: 1.2rem; transition: background-color 0.3s, color 0.3s; }
+  .svc__title { font-family: var(--font-display); font-size: var(--step-3); font-weight: 540; letter-spacing: -0.025em; line-height: 1.05; transition: transform 0.5s var(--ease-out), color 0.3s; }
+  .svc__summary { color: var(--ink-2); max-width: 42ch; }
+  .svc__go { justify-self: end; display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: var(--pill); border: 1px solid var(--line); transition: background-color 0.3s, color 0.3s, transform 0.4s var(--ease-out); }
+  .svc:hover .svc__title { transform: translateX(0.5rem); color: var(--accent); }
+  .svc:hover .svc__icon, .svc:hover .svc__go { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  .svc:hover .svc__go { transform: rotate(-45deg); }
+  .services__media {
+    position: absolute; left: 0; top: 0; width: 230px; aspect-ratio: 4 / 5; border-radius: var(--r-md); overflow: hidden;
+    pointer-events: none; z-index: 2; visibility: hidden; box-shadow: var(--shadow);
+  }
+  .services__media :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+
+  /* ---------- first visit ---------- */
+  .visit { background: var(--bg-2); padding-block: clamp(4rem, 3rem + 4vw, 7rem) 3rem; overflow: hidden; }
+  .visit__track {
+    display: flex; gap: clamp(1rem, 0.5rem + 1.5vw, 2rem); padding-inline: max(var(--gutter), calc((100vw - var(--max)) / 2));
+    overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    scroll-padding-inline: max(var(--gutter), calc((100vw - var(--max)) / 2));
+  }
+  .visit__track::-webkit-scrollbar { display: none; }
+  .visit:global(.is-pinned) { min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; }
+  .visit:global(.is-pinned) .visit__track { overflow: visible; }
+  .visit__intro { flex: 0 0 min(420px, 82vw); align-self: center; scroll-snap-align: start; }
+  .visit__intro h2 { font-size: var(--step-4); }
+  .visit__intro .lede { margin-top: 1.25rem; }
+  .visit__step { flex: 0 0 min(400px, 78vw); display: grid; align-content: start; gap: 0.75rem; scroll-snap-align: start; }
+  .visit__img { aspect-ratio: 4 / 3; margin-bottom: 0.5rem; }
+  .visit__step--tint { background: var(--bloom); color: var(--bloom-ink); border-radius: var(--r-lg); padding: 2rem; align-content: end; aspect-ratio: auto; }
+  .visit__step--tint .muted { color: color-mix(in oklab, var(--bloom-ink) 78%, transparent); }
+  .visit__icon { display: grid; place-items: center; width: 4.5rem; height: 4.5rem; border-radius: var(--pill); background: var(--surface); color: var(--accent); margin-bottom: 4rem; }
+  .visit__n { font-size: var(--step--1); font-weight: 600; color: var(--accent); }
+  .visit__step--tint .visit__n { color: inherit; }
+  .visit__rail { height: 2px; background: var(--line); margin-top: 3rem; border-radius: 2px; overflow: hidden; }
+  .visit__rail span { display: block; height: 100%; background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); }
+  .visit:not(.is-pinned) .visit__rail { display: none; }
+
+  /* ---------- team bento ---------- */
+  .team__grid {
+    display: grid; gap: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-areas: 'lead lead ana marcus' 'dani june ana marcus';
+  }
+  .team__lead { grid-area: lead; background: var(--bloom); color: var(--bloom-ink); border-radius: var(--r-lg); padding: clamp(1.75rem, 1rem + 2.5vw, 3rem); display: grid; gap: 1rem; align-content: end; }
+  .team__lead h2 { font-size: var(--step-3); max-width: 14ch; }
+  .team__lead .muted { color: color-mix(in oklab, var(--bloom-ink) 78%, transparent); max-width: 38ch; }
+  .team__lead .link-arrow { color: var(--bloom-ink); }
+  .team__cell { display: grid; grid-template-rows: 1fr auto; gap: 0.75rem; min-height: 0; }
+  .team__cell--ana { grid-area: ana; } .team__cell--marcus { grid-area: marcus; }
+  .team__cell--dani { grid-area: dani; } .team__cell--june { grid-area: june; }
+  .team__img { min-height: 260px; height: 100%; }
+  .team__cell--ana .team__img, .team__cell--marcus .team__img { min-height: 520px; }
+  .team__cell figcaption { display: grid; line-height: 1.35; }
+  .team__cell figcaption span { color: var(--ink-2); font-size: var(--step--1); }
+
+  /* ---------- reviews ---------- */
+  .reviews { padding-block: var(--section); background: var(--surface); }
+  .reviews__title { font-size: var(--step-3); margin-bottom: 2.5rem; }
+  .marquee { overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+  .marquee__track { display: flex; gap: 1.25rem; width: max-content; animation: marquee 60s linear infinite; }
+  .marquee:hover .marquee__track, .marquee:focus-visible .marquee__track, .marquee.is-paused .marquee__track { animation-play-state: paused; }
+  .reviews__head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 2.5rem; }
+  .reviews__head .reviews__title { margin-bottom: 0; }
+  .reviews__pause { padding: 0.6em 1.1em; font-size: var(--step--1); }
+  .marquee:focus-visible, .visit__track:focus-visible { outline-offset: -3px; }
+  .review { flex: 0 0 380px; background: var(--bg); border-radius: var(--r-md); padding: 1.75rem; display: grid; gap: 1.25rem; align-content: space-between; }
+  .review blockquote { font-family: var(--font-display); font-size: var(--step-1); font-weight: 460; line-height: 1.3; letter-spacing: -0.01em; }
+  .review figcaption { color: var(--ink-2); font-size: var(--step--1); font-weight: 500; }
+  @keyframes marquee { to { transform: translateX(calc(-50% - 0.625rem)); } }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee { overflow-x: auto; mask-image: none; }
+    .marquee__track { animation: none; padding-inline: var(--gutter); }
+    .reviews__pause { display: none; }
+  }
+
+  /* ---------- journal ---------- */
+  .journal__head { display: flex; justify-content: space-between; align-items: end; gap: 2rem; flex-wrap: wrap; margin-bottom: clamp(2rem, 1rem + 2vw, 3.5rem); }
+  .journal__head h2 { font-size: var(--step-4); max-width: 15ch; }
+  .journal__grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(1.5rem, 1rem + 2vw, 3rem); }
+  .post { text-decoration: none; display: grid; gap: 0.75rem; align-content: start; }
+  .post h3 { transition: color 0.3s; }
+  .post:hover h3 { color: var(--accent); }
+  .post__img { aspect-ratio: 4 / 3; }
+  .post__img :global(img), .post__thumb :global(img) { transition: transform 0.9s var(--ease-out); }
+  .post:hover .post__img :global(img), .post:hover .post__thumb :global(img) { transform: scale(1.04); }
+  .post__meta { font-size: var(--step--1); font-weight: 600; color: var(--accent); }
+  .post__meta span { color: var(--line); margin-inline: 0.3em; }
+  .journal__more { display: grid; align-content: start; }
+  .post--row { grid-template-columns: 140px 1fr; gap: 1.25rem; align-items: center; padding-block: 1.25rem; border-bottom: 1px solid var(--line); }
+  .post--row:first-child { padding-top: 0; }
+  .post--row h3 { font-size: var(--step-1); margin-top: 0.35rem; }
+  .post__thumb { aspect-ratio: 1; border-radius: var(--r-md); }
+
+  /* ---------- visit us ---------- */
+  .find__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 1rem + 4vw, 5rem); align-items: center; }
+  .find__img { aspect-ratio: 11 / 12; }
+  .find__copy { display: grid; gap: 1.5rem; justify-items: start; }
+  .find address { font-style: normal; font-size: var(--step-1); display: grid; }
+  .find__hours { display: grid; gap: 0.35rem; min-width: min(100%, 360px); }
+  .find__hours div { display: flex; justify-content: space-between; gap: 2rem; }
+  .find__hours dt { color: var(--ink-2); }
+  .find__facts { list-style: none; padding: 0; display: grid; gap: 0.6rem; color: var(--ink-2); max-width: 46ch; }
+  .find__facts li { display: grid; grid-template-columns: 1.5rem 1fr; gap: 0.6rem; align-items: start; }
+  .find__facts :global(svg) { margin-top: 0.2em; color: var(--accent); }
+  .find__actions { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 960px) {
+    .hero__grid { grid-template-columns: 1fr; }
+    .hero__frame { height: clamp(340px, 60vw, 520px); }
+    .hero__card { left: 1rem; bottom: 1rem; }
+    .svc { grid-template-columns: 3rem minmax(0, 1fr) 3rem; }
+    .svc__summary { display: none; }
+    .team__grid { grid-template-columns: 1fr 1fr; grid-template-areas: 'lead lead' 'ana marcus' 'dani june'; }
+    .team__cell--ana .team__img, .team__cell--marcus .team__img { min-height: 320px; }
+    .journal__grid, .find__grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .svc { grid-template-columns: 4.5rem minmax(0, 1fr) 2.5rem; gap: 1rem; }
+    .svc__icon { display: none; }
+    .svc__thumb { display: block; width: 4.5rem; height: 4.5rem; border-radius: var(--r-sm); }
+    .svc__go { width: 2.5rem; height: 2.5rem; }
+    .team__img, .team__cell--ana .team__img, .team__cell--marcus .team__img { min-height: 220px; }
+    .post--row { grid-template-columns: 96px 1fr; }
+    .review { flex-basis: 300px; }
+  }
+
+  /* ---------- responsive QA ---------- */
+  /* Unpinned first-visit track (reduced motion on desktop): a thin scrollbar so mouse users can reach every step. */
+  @media (hover: hover) and (pointer: fine) {
+    .visit:not(.is-pinned) .visit__track { scrollbar-width: thin; scrollbar-color: color-mix(in oklab, var(--ink-2) 45%, transparent) transparent; padding-bottom: 1rem; }
+  }
+  /* Below the pin breakpoint (motion.ts: min-width 900px) the intro sits above the swipe row instead of eating the first slide. */
+  @media (max-width: 899px) {
+    .visit__track { display: grid; grid-template-columns: repeat(var(--steps, 5), min(360px, 80vw)); gap: 2rem clamp(0.75rem, 0.5rem + 1.5vw, 1.25rem); }
+    .visit__intro { grid-column: 1 / -1; position: sticky; left: 0; width: min(560px, calc(100vw - 2 * var(--gutter))); scroll-snap-align: none; }
+    .visit__icon { margin-bottom: 2.5rem; }
+  }
+  @media (max-width: 560px) {
+    .hero__actions .btn { flex: 1 1 100%; justify-content: center; }
+    .manifesto__text { font-size: var(--step-2); text-align: left; }
+    .manifesto__link { margin-inline: 0; }
+    .team__cell { grid-template-rows: auto auto; align-content: start; }
+    .team__img, .team__cell--ana .team__img, .team__cell--marcus .team__img { min-height: 0; height: auto; aspect-ratio: 4 / 5; }
+  }
+</style>

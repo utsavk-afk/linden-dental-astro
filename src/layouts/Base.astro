@@ -1,0 +1,73 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+import '../styles/global.css';
+
+interface Props { title?: string; description?: string; progress?: boolean }
+const { title, description = `${site.name}: friendly family dentistry in Sellwood, Portland. Check-ups, kids’ dentistry, emergencies and clear aligners.`, progress = false } = Astro.props;
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | Family dentist in Sellwood, Portland`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#f3f3ec" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1612" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      // Theme + motion flags before first paint. `.motion` pre-hides reveal targets;
+      // it is removed again if the motion module never reports ready.
+      (function () {
+        var d = document.documentElement;
+        try { var t = localStorage.getItem('linden-theme'); if (t) d.dataset.theme = t; } catch (e) {}
+        if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+          d.classList.add('motion');
+          setTimeout(function () { if (!window.__motionReady) d.classList.remove('motion'); }, 3000);
+        }
+      })();
+    </script>
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Nav />
+    {progress && <div class="progress" data-progress aria-hidden="true"></div>}
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      import { initMotion, destroyMotion } from '../scripts/motion';
+      import { initUI, applyStoredTheme } from '../scripts/ui';
+      document.addEventListener('astro:page-load', () => { initUI(); initMotion(); });
+      document.addEventListener('astro:before-swap', destroyMotion);
+      document.addEventListener('astro:after-swap', () => {
+        applyStoredTheme();
+        if (matchMedia('(prefers-reduced-motion: no-preference)').matches) document.documentElement.classList.add('motion');
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute; left: 1rem; top: -4rem; z-index: var(--z-skip);
+    background: var(--accent); color: var(--on-accent); padding: 0.75rem 1.1rem; border-radius: var(--pill); font-weight: 600;
+  }
+  .skip:focus { top: 1rem; }
+  .progress {
+    position: fixed; inset: 0 0 auto 0; height: 3px; z-index: calc(var(--z-nav) + 1);
+    background: var(--accent); transform-origin: 0 50%; transform: scaleX(0);
+  }
+</style>

@@ -1,0 +1,175 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+
+const reasons = ['Check-up and clean', "Kids’ check-up", 'Toothache or something broken', 'Filling or crown', 'Clear aligners consult', 'Whitening', 'Not sure yet'];
+const days = ['Weekday mornings', 'Weekday afternoons', 'Saturday morning'];
+---
+<Base title="Book a visit" description="Request an appointment at Linden Dental Studio. We reply within one working day with a time and the full price.">
+  <section class="book">
+    <div class="wrap book__grid">
+      <div class="book__info">
+        <h1 data-split>Book a visit</h1>
+        <p class="lede" data-reveal>Tell us a little about the visit. June replies within one working day with a time and the full price.</p>
+        <ol class="next" data-reveal>
+          <li><Icon name="envelope-simple" /><span><strong>We confirm by email</strong> with a time, the price, and what your insurance should cover.</span></li>
+          <li><Icon name="clipboard-text" /><span><strong>One short form</strong> to fill in at home. No clipboard in the waiting room.</span></li>
+          <li><Icon name="coffee" /><span><strong>Arrive five minutes early</strong> if you like. Tea, coffee and a quiet room.</span></li>
+        </ol>
+        <div class="call" data-reveal>
+          <p class="muted">In pain right now?</p>
+          <a class="btn btn--ghost btn--lg" href={site.phoneHref}><Icon name="phone" /> {site.phone}</a>
+        </div>
+      </div>
+
+      <div class="panel" data-reveal>
+        <form class="form" data-book-form novalidate>
+          <fieldset class="seg">
+            <legend>Who is the visit for?</legend>
+            <div class="seg__opts">
+              <label><input type="radio" name="who" value="me" checked /> <span>Me</span></label>
+              <label><input type="radio" name="who" value="child" /> <span>My child</span></label>
+              <label><input type="radio" name="who" value="family" /> <span>A few of us</span></label>
+            </div>
+          </fieldset>
+
+          <div class="row2">
+            <div class="field">
+              <label for="name">Full name</label>
+              <input id="name" name="name" type="text" autocomplete="name" required aria-describedby="name-error" />
+              <p class="error" id="name-error" aria-live="polite"></p>
+            </div>
+            <div class="field">
+              <label for="phone">Phone</label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" required pattern="[0-9()+\- .]{7,}" aria-describedby="phone-error" />
+              <p class="error" id="phone-error" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required aria-describedby="email-help email-error" />
+            <p class="help" id="email-help">We only use this to confirm your appointment.</p>
+            <p class="error" id="email-error" aria-live="polite"></p>
+          </div>
+
+          <div class="field">
+            <label for="reason">Reason for the visit</label>
+            <div class="select">
+              <select id="reason" name="reason" required aria-describedby="reason-error">
+                <option value="" selected disabled>Choose one</option>
+                {reasons.map((r) => <option>{r}</option>)}
+              </select>
+            </div>
+            <p class="error" id="reason-error" aria-live="polite"></p>
+          </div>
+
+          <fieldset class="checks">
+            <legend>Times that usually work</legend>
+            <div class="checks__opts">
+              {days.map((d) => <label><input type="checkbox" name="days" value={d} /> <span>{d}</span></label>)}
+            </div>
+          </fieldset>
+
+          <label class="toggle">
+            <input type="checkbox" name="nervous" />
+            <span class="toggle__ui" aria-hidden="true"></span>
+            <span><strong>I feel nervous about the dentist.</strong> We will book double time and go at your pace.</span>
+          </label>
+
+          <div class="field">
+            <label for="notes">Anything else we should know? <span class="optional">(optional)</span></label>
+            <textarea id="notes" name="notes" rows="4"></textarea>
+          </div>
+
+          <button class="btn btn--lg submit" type="submit"><span class="submit__label">Send request</span><span class="submit__busy">Sending</span> <Icon name="arrow-right" /></button>
+          <p class="fine">This is a concept site, so requests are not sent anywhere.</p>
+        </form>
+
+        <div class="success" data-book-success hidden tabindex="-1">
+          <span class="success__icon"><Icon name="check" size="1.6rem" /></span>
+          <h2>Thanks, <span data-first-name></span>.</h2>
+          <p class="muted">June will email you within one working day with a time and the full price. If it is urgent, call {site.phone}.</p>
+          <a class="link-arrow" href="/journal/">While you wait, read the journal <Icon name="arrow-right" /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .book { padding-block: clamp(1.5rem, 1rem + 3vw, 4rem) var(--section); }
+  .book__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(2rem, 1rem + 5vw, 6rem); align-items: start; }
+  .book__info { position: sticky; top: 7rem; display: grid; gap: 1.5rem; }
+  .next { list-style: none; padding: 0; display: grid; gap: 1rem; margin-top: 0.5rem; }
+  .next li { display: grid; grid-template-columns: 2.75rem 1fr; gap: 1rem; align-items: start; color: var(--ink-2); }
+  .next li :global(svg) { width: 2.75rem; height: 2.75rem; padding: 0.7rem; border-radius: var(--pill); background: var(--bg-2); color: var(--accent); }
+  .next strong { color: var(--ink); }
+  .call { display: grid; gap: 0.6rem; justify-items: start; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+
+  .panel { background: var(--surface); border-radius: var(--r-lg); padding: clamp(1.5rem, 1rem + 2.5vw, 3rem); box-shadow: var(--shadow); }
+  /* Field and option outlines need 3:1 against the panel (WCAG 1.4.11); --line is only for dividers. */
+  .form { display: grid; gap: 1.5rem; --field-line: color-mix(in oklab, var(--ink-2) 72%, var(--surface)); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .field { display: grid; gap: 0.5rem; }
+  label, legend { font-weight: 600; }
+  .optional { font-weight: 400; color: var(--ink-2); }
+  input[type='text'], input[type='tel'], input[type='email'], select, textarea {
+    width: 100%; padding: 0.85rem 1.1rem; border: 1px solid var(--field-line); border-radius: var(--pill);
+    background: var(--bg); color: var(--ink); transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  textarea { border-radius: var(--r-md); resize: vertical; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent); }
+  [aria-invalid='true'] { border-color: var(--danger) !important; }
+  .select { position: relative; }
+  .select select { appearance: none; padding-right: 2.75rem; }
+  .select::after { content: ''; position: absolute; right: 1.2rem; top: 50%; width: 0.5rem; height: 0.5rem; border-right: 2px solid var(--ink-2); border-bottom: 2px solid var(--ink-2); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+  .help { font-size: var(--step--1); color: var(--ink-2); }
+  .error { font-size: var(--step--1); color: var(--danger); font-weight: 500; min-height: 0; }
+  .error:empty { height: 0; margin-top: -0.5rem; overflow: hidden; } /* stays in the accessibility tree so aria-live announces new errors */
+
+  fieldset { border: 0; padding: 0; display: grid; gap: 0.75rem; }
+  .seg__opts, .checks__opts { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .seg__opts label, .checks__opts label { position: relative; font-weight: 500; }
+  .seg__opts input, .checks__opts input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+  .seg__opts span, .checks__opts span { display: inline-block; padding: 0.65rem 1.1rem; border: 1px solid var(--field-line); border-radius: var(--pill); transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
+  .seg__opts input:checked + span, .checks__opts input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .seg__opts input:focus-visible + span, .checks__opts input:focus-visible + span, .toggle input:focus-visible + .toggle__ui { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .toggle { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start; font-weight: 400; color: var(--ink-2); cursor: pointer; padding: 1.1rem; border-radius: var(--r-md); background: var(--bg-2); }
+  .toggle strong { color: var(--ink); }
+  .toggle input { position: absolute; opacity: 0; }
+  .toggle__ui { width: 2.75rem; height: 1.6rem; border-radius: var(--pill); background: var(--field-line); position: relative; transition: background-color 0.25s; margin-top: 0.1rem; }
+  .toggle__ui::after { content: ''; position: absolute; top: 0.2rem; left: 0.2rem; width: 1.2rem; height: 1.2rem; border-radius: 50%; background: var(--surface); transition: transform 0.3s var(--ease-out); box-shadow: 0 1px 3px rgb(0 0 0 / 0.2); }
+  .toggle input:checked + .toggle__ui { background: var(--accent); }
+  .toggle input:checked + .toggle__ui::after { transform: translateX(1.15rem); }
+  /* dark: the knob must stay a light disc, not the dark surface colour */
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .toggle__ui::after { background: var(--ink); }
+    :global(:root:not([data-theme='light'])) .toggle input:checked + .toggle__ui::after { background: var(--on-accent); }
+  }
+  :global(:root[data-theme='dark']) .toggle__ui::after { background: var(--ink); }
+  :global(:root[data-theme='dark']) .toggle input:checked + .toggle__ui::after { background: var(--on-accent); }
+
+  .submit { justify-self: start; }
+  .submit__busy { display: none; }
+  .submit[data-loading='true'] { opacity: 0.75; cursor: progress; }
+  .submit[data-loading='true'] .submit__label { display: none; }
+  .submit[data-loading='true'] .submit__busy { display: inline; }
+  .fine { font-size: var(--step--1); color: var(--ink-2); }
+
+  .success { display: grid; gap: 1rem; justify-items: start; padding-block: 2rem; outline: none; }
+  .success__icon { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: var(--pill); background: var(--accent); color: var(--on-accent); }
+  .success h2 { font-size: var(--step-3); }
+
+  @media (max-width: 900px) {
+    .book__grid { grid-template-columns: 1fr; }
+    .book__info { position: static; }
+  }
+  @media (max-width: 560px) {
+    .row2 { grid-template-columns: 1fr; }
+    .submit { justify-self: stretch; justify-content: center; }
+    .error { font-size: 0.9rem; }
+  }
+</style>

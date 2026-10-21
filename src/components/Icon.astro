@@ -1,0 +1,14 @@
+---
+// Phosphor icons (regular weight), inlined at build time. Only the names in the glob ship.
+interface Props { name: string; size?: string; label?: string; class?: string }
+const { name, size = '1.25em', label, class: cls } = Astro.props;
+const icons = import.meta.glob(
+  '/node_modules/@phosphor-icons/core/assets/regular/{arrow-right,arrow-up-right,arrow-left,phone,calendar-blank,map-pin,clock,list,x,leaf,tooth,smiley,first-aid-kit,shield-check,sparkle,chat-circle,hand-heart,plus,check,star,sun,moon,instagram-logo,envelope-simple,baby,heartbeat,coffee,armchair,clipboard-text,wallet,hand-waving,car,wheelchair}.svg',
+  { query: '?raw', import: 'default', eager: true },
+) as Record<string, string>;
+const raw = icons[`/node_modules/@phosphor-icons/core/assets/regular/${name}.svg`];
+if (!raw) throw new Error(`Icon "${name}" is not in the Icon.astro allow-list`);
+const a11y = label ? `role="img" aria-label="${label}"` : 'aria-hidden="true" focusable="false"';
+const svg = raw.replace('<svg', `<svg width="${size}" height="${size}" ${a11y}${cls ? ` class="${cls}"` : ''}`);
+---
+<Fragment set:html={svg} />
