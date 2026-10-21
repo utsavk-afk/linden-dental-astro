@@ -9,16 +9,37 @@
   "addressLine2": "Portland, OR 97202",
   "mapLink": "https://www.openstreetmap.org/search?query=SE%20Tacoma%20St%20Portland",
   "hours": [
-    { "days": "Mon to Thu", "time": "7:30 am to 6:00 pm" },
-    { "days": "Friday", "time": "7:30 am to 3:00 pm" },
-    { "days": "Saturday", "time": "8:00 am to 1:00 pm" }
+    {
+      "days": "Mon to Thu",
+      "time": "7:30 am to 6:00 pm"
+    },
+    {
+      "days": "Friday",
+      "time": "7:30 am to 3:00 pm"
+    },
+    {
+      "days": "Saturday",
+      "time": "8:00 am to 1:00 pm"
+    }
   ],
   "nav": [
-    { "label": "About", "link": "/about/" },
-    { "label": "Services", "link": "/services/" },
-    { "label": "Journal", "link": "/journal/" }
+    {
+      "label": "About",
+      "link": "/about/"
+    },
+    {
+      "label": "Services",
+      "link": "/services/"
+    },
+    {
+      "label": "Journal",
+      "link": "/journal/"
+    }
   ],
-  "primaryCta": { "label": "Book a visit", "link": "/book/" },
+  "primaryCta": {
+    "label": "Book a visit",
+    "link": "/book/"
+  },
   "ctaBand": {
     "title": "Ready when you are.",
     "text": "Book online in two minutes, or call June and she will find you a time that suits."
@@ -29,7 +50,12 @@
     "hoursHeading": "Hours",
     "contactHeading": "Contact",
     "directionsLabel": "Get directions",
-    "extraLinks": [{ "label": "Design language", "link": "/design/" }],
+    "extraLinks": [
+      {
+        "label": "Design language",
+        "link": "/design/"
+      }
+    ],
     "note": "A fictional practice. Concept site built with Astro and GSAP."
   },
   "labels": {
@@ -39,7 +65,10 @@
     "minRead": "min read",
     "stepOf": "Step {n} of {total}",
     "pause": "Pause",
-    "play": "Play"
+    "play": "Play",
+    "mainNav": "Main",
+    "homeLink": "{name}, home",
+    "portraitAlt": "Portrait of {name}"
   },
   "seoDefaultTitle": "Linden Dental Studio | Family dentist in Sellwood, Portland",
   "seoTitleSuffix": "| Linden Dental Studio",

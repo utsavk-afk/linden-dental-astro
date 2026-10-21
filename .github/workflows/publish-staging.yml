@@ -37,6 +37,9 @@ jobs:
       - name: Install
         run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 
+      - name: Content check
+        run: node scripts/check-content.mjs
+
       - name: Build for /linden-dental
         run: npx astro build --outDir dist-psi
         env:
@@ -44,6 +47,7 @@ jobs:
           LINDEN_SITE: https://stanventures-psi.fly.dev
           PUBLIC_BOOKING_ENDPOINT: /api/linden/bookings
           PUBLIC_NOINDEX: '1'
+          PUBLIC_SHOW_DRAFTS: '1'
 
       - name: Package
         run: tar -czf site.tgz -C dist-psi . && ls -lh site.tgz

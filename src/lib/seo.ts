@@ -1,6 +1,6 @@
 // Structured data (schema.org JSON-LD) built from the CMS settings, so Google can show
 // the practice's address, phone, hours, FAQs and articles as rich results.
-import settings from '../content/settings.json';
+import { settings } from './content';
 
 type Json = Record<string, unknown>;
 
@@ -82,7 +82,7 @@ export function faqSchema(faqs: { q: string; a: string }[]): Json | null {
   };
 }
 
-export function articleSchema(a: { title: string; description: string; url: string; image?: string; date: Date; author: string; siteUrl: string }): Json {
+export function articleSchema(a: { updated?: Date; title: string; description: string; url: string; image?: string; date: Date; author: string; siteUrl: string }): Json {
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -91,6 +91,7 @@ export function articleSchema(a: { title: string; description: string; url: stri
     mainEntityOfPage: a.url,
     ...(a.image ? { image: [a.image] } : {}),
     datePublished: a.date.toISOString(),
+    dateModified: (a.updated ?? a.date).toISOString(),
     author: { '@type': 'Person', name: a.author },
     publisher: { '@id': `${a.siteUrl}#practice` },
   };

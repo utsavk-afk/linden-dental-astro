@@ -2,18 +2,21 @@
 import { url } from '../../lib/url';
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
-import listings from '../../content/pages/listings.json';
+import { servicesPage as page } from '../../lib/content';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import CtaBand from '../../components/CtaBand.astro';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+// Cards show the headline price: the text up to the first full stop followed by a space
+// ("$185 without insurance. Usually covered..." -> "$185 without insurance."), so "$185.50" stays whole.
+const shortPrice = (price: string) => `${price.split(/\.\s/)[0].trim().replace(/\.$/, '')}.`;
 ---
-<Base title={listings.services.title || 'Services'} description={listings.services.description || undefined}>
+<Base title={page.seo.title || page.title} description={page.seo.description || undefined}>
   <section class="head">
     <div class="wrap">
-      <h1 data-split>Everything a family needs, in one place.</h1>
-      <p class="lede" data-reveal>From a first visit at age one to a crown at seventy. Every price below is the full price.</p>
+      <h1 data-split>{page.title}</h1>
+      {page.lede && <p class="lede" data-reveal>{page.lede}</p>}
     </div>
   </section>
 
@@ -25,14 +28,14 @@ const services = (await getCollection('services')).sort((a, b) => a.data.order -
           <div class="card__body">
             <h2 class="card__title"><Icon name={s.data.icon} /> {s.data.title}</h2>
             <p class="muted">{s.data.summary}</p>
-            <p class="card__price">{s.data.price.split('.')[0]}.</p>
+            <p class="card__price">{shortPrice(s.data.price)}</p>
           </div>
         </a>
       ))}
     </div>
   </section>
 
-  <CtaBand title="Not sure what you need?" body="Call June and describe what is going on. She will tell you which appointment to book and what it costs." />
+  <CtaBand title={page.ctaTitle || undefined} body={page.ctaText || undefined} />
 </Base>
 
 <style>

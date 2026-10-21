@@ -1,25 +1,25 @@
 import { singleton, fields } from '@keystatic/core';
-import { ICONS, photo, seoTitle, seoDescription, seoImage, cta } from '../fields';
+import { ICONS, photo, seoTitle, seoDescription, seoImage, ALT_HELP, reqText, optText } from '../fields';
 
 export const about = singleton({
   label: 'About page',
   path: 'src/content/pages/about',
   format: { data: 'json' },
   schema: {
-    title: fields.text({ label: 'Headline' }),
-    lede: fields.text({ label: 'Intro', multiline: true }),
-    image: photo('Main photo'),
-    imageAlt: fields.text({ label: 'Main photo description (alt text)' }),
-    storyTitle: fields.text({ label: 'Story heading' }),
-    story: fields.array(fields.text({ label: 'Paragraph', multiline: true }), { label: 'Story paragraphs', itemLabel: (p) => (p.value || '').slice(0, 60) || 'Paragraph' }),
-    principlesTitle: fields.text({ label: 'Principles heading' }),
+    title: reqText('H1 heading (hero)'),
+    lede: reqText('Intro paragraph', 'The paragraph under the H1.', { multiline: true }),
+    image: photo('Image (hero)', 'The large photo beside the H1. Also the default Open Graph image.', 'pages/about'),
+    imageAlt: reqText('Image alt text (hero)', ALT_HELP),
+    storyTitle: reqText('H2 heading (our story)'),
+    story: fields.array(reqText('Paragraph', undefined, { multiline: true }), { label: 'Paragraphs (our story)', description: 'At least one paragraph is required.', validation: { length: { min: 1 } }, itemLabel: (p) => (p.value || '').slice(0, 60) || 'Paragraph' }),
+    principlesTitle: reqText('H2 heading (principles)'),
     principles: fields.array(
-      fields.object({ icon: fields.select({ label: 'Icon', options: ICONS, defaultValue: 'clock' }), title: fields.text({ label: 'Title' }), body: fields.text({ label: 'Text', multiline: true }) }),
-      { label: 'Principles', itemLabel: (p) => p.fields.title.value || 'Principle' },
+      fields.object({ icon: fields.select({ label: 'Icon', options: ICONS, defaultValue: 'clock' }), title: reqText('H3 heading'), body: reqText('Paragraph', undefined, { multiline: true }) }),
+      { label: 'Principles (icon + H3 + paragraph each)', description: 'At least one principle is required.', validation: { length: { min: 1 } }, itemLabel: (p) => p.fields.title.value || 'Principle' },
     ),
-    teamTitle: fields.text({ label: 'Team heading' }),
-    ctaTitle: fields.text({ label: 'Bottom banner heading' }),
-    ctaText: fields.text({ label: 'Bottom banner text', multiline: true }),
-    seo: fields.object({ title: seoTitle(), description: seoDescription(), image: seoImage() }, { label: 'SEO' }),
+    teamTitle: reqText('H2 heading (team)', 'Team members are edited under Content > Team.'),
+    ctaTitle: optText('Call to action band: H2 heading', 'The green band at the bottom of the page. Leave empty to use the default from Site settings.'),
+    ctaText: optText('Call to action band: paragraph', 'Leave empty to use the default from Site settings.', { multiline: true }),
+    seo: fields.object({ title: seoTitle(), description: seoDescription(), image: seoImage('pages/about') }, { label: 'SEO (meta tags)', description: 'All optional: empty fields fall back to the site defaults and the hero image.' }),
   },
 });

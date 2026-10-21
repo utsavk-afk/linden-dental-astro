@@ -59,11 +59,20 @@ function bookingForm() {
   const form = document.querySelector<HTMLFormElement>('[data-book-form]');
   if (!form) return;
   const success = document.querySelector<HTMLElement>('[data-book-success]');
+  // Copy comes from the CMS via data-msg-* attributes on the form; the defaults keep old builds working.
+  const d = form.dataset;
+  const t = {
+    emailInvalid: d.msgEmailInvalid || 'That email looks incomplete.',
+    phonePattern: d.msgPhonePattern || 'Use digits, for example 503 555 0142.',
+    invalid: d.msgInvalid || 'Please check this field.',
+    sendFailed: d.msgSendFailed || 'We could not send that just now.',
+    retry: d.msgRetry || 'Please try again, or call us.',
+  };
   const messages: Record<string, string> = {
-    name: 'Please tell us your name.',
-    email: 'We need an email to confirm your visit.',
-    phone: 'A phone number helps if we need to move things around.',
-    reason: 'Pick the closest reason. You can explain more below.',
+    name: d.msgName || 'Please tell us your name.',
+    email: d.msgEmailMissing || 'We need an email to confirm your visit.',
+    phone: d.msgPhoneMissing || 'A phone number helps if we need to move things around.',
+    reason: d.msgReason || 'Pick the closest reason. You can explain more below.',
   };
 
   const showError = (field: HTMLInputElement | HTMLSelectElement, msg: string) => {
@@ -76,8 +85,8 @@ function bookingForm() {
     if (!(field.name in messages)) return true;
     let msg = '';
     if (field.validity.valueMissing) msg = messages[field.name];
-    else if (field.validity.typeMismatch) msg = field.type === 'email' ? 'That email looks incomplete.' : 'Please check this field.';
-    else if (field.validity.patternMismatch) msg = 'Use digits, for example 503 555 0142.';
+    else if (field.validity.typeMismatch) msg = field.type === 'email' ? t.emailInvalid : t.invalid;
+    else if (field.validity.patternMismatch) msg = t.phonePattern;
     showError(field, msg);
     return !msg;
   };
@@ -108,12 +117,12 @@ function bookingForm() {
         const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
-          throw new Error(body.error || 'We could not send that just now.');
+          throw new Error(body.error || t.sendFailed);
         }
       } catch (err) {
         if (submit) { submit.disabled = false; delete submit.dataset.loading; }
         if (formError) {
-          formError.textContent = `${err instanceof Error ? err.message : 'We could not send that just now.'} Please try again, or call us.`;
+          formError.textContent = `${err instanceof Error ? err.message : t.sendFailed} ${t.retry}`;
           formError.hidden = false;
           formError.focus?.();
         }
@@ -139,10 +148,12 @@ function marqueeToggle() {
   const marquee = document.querySelector<HTMLElement>('.marquee');
   if (!btn || !marquee) return;
   const label = btn.querySelector('.reviews__pause-label');
+  const pauseText = btn.dataset.labelPause || 'Pause';
+  const playText = btn.dataset.labelPlay || 'Play';
   btn.addEventListener('click', () => {
     const paused = marquee.classList.toggle('is-paused');
     btn.setAttribute('aria-pressed', String(paused));
-    if (label) label.textContent = paused ? 'Play' : 'Pause';
+    if (label) label.textContent = paused ? playText : pauseText;
   });
 }
 

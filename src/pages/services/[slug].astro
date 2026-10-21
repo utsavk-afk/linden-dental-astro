@@ -7,6 +7,7 @@ import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import { site } from '../../data/site';
+import { servicesPage as page } from '../../lib/content';
 
 export async function getStaticPaths() {
   const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
@@ -18,6 +19,7 @@ export async function getStaticPaths() {
 const { entry, others } = Astro.props;
 const { Content } = await render(entry);
 const s = entry.data;
+const t = page.detail;
 const siteUrl = new URL(url('/'), Astro.site).href;
 const jsonLd = [
   faqSchema(s.faqs),
@@ -28,13 +30,13 @@ const jsonLd = [
   <section class="hero">
     <div class="wrap hero__grid">
       <div class="hero__copy">
-        <a class="back" href={url('/services/')}><Icon name="arrow-left" /> All services</a>
+        <a class="back" href={url('/services/')}><Icon name="arrow-left" /> {t.backLabel}</a>
         <span class="hero__icon" data-reveal><Icon name={s.icon} size="1.6rem" /></span>
         <h1 data-split>{s.title}</h1>
         <p class="lede" data-reveal>{s.summary}</p>
         <dl class="facts" data-reveal>
-          <div><dt>Cost</dt><dd>{s.price}</dd></div>
-          <div><dt>Time</dt><dd>{s.duration}</dd></div>
+          <div><dt>{t.costLabel}</dt><dd>{s.price}</dd></div>
+          <div><dt>{t.timeLabel}</dt><dd>{s.duration}</dd></div>
         </dl>
         <div class="actions" data-reveal>
           <a class="btn btn--lg" href={site.cta.href}>{site.cta.label} <Icon name="arrow-right" /></a>
@@ -47,8 +49,9 @@ const jsonLd = [
   <section class="section">
     <div class="wrap detail">
       <div class="detail__intro prose" data-reveal><Content /></div>
+      {s.steps.length > 0 && (
       <div class="steps">
-        <h2 class="steps__title" data-split>What happens</h2>
+        <h2 class="steps__title" data-split>{t.stepsTitle}</h2>
         <ol>
           {s.steps.map((st, i) => (
             <li data-reveal>
@@ -58,13 +61,14 @@ const jsonLd = [
           ))}
         </ol>
       </div>
+      )}
     </div>
   </section>
 
   {s.faqs.length > 0 && (
     <section class="faq">
       <div class="wrap faq__grid">
-        <h2 data-split>Questions people ask</h2>
+        <h2 data-split>{t.faqTitle}</h2>
         <div class="faq__list">
           {s.faqs.map((f) => (
             <details data-reveal>
@@ -79,7 +83,7 @@ const jsonLd = [
 
   <section class="section more">
     <div class="wrap">
-      <h2 class="more__title">Also at Linden</h2>
+      <h2 class="more__title">{t.moreTitle}</h2>
       <ul class="more__list">
         {others.map((o) => (
           <li data-reveal>
@@ -94,7 +98,7 @@ const jsonLd = [
     </div>
   </section>
 
-  <CtaBand />
+  <CtaBand title={t.ctaTitle || undefined} body={t.ctaText || undefined} />
 </Base>
 
 <style>

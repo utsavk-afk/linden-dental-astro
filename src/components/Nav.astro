@@ -2,15 +2,15 @@
 import { url } from '../lib/url';
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
-import { site } from '../data/site';
+import { site, fill } from '../data/site';
 const path = Astro.url.pathname;
 const isCurrent = (href: string) => path.startsWith(href);
 ---
 <header class="nav" data-nav>
   <div class="wrap nav__inner">
-    <a href={url('/')} class="nav__brand" aria-label={`${site.name}, home`}><Logo /></a>
+    <a href={url('/')} class="nav__brand" aria-label={fill(site.labels.homeLink, { name: site.name })}><Logo /></a>
 
-    <nav aria-label="Main" class="nav__links">
+    <nav aria-label={site.labels.mainNav} class="nav__links">
       <ul>
         {site.nav.map((l) => (
           <li><a href={l.href} aria-current={isCurrent(l.href) ? 'page' : undefined}>{l.label}</a></li>
@@ -20,12 +20,12 @@ const isCurrent = (href: string) => path.startsWith(href);
 
     <div class="nav__actions">
       <a class="nav__phone" href={site.phoneHref}><Icon name="phone" /> {site.phone}</a>
-      <button class="nav__icon" type="button" data-theme-toggle aria-label="Dark theme">
+      <button class="nav__icon" type="button" data-theme-toggle aria-label={site.labels.themeToggle}>
         <span class="i-sun"><Icon name="sun" /></span><span class="i-moon"><Icon name="moon" /></span>
       </button>
       <a class="btn nav__cta" href={site.cta.href}>{site.cta.label}</a>
       <button class="nav__icon nav__menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="menu-sheet">
-        <span class="visually-hidden">Menu</span>
+        <span class="visually-hidden">{site.labels.menu}</span>
         <span class="i-open"><Icon name="list" size="1.4em" /></span><span class="i-close"><Icon name="x" size="1.4em" /></span>
       </button>
     </div>

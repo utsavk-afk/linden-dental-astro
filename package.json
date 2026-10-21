@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "photos": "node scripts/photos.mjs",
-    "prebuild": "node scripts/photos.mjs"
+    "prebuild": "node scripts/photos.mjs && node scripts/check-content.mjs",
+    "check:content": "node scripts/check-content.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.7",

@@ -1,46 +1,47 @@
 ---
-import { url } from '../lib/url';
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
 import { site } from '../data/site';
 const year = new Date().getFullYear();
+const { footer } = site;
+const intro = [site.tagline && `${site.tagline}.`, footer.intro].filter(Boolean).join(' ');
 ---
 <footer class="footer">
   <div class="wrap footer__grid">
     <div class="footer__brand">
       <Logo />
-      <p class="muted">{site.tagline}. Check-ups, kids’ visits and same-week emergencies, without the lecture.</p>
+      {intro && <p class="muted">{intro}</p>}
     </div>
 
     <div>
-      <h2 class="footer__h">Visit</h2>
+      <h2 class="footer__h">{footer.visitHeading}</h2>
       <address>
         {site.address.map((l) => <span>{l}</span>)}
       </address>
-      <a class="link-arrow" href={site.mapHref}>Get directions <Icon name="arrow-up-right" /></a>
+      <a class="link-arrow" href={site.mapHref}>{footer.directionsLabel} <Icon name="arrow-up-right" /></a>
     </div>
 
     <div>
-      <h2 class="footer__h">Hours</h2>
+      <h2 class="footer__h">{footer.hoursHeading}</h2>
       <dl class="footer__hours">
         {site.hours.map((h) => (<><dt>{h.days}</dt><dd>{h.time}</dd></>))}
       </dl>
     </div>
 
     <div>
-      <h2 class="footer__h">Contact</h2>
+      <h2 class="footer__h">{footer.contactHeading}</h2>
       <ul class="footer__list">
         <li><a href={site.phoneHref}>{site.phone}</a></li>
         <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
         {site.nav.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
-        <li><a href={url('/design/')}>Design language</a></li>
+        {footer.extraLinks.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
       </ul>
     </div>
   </div>
 
   <div class="wrap footer__base">
     <p>&copy; {year} {site.name}</p>
-    <p>A fictional practice. Concept site built with Astro and GSAP.</p>
+    {footer.note && <p>{footer.note}</p>}
   </div>
 </footer>
 

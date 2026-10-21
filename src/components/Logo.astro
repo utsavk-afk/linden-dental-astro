@@ -1,12 +1,13 @@
 ---
 // Wordmark: a Phosphor leaf (the linden) in a pill badge, set beside the name in the display face.
 import Icon from './Icon.astro';
+import { site } from '../data/site';
 interface Props { compact?: boolean }
 const { compact = false } = Astro.props;
 ---
 <span class="logo">
   <span class="logo__mark"><Icon name="leaf" size="1.05em" /></span>
-  <span class="logo__word">Linden{!compact && ' '}{!compact && <span class="logo__sub">Dental Studio</span>}</span>
+  <span class="logo__word">{site.logo.word}{!compact && site.logo.sub && ' '}{!compact && site.logo.sub && <span class="logo__sub">{site.logo.sub}</span>}</span>
 </span>
 
 <style>

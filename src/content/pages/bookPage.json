@@ -1,0 +1,85 @@
+{
+  "intro": {
+    "title": "Book a visit",
+    "lede": "Tell us a little about the visit. June replies within one working day with a time and the full price.",
+    "callLabel": "In pain right now?"
+  },
+  "nextSteps": [
+    {
+      "icon": "envelope-simple",
+      "lead": "We confirm by email",
+      "text": "with a time, the price, and what your insurance should cover."
+    },
+    {
+      "icon": "clipboard-text",
+      "lead": "One short form",
+      "text": "to fill in at home. No clipboard in the waiting room."
+    },
+    {
+      "icon": "coffee",
+      "lead": "Arrive five minutes early",
+      "text": "if you like. Tea, coffee and a quiet room."
+    }
+  ],
+  "form": {
+    "whoLegend": "Who is the visit for?",
+    "whoMe": "Me",
+    "whoChild": "My child",
+    "whoFamily": "A few of us",
+    "name": "Full name",
+    "phone": "Phone",
+    "email": "Email",
+    "emailHelp": "We only use this to confirm your appointment.",
+    "reason": "Reason for the visit",
+    "reasonPlaceholder": "Choose one",
+    "days": "Times that usually work",
+    "nervousLead": "I feel nervous about the dentist.",
+    "nervousText": "We will book double time and go at your pace.",
+    "notes": "Anything else we should know?",
+    "optional": "(optional)",
+    "submit": "Send request",
+    "sending": "Sending",
+    "fineStaging": "Staging: requests are saved to the Linden demo backend. Please use test details only.",
+    "fineConcept": "This is a concept site, so requests are not sent anywhere."
+  },
+  "options": {
+    "reasons": [
+      "Check-up and clean",
+      "Kids’ check-up",
+      "Toothache or something broken",
+      "Filling or crown",
+      "Clear aligners consult",
+      "Whitening",
+      "Not sure yet"
+    ],
+    "days": [
+      "Weekday mornings",
+      "Weekday afternoons",
+      "Saturday morning"
+    ]
+  },
+  "messages": {
+    "name": "Please tell us your name.",
+    "emailMissing": "We need an email to confirm your visit.",
+    "emailInvalid": "That email looks incomplete.",
+    "phoneMissing": "A phone number helps if we need to move things around.",
+    "phonePattern": "Use digits, for example 503 555 0142.",
+    "reason": "Pick the closest reason. You can explain more below.",
+    "fieldInvalid": "Please check this field.",
+    "sendFailed": "We could not send that just now.",
+    "retry": "Please try again, or call us."
+  },
+  "success": {
+    "headingPrefix": "Thanks,",
+    "headingSuffix": ".",
+    "text": "June will email you within one working day with a time and the full price. If it is urgent, call {phone}.",
+    "link": {
+      "label": "While you wait, read the journal",
+      "link": "/journal/"
+    }
+  },
+  "seo": {
+    "title": "Book a visit",
+    "description": "Request an appointment at Linden Dental Studio. We reply within one working day with a time and the full price."
+  }
+}

@@ -2,7 +2,10 @@
 import Icon from './Icon.astro';
 import { site } from '../data/site';
 interface Props { title?: string; body?: string }
-const { title = 'Ready when you are.', body = 'Book online in two minutes, or call June and she will find you a time that suits.' } = Astro.props;
+// Default wording comes from Site settings > Call to action band; pages can pass their own.
+// An empty override (field cleared in the CMS) also falls back to the default.
+const title = Astro.props.title || site.ctaBand.title;
+const body = Astro.props.body || site.ctaBand.text;
 ---
 <section class="band">
   <div class="wrap band__inner">

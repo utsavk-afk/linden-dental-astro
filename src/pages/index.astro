@@ -1,11 +1,11 @@
 ---
-import { url } from '../lib/url';
+import { url, href } from '../lib/url';
 import { Image } from 'astro:assets';
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import { site } from '../data/site';
-import { reviews } from '../data/reviews';
+import { site, fill } from '../data/site';
+import { reviews } from '../lib/content';
 import { getPosts, readMinutes, formatDate as fmt } from '../lib/journal';
 
 // All copy and photos on this page are edited in the CMS: Keystatic > Home page.
@@ -14,7 +14,10 @@ const services = (await getCollection('services')).sort((a, b) => a.data.order -
 const team = (await getCollection('team')).sort((a, b) => a.data.order - b.data.order);
 const [feature, ...more] = (await getPosts()).slice(0, 3);
 const steps = page.visitSteps;
+// The bento has four named slots; a fifth or later team member flows into extra rows below.
 const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
+const { manifestoCta, teamCta, journalCta, reviewsLabel } = page;
+const { labels } = site;
 ---
 <Base title={page.seo.title || undefined} description={page.seo.description || undefined} image={page.seo.image ?? page.heroImage}>
   <!-- HERO -->
@@ -44,7 +47,7 @@ const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
   <section class="section manifesto">
     <div class="wrap">
       <p class="manifesto__text" data-scrub-words>{page.manifesto}</p>
-      <a class="link-arrow manifesto__link" href={url('/about/')} data-reveal>How we work <Icon name="arrow-right" /></a>
+      <a class="link-arrow manifesto__link" href={href(manifestoCta.link)} data-reveal>{manifestoCta.label} <Icon name="arrow-right" /></a>
     </div>
   </section>
 
@@ -83,11 +86,11 @@ const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
       {steps.map((st, i) => (
         <article class={`visit__step ${st.image ? '' : 'visit__step--tint'}`} data-hpan-step>
           {st.image ? (
-            <div class="frame visit__img" data-hpan-in><Image src={st.image} alt={st.imageAlt} width={720} height={540} /></div>
+            <div class="frame visit__img" data-hpan-in><Image src={st.image} alt={st.imageAlt || st.title} width={720} height={540} /></div>
           ) : (
             <div class="visit__icon" data-hpan-in><Icon name="calendar-blank" size="2.4rem" /></div>
           )}
-          <p class="visit__n" data-hpan-in>Step {i + 1} of {steps.length}</p>
+          <p class="visit__n" data-hpan-in>{fill(labels.stepOf, { n: i + 1, total: steps.length })}</p>
           <h3 data-hpan-in>{st.title}</h3>
           <p class="muted" data-hpan-in>{st.body}</p>
         </article>
@@ -102,34 +105,36 @@ const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
       <div class="team__lead" data-reveal>
         <h2 id="team-title" data-split>{page.teamTitle}</h2>
         <p class="muted">{page.teamText}</p>
-        <a class="link-arrow" href={url('/about/#team')}>Meet the team <Icon name="arrow-right" /></a>
+        <a class="link-arrow" href={href(teamCta.link)}>{teamCta.label} <Icon name="arrow-right" /></a>
       </div>
       {team.map((m, i) => (
-        <figure class={`team__cell team__cell--${bentoAreas[i]}`} data-reveal>
-          <div class="frame team__img" data-parallax="5"><Image src={m.data.photo} alt={`Portrait of ${m.data.name}`} width={640} height={800} /></div>
+        <figure class={`team__cell team__cell--${bentoAreas[i] ?? 'extra'}`} data-reveal>
+          <div class="frame team__img" data-parallax="5"><Image src={m.data.photo} alt={fill(site.labels.portraitAlt, { name: m.data.name })} width={640} height={800} /></div>
           <figcaption><strong>{m.data.name}</strong><span>{m.data.role}</span></figcaption>
         </figure>
       ))}
     </div>
   </section>
 
-  <!-- REVIEWS MARQUEE -->
+  <!-- REVIEWS MARQUEE (hidden when there are no reviews) -->
+  {reviews.length > 0 && (
   <section class="reviews" aria-labelledby="reviews-title">
     <div class="wrap reviews__head">
       <h2 id="reviews-title" class="reviews__title" data-split>{page.reviewsTitle}</h2>
-      <button class="btn btn--ghost reviews__pause" type="button" data-marquee-toggle aria-pressed="false"><span class="reviews__pause-label">Pause</span></button>
+      <button class="btn btn--ghost reviews__pause" type="button" data-marquee-toggle data-label-pause={labels.pause} data-label-play={labels.play} aria-pressed="false"><span class="reviews__pause-label">{labels.pause}</span></button>
     </div>
-    <div class="marquee" tabindex="0" role="group" aria-label="Patient reviews">
+    <div class="marquee" tabindex="0" role="group" aria-label={reviewsLabel}>
       <div class="marquee__track">
         {[...reviews, ...reviews].map((r, i) => (
           <figure class="review" aria-hidden={i >= reviews.length ? 'true' : undefined}>
             <blockquote>&ldquo;{r.quote}&rdquo;</blockquote>
-            <figcaption>{r.name}, {r.where}</figcaption>
+            <figcaption>{r.where ? `${r.name}, ${r.where}` : r.name}</figcaption>
           </figure>
         ))}
       </div>
     </div>
   </section>
+  )}
 
   <!-- JOURNAL (hidden when nothing is published yet) -->
   {feature && (
@@ -137,12 +142,12 @@ const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
     <div class="wrap">
       <div class="journal__head">
         <h2 id="journal-title" data-split>{page.journalTitle}</h2>
-        <a class="link-arrow" href={url('/journal/')} data-reveal>Read the journal <Icon name="arrow-right" /></a>
+        <a class="link-arrow" href={href(journalCta.link)} data-reveal>{journalCta.label} <Icon name="arrow-right" /></a>
       </div>
       <div class="journal__grid">
         <a class="post post--feature" href={url(`/journal/${feature.id}/`)} data-reveal>
           <div class="frame post__img"><Image src={feature.data.cover} alt={feature.data.coverAlt} width={960} height={720} /></div>
-          <p class="post__meta">{feature.data.tag} <span aria-hidden="true">/</span> {readMinutes(feature)} min read</p>
+          <p class="post__meta">{feature.data.tag} <span aria-hidden="true">/</span> {readMinutes(feature)} {labels.minRead}</p>
           <h3>{feature.data.title}</h3>
           <p class="muted">{feature.data.description}</p>
         </a>
@@ -179,7 +184,7 @@ const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
         </ul>
         <div class="find__actions" data-reveal>
           <a class="btn btn--lg" href={site.cta.href}>{site.cta.label} <Icon name="arrow-right" /></a>
-          <a class="link-arrow" href={site.mapHref}>Get directions <Icon name="arrow-up-right" /></a>
+          <a class="link-arrow" href={site.mapHref}>{site.footer.directionsLabel} <Icon name="arrow-up-right" /></a>
         </div>
       </div>
     </div>
@@ -272,6 +277,8 @@ const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
   .team__cell { display: grid; grid-template-rows: 1fr auto; gap: 0.75rem; min-height: 0; }
   .team__cell--ana { grid-area: ana; } .team__cell--marcus { grid-area: marcus; }
   .team__cell--dani { grid-area: dani; } .team__cell--june { grid-area: june; }
+  /* 5th+ member: no named slot, so it auto-places into a new row under the bento */
+  .team__cell--extra .team__img { min-height: 320px; }
   .team__img { min-height: 260px; height: 100%; }
   .team__cell--ana .team__img, .team__cell--marcus .team__img { min-height: 520px; }
   .team__cell figcaption { display: grid; line-height: 1.35; }
@@ -365,6 +372,6 @@ const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
     .manifesto__text { font-size: var(--step-2); text-align: left; }
     .manifesto__link { margin-inline: 0; }
     .team__cell { grid-template-rows: auto auto; align-content: start; }
-    .team__img, .team__cell--ana .team__img, .team__cell--marcus .team__img { min-height: 0; height: auto; aspect-ratio: 4 / 5; }
+    .team__img, .team__cell--ana .team__img, .team__cell--marcus .team__img, .team__cell--extra .team__img { min-height: 0; height: auto; aspect-ratio: 4 / 5; }
   }
 </style>

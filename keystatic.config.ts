@@ -16,6 +16,7 @@ import { notFound } from './cms/singletons/notFound';
 import { designPage } from './cms/singletons/designPage';
 import { reviews } from './cms/singletons/reviews';
 import { settings } from './cms/singletons/settings';
+import { redirects } from './cms/singletons/redirects';
 
 export default config({
   storage: { kind: 'local' },
@@ -24,9 +25,9 @@ export default config({
     navigation: {
       Pages: ['home', 'about', 'servicesPage', 'journalPage', 'bookPage', 'notFound', 'designPage'],
       Content: ['services', 'journal', 'team', 'reviews'],
-      Settings: ['settings'],
+      Settings: ['settings', 'redirects'],
     },
   },
   collections: { services, journal, team },
-  singletons: { home, about, servicesPage, journalPage, bookPage, notFound, designPage, reviews, settings },
+  singletons: { home, about, servicesPage, journalPage, bookPage, notFound, designPage, reviews, settings, redirects },
 });

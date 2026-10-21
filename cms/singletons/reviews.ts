@@ -1,5 +1,5 @@
 import { singleton, fields } from '@keystatic/core';
-import { ICONS, photo, seoTitle, seoDescription, seoImage, cta } from '../fields';
+import { reqText, optText } from '../fields';
 
 export const reviews = singleton({
   label: 'Reviews',
@@ -7,8 +7,12 @@ export const reviews = singleton({
   format: { data: 'json' },
   schema: {
     items: fields.array(
-      fields.object({ quote: fields.text({ label: 'Quote', description: 'Keep it to three lines or less.', multiline: true }), name: fields.text({ label: 'Name' }), where: fields.text({ label: 'Neighbourhood' }) }),
-      { label: 'Reviews', itemLabel: (p) => p.fields.name.value || 'Review' },
+      fields.object({
+        quote: reqText('Blockquote (review text)', 'Keep it to three lines or less.', { multiline: true }),
+        name: reqText('Reviewer name (caption)'),
+        where: optText('Reviewer neighbourhood (caption)', 'Shown after the name.'),
+      }),
+      { label: 'Reviews (blockquote + name each)', description: 'The scrolling reviews strip on the home page. The strip is hidden when there are no reviews.', itemLabel: (p) => p.fields.name.value || 'Review' },
     ),
   },
 });

@@ -2,15 +2,18 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 export type Post = CollectionEntry<'journal'>;
 
-/** Published posts, newest first. Drafts show only on the local dev server. */
+// Drafts show on the local dev server and on staging builds (PUBLIC_SHOW_DRAFTS=1, set by the
+// publish Action) so editors can preview them; production builds leave them out.
+export const showDrafts = import.meta.env.DEV || !!import.meta.env.PUBLIC_SHOW_DRAFTS;
+
+/** Published posts (plus drafts where showDrafts), newest first. */
 export async function getPosts(): Promise<Post[]> {
-  const posts = await getCollection('journal', ({ data }) => import.meta.env.DEV || !data.draft);
+  const posts = await getCollection('journal', ({ data }) => showDrafts || !data.draft);
   return posts.sort((a, b) => +b.data.date - +a.data.date);
 }
 
-/** Uses the readMinutes field when set, otherwise ~200 words a minute. */
+/** Reading time, always calculated from the article at ~200 words a minute. */
 export function readMinutes(post: Post): number {
-  if (post.data.readMinutes) return post.data.readMinutes;
   const words = (post.body ?? '').split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
 }

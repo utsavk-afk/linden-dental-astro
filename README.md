@@ -107,16 +107,23 @@ Every piece of text, every photo and all SEO fields can be edited in a visual CM
 
 The CMS runs on your machine only (Keystatic local mode). The published site stays fully static, so there is no admin login to secure on the live server. To edit from a browser on staging instead, Keystatic can switch to GitHub mode, which needs a small server and a GitHub App.
 
-| CMS section | What it edits | File(s) |
+| CMS screen | What it edits | File(s) |
 |---|---|---|
-| Home page | Every headline, paragraph, photo and the five first-visit steps | `src/content/pages/home.json` |
-| About page | Headline, story, principles, bottom banner | `src/content/pages/about.json` |
-| Other pages (SEO) | SEO title and description for Services, Journal and Book | `src/content/pages/listings.json` |
-| Services | One page per service: summary, price, steps, FAQs, text, photo | `src/content/services/<slug>.md` |
-| Journal (blog) | Posts: title, author, date, topic, cover, rich-text article | `src/content/journal/<slug>.md` |
-| Team | Name, role, portrait, bio, "outside work" line | `src/content/team/<slug>.json` |
-| Reviews | The scrolling review strip | `src/content/reviews.json` |
-| Site settings and SEO | Name, phone, email, address, hours, booking label, SEO defaults | `src/content/settings.json` |
+| Pages > Home page | Every heading, paragraph, button/link (text + URL) and photo, the first-visit steps, meta tags | `src/content/pages/home.json` |
+| Pages > About page | H1, story, principles, team heading, call to action band, meta tags | `src/content/pages/about.json` |
+| Pages > Services page | Listing H1/intro/banner plus every label on service detail pages | `src/content/pages/servicesPage.json` |
+| Pages > Journal page | Listing H1/intro plus the labels on every post (back link, author line, updated, draft banner) | `src/content/pages/journalPage.json` |
+| Pages > Book a visit page | Every word of the booking page: labels, options, error messages, success message | `src/content/pages/bookPage.json` |
+| Pages > 404 page | Page not found copy and buttons | `src/content/pages/notFound.json` |
+| Pages > Design page | The whole /design/ page | `src/content/pages/designPage.json` |
+| Content > Services | One page per service: excerpt, price, steps, FAQs, content, featured image, meta tags | `src/content/services/<slug>.md` |
+| Content > Journal | Blog posts: H1, excerpt, author, category, dates, featured image, rich-text content, meta tags | `src/content/journal/<slug>.md` |
+| Content > Team | Name, role, portrait, bio, outside-work line | `src/content/team/<slug>.json` |
+| Content > Reviews | The scrolling review strip | `src/content/reviews.json` |
+| Settings > Site settings | Practice details, hours, header menu, booking button, footer, default CTA band, accessibility labels, default meta tags | `src/content/settings.json` |
+| Settings > Redirects (301) | Old URL to new URL, for changed slugs | `src/content/redirects.json` |
+
+Field labels follow WordPress / Yoast wording (H1 heading, Intro paragraph, Meta title, Meta description, Excerpt, Featured image alt text, Open Graph image). Required fields cannot be saved empty; optional ones fall back to sensible defaults (`src/lib/content.ts`). Every build runs `scripts/check-content.mjs`, which fails on raw `{% %}` tags, missing images or a post whose author is not a team member.
 
 All content is typed by the schemas in `src/content.config.ts`, so a missing or misspelled field fails the build with a clear message instead of shipping a broken page.
 

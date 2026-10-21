@@ -1,0 +1,7 @@
+{
+  "pageTitle": "Page not found",
+  "title": "This page has gone missing.",
+  "lede": "The link may be old, or the page may have moved. The rest of the site is still here.",
+  "primary": { "label": "Back to home", "link": "/" },
+  "secondary": { "label": "See our services", "link": "/services/" }
+}

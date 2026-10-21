@@ -2,22 +2,34 @@ import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
+// These schemas mirror the Keystatic fields in cms/. Keystatic deletes a cleared field from the
+// file instead of saving "", so:
+//   - fields the CMS refuses to save empty (validation in cms/) stay required here;
+//   - every field the CMS lets an editor clear is optional or has a default here, and the
+//     templates fall back when it is empty. Keep the two in step when adding a field.
+
+/** Optional text: missing (cleared in the CMS) reads as "". */
+const opt = () => z.string().default('');
+/** A cleared optional date can arrive as a missing key or null; both mean "no date". */
+const optDate = () => z.coerce.date().nullish().transform((d) => d ?? undefined);
+const link = z.object({ label: z.string(), link: z.string() });
+
 const services = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/services' }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
       summary: z.string(),
-      icon: z.string(),
-      order: z.number(),
+      icon: z.string().default('tooth'),
+      order: z.number().default(10),
       photo: image(),
       photoAlt: z.string(),
       price: z.string(),
       duration: z.string(),
-      steps: z.array(z.object({ title: z.string(), body: z.string() })),
+      steps: z.array(z.object({ title: z.string(), body: z.string() })).default([]),
       faqs: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
-      seoTitle: z.string().optional(),
-      seoDescription: z.string().optional(),
+      seoTitle: opt(),
+      seoDescription: opt(),
     }),
 });
 
@@ -28,14 +40,15 @@ const journal = defineCollection({
       title: z.string(),
       description: z.string(),
       date: z.coerce.date(),
+      updatedDate: optDate(),
       author: reference('team'),
       draft: z.boolean().default(false),
       cover: image(),
       coverAlt: z.string(),
-      readMinutes: z.number().optional(), // calculated from the article when empty
-      tag: z.string(),
-      seoTitle: z.string().optional(),
-      seoDescription: z.string().optional(),
+      // Read time is always calculated from the article (src/lib/journal.ts).
+      tag: z.string().default('Everyday care'),
+      seoTitle: opt(),
+      seoDescription: opt(),
     }),
 });
 
@@ -48,13 +61,17 @@ const team = defineCollection({
       role: z.string(),
       photo: image(),
       bio: z.string(),
-      outside: z.string(),
-      order: z.number(),
+      outside: opt(),
+      order: z.number().default(10),
     }),
 });
 
 // Page copy edited in the CMS (Keystatic singletons). Each is a single JSON file in
 // src/content/pages; image paths are relative to that file, so Astro optimises them.
+// SEO blocks are optional: a cleared block is saved as {} or dropped entirely.
+const seo = <T extends z.ZodType>(img: T) =>
+  z.object({ title: opt(), description: opt(), image: img.nullish() }).prefault({});
+
 const home = defineCollection({
   loader: glob({ pattern: 'home.json', base: './src/content/pages' }),
   schema: ({ image }) =>
@@ -67,21 +84,26 @@ const home = defineCollection({
       heroCardTitle: z.string(),
       heroCardText: z.string(),
       manifesto: z.string(),
+      manifestoCta: link,
       servicesTitle: z.string(),
       visitTitle: z.string(),
       visitLede: z.string(),
-      visitSteps: z.array(z.object({ title: z.string(), body: z.string(), image: image().nullable(), imageAlt: z.string().default('') })),
+      // A step with no image drops the key (or saves null): it shows the calendar card instead.
+      visitSteps: z.array(z.object({ title: z.string(), body: z.string(), image: image().nullish(), imageAlt: opt() })).default([]),
       teamTitle: z.string(),
       teamText: z.string(),
+      teamCta: link,
       reviewsTitle: z.string(),
+      reviewsLabel: z.string(),
       journalTitle: z.string(),
+      journalCta: link,
       findTitle: z.string(),
       findImage: image(),
       findImageAlt: z.string(),
       insurance: z.string(),
       parking: z.string(),
       access: z.string(),
-      seo: z.object({ title: z.string().default(''), description: z.string().default(''), image: image().nullable().default(null) }).default({ title: '', description: '', image: null }),
+      seo: seo(image()),
     }),
 });
 
@@ -94,13 +116,14 @@ const about = defineCollection({
       image: image(),
       imageAlt: z.string(),
       storyTitle: z.string(),
-      story: z.array(z.string()),
+      story: z.array(z.string()).default([]),
       principlesTitle: z.string(),
-      principles: z.array(z.object({ icon: z.string(), title: z.string(), body: z.string() })),
+      principles: z.array(z.object({ icon: z.string().default('clock'), title: z.string(), body: z.string() })).default([]),
       teamTitle: z.string(),
-      ctaTitle: z.string(),
-      ctaText: z.string(),
-      seo: z.object({ title: z.string().default(''), description: z.string().default(''), image: image().nullable().default(null) }).default({ title: '', description: '', image: null }),
+      // Optional overrides: empty means the site-wide call to action band wording (Site settings).
+      ctaTitle: opt(),
+      ctaText: opt(),
+      seo: seo(image()),
     }),
 });
 

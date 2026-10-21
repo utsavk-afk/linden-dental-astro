@@ -3,48 +3,47 @@ import { url } from '../lib/url';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import Logo from '../components/Logo.astro';
-import { palette, inspirations, motion } from '../data/design';
+import { palette } from '../data/design';
+import { designPage as page } from '../lib/content';
 
-const scale = [
-  { step: '--step-5', label: 'Display', sample: 'The family dentist' },
-  { step: '--step-4', label: 'Section', sample: 'Come and see us.' },
-  { step: '--step-3', label: 'Feature', sample: 'Check-ups and cleanings' },
-  { step: '--step-2', label: 'Card', sample: 'Leave with a written plan' },
-  { step: '--step-1', label: 'Lede', sample: 'Prices up front, no lectures.' },
-  { step: '--step-0', label: 'Body', sample: 'We book longer appointments and explain before we touch anything.' },
-];
+// Hex values come from code; each colour's name and use text come from the CMS, matched by token.
+const swatches = palette.map((c) => {
+  const words = page.colour.swatches.find((s) => s.token === c.token);
+  return { ...c, name: words?.name || c.token.slice(2), use: words?.use || '' };
+});
+const { principles, colour, type, components, motion, inspiration } = page;
 ---
-<Base title="Design language" description="The design system behind the Linden Dental Studio concept site: colour, type, shape, motion and the UK/US work that inspired it.">
+<Base title={page.seo.title || page.title} description={page.seo.description || undefined}>
   <section class="head">
     <div class="wrap">
-      <h1 data-split>Design language</h1>
-      <p class="lede" data-reveal>Warm minimal, for a family dentist. Calm enough for a nervous adult, friendly enough for a four-year-old, and specific enough to feel like a real neighbourhood practice.</p>
+      <h1 data-split>{page.title}</h1>
+      {page.lede && <p class="lede" data-reveal>{page.lede}</p>}
     </div>
   </section>
 
   <section class="section block">
     <div class="wrap">
-      <h2>Principles</h2>
+      <h2>{principles.title}</h2>
       <ul class="principles">
-        <li data-reveal><h3>Calm over clinical</h3><p class="muted">No hospital blue, no stock tooth renders. Paper tones, forest ink and real people.</p></li>
-        <li data-reveal><h3>Say the price</h3><p class="muted">Copy is plain and specific. Real prices, real times, no "starting from".</p></li>
-        <li data-reveal><h3>Motion explains</h3><p class="muted">Every animation reveals order or depth. Nothing loops for show, and reduced motion turns it all off.</p></li>
+        {principles.items.map((p) => (
+          <li data-reveal><h3>{p.title}</h3><p class="muted">{p.text}</p></li>
+        ))}
       </ul>
     </div>
   </section>
 
   <section class="section block">
     <div class="wrap">
-      <h2>Colour</h2>
-      <p class="muted measure">One accent. Bloom is a tint, used once per section at most, never on a control. Each theme is designed on its own terms.</p>
+      <h2>{colour.title}</h2>
+      {colour.intro && <p class="muted measure">{colour.intro}</p>}
       <div class="swatches">
-        {palette.map((c) => (
+        {swatches.map((c) => (
           <div class="swatch" data-reveal>
             <div class="swatch__chips"><span style={`background:${c.light}`}></span><span style={`background:${c.dark}`}></span></div>
             <strong>{c.name}</strong>
             <code>{c.token.slice(2)}</code>
             <span class="muted swatch__hex">{c.light} / {c.dark}</span>
-            <p class="muted">{c.use}</p>
+            {c.use && <p class="muted">{c.use}</p>}
           </div>
         ))}
       </div>
@@ -53,10 +52,10 @@ const scale = [
 
   <section class="section block">
     <div class="wrap">
-      <h2>Type</h2>
-      <p class="muted measure">Bricolage Grotesque for display: warm, slightly irregular, with optical sizes. Figtree for text: round and very readable. Emphasis uses colour, never italics.</p>
+      <h2>{type.title}</h2>
+      {type.intro && <p class="muted measure">{type.intro}</p>}
       <div class="specimen">
-        {scale.map((s) => (
+        {type.specimens.map((s) => (
           <div class="specimen__row" data-reveal>
             <span class="specimen__meta"><strong>{s.label}</strong><code>{s.step.slice(2)}</code></span>
             <span class={s.step === '--step-0' || s.step === '--step-1' ? 'specimen__text specimen__text--body' : 'specimen__text'} style={`font-size:var(${s.step})`}>{s.sample}</span>
@@ -68,16 +67,16 @@ const scale = [
 
   <section class="section block">
     <div class="wrap">
-      <h2>Shape and components</h2>
-      <p class="muted measure">Media and panels use soft corners (28px for photos, 18px for cards). Every interactive control is a pill. That rule holds on every page.</p>
+      <h2>{components.title}</h2>
+      {components.intro && <p class="muted measure">{components.intro}</p>}
       <div class="components">
         <div class="components__cell" data-reveal>
           <Logo />
         </div>
         <div class="components__cell" data-reveal>
-          <a class="btn" href={url('/book/')}>Book a visit <Icon name="arrow-right" /></a>
-          <a class="btn btn--ghost" href={url('/design/')}><Icon name="phone" /> Secondary</a>
-          <a class="link-arrow" href={url('/design/')}>Text link <Icon name="arrow-right" /></a>
+          <a class="btn" href={url('/book/')}>{components.primaryButton} <Icon name="arrow-right" /></a>
+          <a class="btn btn--ghost" href={url('/design/')}><Icon name="phone" /> {components.secondaryButton}</a>
+          <a class="link-arrow" href={url('/design/')}>{components.textLink} <Icon name="arrow-right" /></a>
         </div>
         <div class="components__cell components__cell--radii" data-reveal>
           <span style="border-radius:var(--r-lg)">28</span><span style="border-radius:var(--r-md)">18</span><span style="border-radius:var(--r-sm)">12</span><span style="border-radius:var(--pill)">pill</span>
@@ -88,10 +87,10 @@ const scale = [
 
   <section class="section block">
     <div class="wrap">
-      <h2>Motion</h2>
-      <p class="muted measure">GSAP with ScrollTrigger and SplitText. Each effect is opt-in by data attribute, moves only position and opacity, and switches off for anyone who prefers reduced motion.</p>
+      <h2>{motion.title}</h2>
+      {motion.intro && <p class="muted measure">{motion.intro}</p>}
       <dl class="motion">
-        {motion.map((m) => (
+        {motion.items.map((m) => (
           <div data-reveal>
             <dt>{m.name}</dt>
             <dd><p>{m.why}</p><p class="muted">{m.how}</p></dd>
@@ -103,15 +102,15 @@ const scale = [
 
   <section class="section block">
     <div class="wrap">
-      <h2>Inspiration</h2>
-      <p class="muted measure">UK and US studios only. We studied each one and took a single idea from it.</p>
+      <h2>{inspiration.title}</h2>
+      {inspiration.intro && <p class="muted measure">{inspiration.intro}</p>}
       <ul class="refs">
-        {inspirations.map((r) => (
+        {inspiration.items.map((r) => (
           <li data-reveal>
-            <a href={r.url} rel="noopener">
-              <span class="refs__who"><strong>{r.who}</strong><span class="muted">{r.where}</span></span>
+            <a href={r.url || undefined} rel="noopener">
+              <span class="refs__who"><strong>{r.who}</strong>{r.where && <span class="muted">{r.where}</span>}</span>
               <span class="refs__title">{r.title} <Icon name="arrow-up-right" /></span>
-              <span class="muted refs__took">{r.took}</span>
+              {r.took && <span class="muted refs__took">{r.took}</span>}
             </a>
           </li>
         ))}
