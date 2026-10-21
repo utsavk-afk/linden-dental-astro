@@ -25,4 +25,11 @@ export default defineConfig({
     sitemap({ filter: (page) => !page.endsWith('/404/') }),
     ...(isDev ? [keystatic()] : []),
   ],
+  vite: {
+    // Pre-bundle the CMS at startup so Vite never re-optimises it mid-session
+    // (that caused "504 Outdated Optimize Dep" and a blank /keystatic page).
+    optimizeDeps: { include: ['@keystatic/core', '@keystatic/core/ui', '@keystatic/astro/ui'] },
+    // Build output and local docs are not source; watching them triggered reloads.
+    server: { watch: { ignored: ['**/dist/**', '**/dist-psi/**', '**/docs/**'] } },
+  },
 });
