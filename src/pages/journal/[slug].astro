@@ -1,30 +1,37 @@
 ---
 import { url } from '../../lib/url';
 import { Image } from 'astro:assets';
-import { getCollection, render } from 'astro:content';
+import { getEntry, render } from 'astro:content';
+import { getPosts, readMinutes, formatDate as fmt } from '../../lib/journal';
+import { articleSchema, breadcrumbSchema } from '../../lib/seo';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import CtaBand from '../../components/CtaBand.astro';
 
 export async function getStaticPaths() {
-  const posts = (await getCollection('journal')).sort((a, b) => +b.data.date - +a.data.date);
+  const posts = await getPosts();
   return posts.map((entry) => ({ params: { slug: entry.id }, props: { entry, next: posts.filter((p) => p.id !== entry.id).slice(0, 2) } }));
 }
 const { entry, next } = Astro.props;
 const { Content } = await render(entry);
 const p = entry.data;
-const team = await getCollection('team');
-const author = team.find((m) => m.data.name === p.author);
-const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+const author = await getEntry(p.author);
+const authorName = author?.data.name ?? 'Linden Dental Studio';
+const siteUrl = new URL(url('/'), Astro.site).href;
+const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
+const jsonLd = [
+  articleSchema({ title: p.title, description: p.seoDescription || p.description, url: pageUrl, image: new URL(p.cover.src, Astro.site).href, date: p.date, author: authorName, siteUrl }),
+  breadcrumbSchema([{ name: 'Home', url: siteUrl }, { name: 'Journal', url: new URL(url('/journal/'), Astro.site).href }, { name: p.title, url: pageUrl }]),
+];
 ---
-<Base title={p.title} description={p.description} progress>
+<Base title={p.seoTitle || p.title} description={p.seoDescription || p.description} image={p.cover} type="article" jsonLd={jsonLd} progress>
   <article data-article>
     <header class="wrap head">
       <a class="back" href={url('/journal/')}><Icon name="arrow-left" /> Journal</a>
-      <p class="meta" data-reveal>{p.tag} <span aria-hidden="true">/</span> {p.readMinutes} min read</p>
+      <p class="meta" data-reveal>{p.tag} <span aria-hidden="true">/</span> {readMinutes(entry)} min read</p>
       <h1 data-split>{p.title}</h1>
       <p class="lede" data-reveal>{p.description}</p>
-      <p class="byline" data-reveal>{p.author}, <time datetime={p.date.toISOString()}>{fmt(p.date)}</time></p>
+      <p class="byline" data-reveal>{authorName}, <time datetime={p.date.toISOString()}>{fmt(p.date)}</time></p>
     </header>
     <div class="wrap">
       <div class="frame cover" data-parallax="5"><Image src={p.cover} alt={p.coverAlt} layout="full-width" loading="eager" /></div>

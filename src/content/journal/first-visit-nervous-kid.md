@@ -2,10 +2,9 @@
 title: Getting a nervous kid through their first check-up
 description: What we tell parents the week before, what to say in the car, and the one word to avoid.
 date: 2026-09-18
-author: Danielle Okafor, RDH
-cover: ../../assets/photos/kid-mirror.jpg
+author: danielle-okafor
+cover: ../../assets/journal/first-visit-nervous-kid/cover.jpg
 coverAlt: A young girl in the dental chair grinning at her teeth in a hand mirror.
-readMinutes: 4
 tag: Kids
 ---
 

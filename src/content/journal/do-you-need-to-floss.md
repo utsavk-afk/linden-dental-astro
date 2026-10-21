@@ -2,10 +2,9 @@
 title: Do you need to floss?
 description: A straight answer, and what to do instead if you know you will never floss.
 date: 2026-08-29
-author: Dr. Ana Whitlock, DDS
-cover: ../../assets/photos/brushes-bamboo.jpg
+author: ana-whitlock
+cover: ../../assets/journal/do-you-need-to-floss/cover.jpg
 coverAlt: Three wooden toothbrushes standing in a white cup next to a sprig of greenery.
-readMinutes: 3
 tag: Everyday care
 ---
 

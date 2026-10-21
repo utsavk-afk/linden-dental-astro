@@ -3,7 +3,7 @@ title: Fillings and crowns
 summary: Tooth-coloured fillings and same-week crowns, explained on screen first, priced before we start.
 icon: shield-check
 order: 4
-photo: ../../assets/photos/consult-explain.jpg
+photo: ../../assets/services/fillings-crowns/photo.jpg
 photoAlt: A dentist walking a patient through her x-rays on a tablet before treatment.
 price: Fillings $190 to $310. Crowns from $1,150. Insurance usually pays half or more.
 duration: 45 to 90 minutes

@@ -3,7 +3,7 @@ title: Clear aligners
 summary: Straighter teeth without metal braces, planned on a 3D scan, with check-ins every six to eight weeks.
 icon: sparkle
 order: 6
-photo: ../../assets/photos/aligner-case.jpg
+photo: ../../assets/services/clear-aligners/photo.jpg
 photoAlt: A hand lifting a clear aligner out of its open case.
 price: $3,900 to $5,400 depending on the case. Monthly payment plans available.
 duration: Usually 6 to 18 months

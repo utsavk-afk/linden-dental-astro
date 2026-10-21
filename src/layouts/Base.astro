@@ -5,11 +5,31 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site';
 import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import settings from '../content/settings.json';
+import defaultShare from '../assets/photos/hero-family.jpg';
+import { dentistSchema } from '../lib/seo';
 
-interface Props { title?: string; description?: string; progress?: boolean }
-const { title, description = `${site.name}: friendly family dentistry in Sellwood, Portland. Check-ups, kids’ dentistry, emergencies and clear aligners.`, progress = false } = Astro.props;
-const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | Family dentist in Sellwood, Portland`;
+// SEO: every page passes its own title/description (editable in the CMS); the rest has defaults.
+interface Props {
+  title?: string;           // page title; the site suffix is added unless it already names the practice
+  description?: string;
+  image?: ImageMetadata;    // social share image, cropped to 1200x630
+  type?: 'website' | 'article';
+  jsonLd?: (Record<string, unknown> | null)[];
+  progress?: boolean;
+}
+const { title, description, image, type = 'website', jsonLd = [], progress = false } = Astro.props;
+const metaDescription = description || settings.seoDefaultDescription;
+const fullTitle = !title
+  ? `${site.name} | Family dentist in Sellwood, Portland`
+  : title.includes(site.name) ? title : `${title} ${settings.seoTitleSuffix}`.trim();
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const siteUrl = new URL(url('/'), Astro.site).href;
+const share = await getImage({ src: image ?? defaultShare, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 80 });
+const shareUrl = new URL(share.src, Astro.site).href;
+const schemas = [dentistSchema(siteUrl, shareUrl), ...jsonLd].filter(Boolean);
 ---
 <!doctype html>
 <html lang="en-US">
@@ -17,12 +37,25 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescription} />
     {import.meta.env.PUBLIC_NOINDEX && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={shareUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={shareUrl} />
+    {settings.twitterHandle && <meta name="twitter:site" content={settings.twitterHandle} />}
+    <link rel="sitemap" href={url('/sitemap-index.xml')} />
+    {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
     <meta name="theme-color" content="#f3f3ec" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0f1612" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />

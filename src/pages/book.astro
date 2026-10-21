@@ -3,13 +3,14 @@ import { url } from '../lib/url';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { site } from '../data/site';
+import listings from '../content/pages/listings.json';
 
 const reasons = ['Check-up and clean', "Kids’ check-up", 'Toothache or something broken', 'Filling or crown', 'Clear aligners consult', 'Whitening', 'Not sure yet'];
 const days = ['Weekday mornings', 'Weekday afternoons', 'Saturday morning'];
 // Set at build time for the staging backend; empty means the form only simulates a send.
 const endpoint = import.meta.env.PUBLIC_BOOKING_ENDPOINT || '';
 ---
-<Base title="Book a visit" description="Request an appointment at Linden Dental Studio. We reply within one working day with a time and the full price.">
+<Base title={listings.book.title || 'Book a visit'} description={listings.book.description || undefined}>
   <section class="book">
     <div class="wrap book__grid">
       <div class="book__info">

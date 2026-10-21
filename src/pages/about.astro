@@ -1,44 +1,38 @@
 ---
 import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import CtaBand from '../components/CtaBand.astro';
-import studio from '../assets/photos/studio-room.jpg';
 
+// All copy and photos on this page are edited in the CMS: Keystatic > About page.
+const page = (await getEntry('about', 'about'))!.data;
 const team = (await getCollection('team')).sort((a, b) => a.data.order - b.data.order);
-const principles = [
-  { icon: 'clock', title: 'Longer appointments', body: 'An hour for a check-up, double time for nervous patients. We see fewer people a day so nobody is rushed.' },
-  { icon: 'wallet', title: 'Prices before treatment', body: 'You get the full cost in writing before you agree to anything, including what insurance should cover.' },
-  { icon: 'hand-waving', title: 'A stop signal you control', body: 'Raise your left hand and we stop. Every time, no questions, no sighing.' },
-  { icon: 'chat-circle', title: 'Explain, never lecture', body: 'We show you what we see on screen and tell you what can wait. Flossing guilt is not part of the service.' },
-];
+const principles = page.principles;
 ---
-<Base title="About us" description="Linden Dental Studio is a small family practice in Sellwood, Portland, built around longer appointments, clear prices and no judgement.">
+<Base title={page.seo.title || 'About us'} description={page.seo.description || 'Linden Dental Studio is a small family practice in Sellwood, Portland, built around longer appointments, clear prices and no judgement.'} image={page.seo.image ?? page.image}>
   <section class="intro">
     <div class="wrap">
-      <h1 data-split>A small practice, on purpose.</h1>
-      <p class="lede" data-reveal>Four people, two treatment rooms and appointments long enough to talk properly. That is the whole idea.</p>
+      <h1 data-split>{page.title}</h1>
+      <p class="lede" data-reveal>{page.lede}</p>
     </div>
     <div class="wrap">
-      <div class="frame intro__img" data-parallax="6"><Image src={studio} alt="A calm, sunlit treatment room with a single dental chair." layout="full-width" loading="eager" /></div>
+      <div class="frame intro__img" data-parallax="6"><Image src={page.image} alt={page.imageAlt} layout="full-width" loading="eager" /></div>
     </div>
   </section>
 
   <section class="section story">
     <div class="wrap story__grid">
-      <h2 data-split>Why Linden exists</h2>
+      <h2 data-split>{page.storyTitle}</h2>
       <div class="story__body measure" data-reveal>
-        <p>Ana spent nine years in a downtown group practice where every check-up was booked into fifteen minutes. She liked the people. She did not like watching patients leave confused about what had just happened in their own mouths.</p>
-        <p>In 2016 she took over a tired single-chair surgery on SE Tacoma Street, knocked through to the empty shop next door, and opened Linden with a simple rule: book less, explain more.</p>
-        <p>Ten years on, most new patients find us through a neighbour. A lot of them have not seen a dentist in years. We think that says more about how dentistry is usually delivered than about them.</p>
+        {page.story.map((p) => <p>{p}</p>)}
       </div>
     </div>
   </section>
 
   <section class="principles">
     <div class="wrap">
-      <h2 class="principles__title" data-split>What you can hold us to</h2>
+      <h2 class="principles__title" data-split>{page.principlesTitle}</h2>
       <ul class="principles__list">
         {principles.map((p) => (
           <li data-reveal>
@@ -53,7 +47,7 @@ const principles = [
 
   <section class="section" id="team" aria-labelledby="team-title">
     <div class="wrap">
-      <h2 id="team-title" data-split>The team</h2>
+      <h2 id="team-title" data-split>{page.teamTitle}</h2>
       <div class="people">
         {team.map((m) => (
           <article class="person" data-reveal>
@@ -70,7 +64,7 @@ const principles = [
     </div>
   </section>
 
-  <CtaBand title="Come and meet us." body="New patients are welcome most weeks. Book online, or call June and ask her anything first." />
+  <CtaBand title={page.ctaTitle} body={page.ctaText} />
 </Base>
 
 <style>

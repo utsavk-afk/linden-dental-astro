@@ -3,7 +3,7 @@ title: Kids’ dentistry
 summary: First visits from age one, check-ups that feel like a game, and sealants that stop most cavities before they start.
 icon: smiley
 order: 2
-photo: ../../assets/photos/kid-chair.jpg
+photo: ../../assets/services/kids/photo.jpg
 photoAlt: A young girl smiling up at a dentist from the chair while her mother sits beside her.
 price: $120 for a check-up under age 12. Covered by most plans and Oregon Health Plan.
 duration: 30 to 45 minutes

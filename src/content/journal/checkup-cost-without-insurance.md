@@ -2,10 +2,9 @@
 title: What a check-up costs in Portland without insurance
 description: Our prices, why they vary between practices, and how our membership plan works.
 date: 2026-08-07
-author: June Halvorsen
-cover: ../../assets/photos/reception.jpg
+author: june-halvorsen
+cover: ../../assets/journal/checkup-cost-without-insurance/cover.jpg
 coverAlt: A patient checking in at a wooden reception desk with a smiling coordinator.
-readMinutes: 4
 tag: Costs
 ---
 

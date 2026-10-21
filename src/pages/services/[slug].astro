@@ -2,6 +2,7 @@
 import { url } from '../../lib/url';
 import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
+import { faqSchema, breadcrumbSchema } from '../../lib/seo';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import CtaBand from '../../components/CtaBand.astro';
@@ -17,8 +18,13 @@ export async function getStaticPaths() {
 const { entry, others } = Astro.props;
 const { Content } = await render(entry);
 const s = entry.data;
+const siteUrl = new URL(url('/'), Astro.site).href;
+const jsonLd = [
+  faqSchema(s.faqs),
+  breadcrumbSchema([{ name: 'Home', url: siteUrl }, { name: 'Services', url: new URL(url('/services/'), Astro.site).href }, { name: s.title, url: new URL(Astro.url.pathname, Astro.site).href }]),
+];
 ---
-<Base title={s.title} description={s.summary}>
+<Base title={s.seoTitle || s.title} description={s.seoDescription || s.summary} image={s.photo} jsonLd={jsonLd}>
   <section class="hero">
     <div class="wrap hero__grid">
       <div class="hero__copy">

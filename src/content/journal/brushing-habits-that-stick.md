@@ -2,10 +2,9 @@
 title: The two-minute rule, and brushing habits that stick
 description: Small changes that get kids, and their parents, brushing properly without a nightly fight.
 date: 2026-07-16
-author: Dr. Marcus Oyelaran, DMD
-cover: ../../assets/photos/kids-brushing.jpg
+author: marcus-oyelaran
+cover: ../../assets/journal/brushing-habits-that-stick/cover.jpg
 coverAlt: Two children brushing their teeth together at a sunny bathroom sink.
-readMinutes: 3
 tag: Kids
 ---
 

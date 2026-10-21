@@ -3,7 +3,7 @@ title: Whitening
 summary: Custom take-home trays that whiten safely over two weeks, with less sensitivity than the shop-bought kind.
 icon: sun
 order: 7
-photo: ../../assets/photos/patient-mirror.jpg
+photo: ../../assets/services/whitening/photo.jpg
 photoAlt: A woman in the dental chair smiling at her teeth in a hand mirror.
 price: $350 for custom trays and gel. Top-up gel $40.
 duration: Two short visits

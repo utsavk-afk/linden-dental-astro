@@ -1,15 +1,17 @@
 ---
 import { url } from '../../lib/url';
 import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
+import { getEntry } from 'astro:content';
+import { getPosts, readMinutes, formatDate as fmt } from '../../lib/journal';
+import listings from '../../content/pages/listings.json';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 
-const posts = (await getCollection('journal')).sort((a, b) => +b.data.date - +a.data.date);
+const posts = await getPosts();
 const [feature, ...rest] = posts;
-const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+const featureAuthor = feature ? (await getEntry(feature.data.author))?.data.name : '';
 ---
-<Base title="Journal" description="Plain answers to the questions patients ask us most: costs, kids’ visits, flossing and more.">
+<Base title={listings.journal.title || 'Journal'} description={listings.journal.description || undefined}>
   <section class="head">
     <div class="wrap">
       <h1 data-split>Journal</h1>
@@ -21,10 +23,10 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'long', day: 'nu
     <a class="feature" href={url(`/journal/${feature.id}/`)} data-reveal>
       <div class="frame feature__img"><Image src={feature.data.cover} alt={feature.data.coverAlt} width={1200} height={900} loading="eager" /></div>
       <div class="feature__copy">
-        <p class="meta">{feature.data.tag} <span aria-hidden="true">/</span> {feature.data.readMinutes} min read</p>
+        <p class="meta">{feature.data.tag} <span aria-hidden="true">/</span> {readMinutes(feature)} min read</p>
         <h2>{feature.data.title}</h2>
         <p class="muted">{feature.data.description}</p>
-        <p class="byline">{feature.data.author}, {fmt(feature.data.date)}</p>
+        <p class="byline">{featureAuthor}, {fmt(feature.data.date)}</p>
         <span class="link-arrow">Read it <Icon name="arrow-right" /></span>
       </div>
     </a>
@@ -38,7 +40,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'long', day: 'nu
             <a href={url(`/journal/${p.id}/`)} class="row">
               <div class="frame row__img"><Image src={p.data.cover} alt={p.data.coverAlt} width={480} height={360} /></div>
               <div class="row__copy">
-                <p class="meta">{p.data.tag} <span aria-hidden="true">/</span> {p.data.readMinutes} min read</p>
+                <p class="meta">{p.data.tag} <span aria-hidden="true">/</span> {readMinutes(p)} min read</p>
                 <h2>{p.data.title}</h2>
                 <p class="muted">{p.data.description}</p>
               </div>

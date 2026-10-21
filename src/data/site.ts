@@ -1,23 +1,23 @@
-import { url } from '../lib/url';
+// Practice details. Edit them in the CMS (Keystatic > Site settings) or in
+// src/content/settings.json; this file only derives links from them.
 // Linden Dental Studio is a fictional practice. Phone uses the reserved 555-01xx range.
+import { url } from '../lib/url';
+import settings from '../content/settings.json';
+
 export const site = {
-  name: 'Linden Dental Studio',
-  short: 'Linden',
-  tagline: 'Family dentistry in Sellwood, Portland',
-  phone: '(503) 555-0142',
-  phoneHref: 'tel:+15035550142',
-  email: 'hello@lindendental.example',
-  address: ['1504 SE Tacoma St', 'Portland, OR 97202'],
-  mapHref: 'https://www.openstreetmap.org/search?query=SE%20Tacoma%20St%20Portland',
-  hours: [
-    { days: 'Mon to Thu', time: '7:30 am to 6:00 pm' },
-    { days: 'Friday', time: '7:30 am to 3:00 pm' },
-    { days: 'Saturday', time: '8:00 am to 1:00 pm' },
-  ],
+  name: settings.name,
+  short: settings.name.split(' ')[0],
+  tagline: settings.tagline,
+  phone: settings.phone,
+  phoneHref: 'tel:+1' + settings.phone.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, ''),
+  email: settings.email,
+  address: [settings.addressLine1, settings.addressLine2].filter(Boolean),
+  mapHref: settings.mapLink,
+  hours: settings.hours,
   nav: [
     { href: url('/about/'), label: 'About' },
     { href: url('/services/'), label: 'Services' },
     { href: url('/journal/'), label: 'Journal' },
   ],
-  cta: { href: url('/book/'), label: 'Book a visit' },
+  cta: { href: url('/book/'), label: settings.bookLabel },
 };

@@ -22,7 +22,7 @@ npm run preview   # serves dist/ locally to check the production build
 | Part | What we use |
 | --- | --- |
 | Framework | Astro 6.4, static output |
-| Content | Content collections: services and journal as Markdown (glob loader), team as JSON (file loader) |
+| Content | Content collections (glob loader): services and journal as Markdown, team and page copy as JSON. Edited in the Keystatic CMS (local mode) |
 | Images | `astro:assets` with responsive `srcset`, WebP output, default layout `constrained` |
 | Page changes | Astro `ClientRouter` view transitions, link prefetch on hover |
 | Motion | GSAP 3.15 with ScrollTrigger and SplitText |
@@ -78,11 +78,14 @@ linden-dental-astro/
     ├── content/
     │   ├── services/         7 Markdown files
     │   ├── journal/          4 Markdown files
-    │   └── team.json         4 team members
+    │   ├── team/             one JSON file per team member
+    │   ├── pages/            home, about and listing-page copy + SEO (CMS singletons)
+    │   ├── settings.json     practice details + SEO defaults
+    │   └── reviews.json      the review strip
     ├── data/
     │   ├── design.ts         palette, inspirations, motion list (feeds /design/)
     │   ├── reviews.ts        sample reviews (fictional)
-    │   └── site.ts           name, phone, address, hours, nav
+    │   └── site.ts           derives links from content/settings.json
     ├── layouts/
     │   └── Base.astro        head, skip link, theme and motion flags, nav, footer
     ├── pages/                see the table above
@@ -93,77 +96,50 @@ linden-dental-astro/
         └── global.css        tokens, base type, buttons, frames, motion gating
 ```
 
-## How content works
+## Editing content (Keystatic CMS)
 
-All content is typed by the schemas in `src/content.config.ts`. A missing or misspelled field fails the build with a clear message.
+Every piece of text, every photo and all SEO fields can be edited in a visual CMS. No code needed.
 
-### Add a service
+1. Run `npm run dev`.
+2. Open http://localhost:4321/keystatic.
+3. Edit and press **Save**. The change is written straight into the files in `src/content` (images into `src/assets`) and shows on http://localhost:4321 within a second.
+4. Publish: commit and push to GitHub, then run the staging deploy (see Deploying).
 
-1. Put a photo in `src/assets/photos/` (or run it through the photo pipeline below).
-2. Create `src/content/services/<slug>.md`. The file name becomes the URL, `/services/<slug>/`.
-3. Fill in the frontmatter, then write one or two short paragraphs of body copy:
+The CMS runs on your machine only (Keystatic local mode). The published site stays fully static, so there is no admin login to secure on the live server. To edit from a browser on staging instead, Keystatic can switch to GitHub mode, which needs a small server and a GitHub App.
 
-```yaml
----
-title: Check-ups and cleanings
-summary: One or two plain sentences. Shown in lists and as the page description.
-icon: tooth                  # must be in the allow-list in src/components/Icon.astro
-order: 1                     # position in every list
-photo: ../../assets/photos/consult-brushing.jpg
-photoAlt: A dentist showing a patient how to angle a toothbrush along the gum line.
-price: $185 without insurance. Usually covered in full by PPO plans.
-duration: 60 minutes
-steps:                       # shown as "What happens"
-  - title: Talk first
-    body: We ask what has changed since last time.
-faqs:                        # optional
-  - q: How often should I come in?
-    a: Every six months suits most adults and kids.
----
-```
+| CMS section | What it edits | File(s) |
+|---|---|---|
+| Home page | Every headline, paragraph, photo and the five first-visit steps | `src/content/pages/home.json` |
+| About page | Headline, story, principles, bottom banner | `src/content/pages/about.json` |
+| Other pages (SEO) | SEO title and description for Services, Journal and Book | `src/content/pages/listings.json` |
+| Services | One page per service: summary, price, steps, FAQs, text, photo | `src/content/services/<slug>.md` |
+| Journal (blog) | Posts: title, author, date, topic, cover, rich-text article | `src/content/journal/<slug>.md` |
+| Team | Name, role, portrait, bio, "outside work" line | `src/content/team/<slug>.json` |
+| Reviews | The scrolling review strip | `src/content/reviews.json` |
+| Site settings and SEO | Name, phone, email, address, hours, booking label, SEO defaults | `src/content/settings.json` |
 
-The page, the home page list and the services grid pick it up on the next build. The services grid gives wide cards to the first and seventh items, so check that layout if you add an eighth service. To use a new icon, add its Phosphor name to the glob in `Icon.astro`; only listed icons ship.
+All content is typed by the schemas in `src/content.config.ts`, so a missing or misspelled field fails the build with a clear message instead of shipping a broken page.
 
-### Add a journal post
+### Writing a blog post
 
-Create `src/content/journal/<slug>.md`:
+In the CMS open **Journal (blog)** and choose **Create**. Type the title (the URL slug fills in from it), pick the author from the team list, upload a cover photo, write the article in the editor (headings, bold, links, lists and inline images all work), then Save.
 
-```yaml
----
-title: Do you need to floss?
-description: One sentence. Used on cards and as the meta description.
-date: 2026-08-29
-author: Dr. Ana Whitlock, DDS   # must match a name in team.json to show the author box
-cover: ../../assets/photos/brushes-bamboo.jpg
-coverAlt: Three wooden toothbrushes standing in a white cup next to a sprig of greenery.
-readMinutes: 3
-tag: Everyday care
----
-```
+- **Draft** keeps a post on your local preview only; it is left out of the published build, the sitemap and the journal list until you untick it.
+- Read time is calculated from the article length. Use headings from level 2 down, because the title is the page's only h1.
+- Inline images in an article are saved under `src/assets/journal/<slug>/` and optimised by Astro like every other photo.
 
-Posts sort by date, newest first. The newest post becomes the feature on `/journal/` and on the home page. Use `##` for headings inside the post, since the title is the page's only `h1`.
+### Services and team
 
-### Add or edit a team member
+Service, post and team images live in one folder per entry, for example `src/assets/services/kids/photo.jpg`. That is the layout Keystatic expects; uploading a new photo in the CMS replaces the file there. Service icons come from the allow-list in `src/components/Icon.astro`. The home page team bento has exactly four grid areas, so a fifth person needs a small layout change in `index.astro`.
 
-Add an object to `src/content/team.json`. The photo path is relative to the JSON file:
+## SEO
 
-```json
-{
-  "id": "june-halvorsen",
-  "name": "June Halvorsen",
-  "role": "Patient coordinator",
-  "photo": "../assets/photos/team-june.jpg",
-  "bio": "Two or three sentences.",
-  "outside": "One human detail from outside work.",
-  "order": 4
-}
-```
-
-The about page lists everyone. The home page bento has exactly four named grid areas (`ana`, `marcus`, `dani`, `june` in `index.astro`), so a fifth person needs a layout change there.
-
-### Practice details
-
-Name, phone, email, address, opening hours and nav links live in `src/data/site.ts`. Reviews live in `src/data/reviews.ts`.
+- **Per page:** every service and post has optional SEO title and SEO description fields. Home and About also take a social share image. Empty fields fall back to the page title and summary.
+- **Titles:** the site suffix (Site settings) is added automatically, for example "Kids’ dentistry | Linden Dental Studio".
+- **Social cards:** Open Graph and Twitter tags on every page, with the share image cropped to 1200 x 630.
+- **Structured data (JSON-LD):** a `Dentist` listing on every page (name, address, phone, email, opening hours, all built from Site settings), `FAQPage` on service pages, `Article` on posts, and `BreadcrumbList` on detail pages.
+- **Sitemap and robots:** `@astrojs/sitemap` writes `sitemap-index.xml`; `robots.txt` points to it. Staging builds (`PUBLIC_NOINDEX=1`) add a noindex meta tag and a robots.txt that blocks everything, so staging never competes with the real site.
+- **Canonical URLs** come from `site` and `base` in `astro.config.mjs`. Set `LINDEN_SITE` to the real domain before launch.
 
 ## Photo pipeline
 

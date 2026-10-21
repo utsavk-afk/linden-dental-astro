@@ -3,7 +3,7 @@ title: Emergency care
 summary: Toothache, a chipped tooth or a lost filling. We keep slots open every weekday for same-day and next-day visits.
 icon: first-aid-kit
 order: 5
-photo: ../../assets/photos/xray.jpg
+photo: ../../assets/services/emergencies/photo.jpg
 photoAlt: A dentist holding up a patient's x-ray and pointing out the problem tooth.
 price: $95 for the emergency exam and x-ray. Treatment priced on the day.
 duration: 30 minutes to start

@@ -3,7 +3,7 @@ title: Nervous patients
 summary: Longer appointments, a stop signal you control, and the option of nitrous oxide. No judgement about how long it has been.
 icon: hand-heart
 order: 3
-photo: ../../assets/photos/patient-chair.jpg
+photo: ../../assets/services/nervous-patients/photo.jpg
 photoAlt: A young woman laughing with the dentist during her appointment.
 price: No extra charge for longer slots. Nitrous oxide is $75 per visit.
 duration: We book double time

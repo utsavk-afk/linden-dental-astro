@@ -3,7 +3,7 @@ title: Check-ups and cleanings
 summary: A full exam, a gentle clean and a plain-English rundown of what we saw. Every six months for most people.
 icon: tooth
 order: 1
-photo: ../../assets/photos/consult-brushing.jpg
+photo: ../../assets/services/checkups/photo.jpg
 photoAlt: A dentist showing a patient how to angle a toothbrush along the gum line.
 price: $185 without insurance. Usually covered in full by PPO plans.
 duration: 60 minutes

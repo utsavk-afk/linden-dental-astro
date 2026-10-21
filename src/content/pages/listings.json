@@ -1,0 +1,14 @@
+{
+  "services": {
+    "title": "Dental services in Sellwood, Portland",
+    "description": "Check-ups, kids’ dentistry, nervous patients, fillings and crowns, emergency care, clear aligners and whitening in Sellwood, Portland. Real prices listed."
+  },
+  "journal": {
+    "title": "Journal: straight answers about your teeth",
+    "description": "Plain answers to the questions patients ask us most: costs, kids’ visits, flossing and more."
+  },
+  "book": {
+    "title": "Book a visit",
+    "description": "Request an appointment at Linden Dental Studio. We reply within one working day with a time and the full price."
+  }
+}
