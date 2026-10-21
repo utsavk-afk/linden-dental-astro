@@ -46,7 +46,7 @@ const endpoint = import.meta.env.PUBLIC_BOOKING_ENDPOINT || '';
             </div>
             <div class="field">
               <label for="phone">Phone</label>
-              <input id="phone" name="phone" type="tel" autocomplete="tel" required pattern="[0-9()+\- .]{7,}" aria-describedby="phone-error" />
+              <input id="phone" name="phone" type="tel" autocomplete="tel" required pattern="[0-9 \(\)\+\-\.]{7,}" aria-describedby="phone-error" />
               <p class="error" id="phone-error" aria-live="polite"></p>
             </div>
           </div>
