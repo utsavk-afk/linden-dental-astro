@@ -26,3 +26,4 @@ pnpm-debug.log*
 # licensed Envato originals (only web-sized copies in src/assets are committed)
 docs/envato-downloads/
 dist-psi/
+docs/walkthrough.html
