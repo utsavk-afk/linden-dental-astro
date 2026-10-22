@@ -9,22 +9,23 @@ import { getAboutPage, getTeam } from '../lib/cms';
 // All copy and photos on this page are edited in the CMS: EmDash > About page.
 const [site, page, team] = await Promise.all([getSite(), getAboutPage(), getTeam()]);
 const principles = page.principles;
+const e = page.edit; // inline-edit annotations (EmDash Edit mode)
 ---
 <Base title={page.seo.title || 'About us'} description={page.seo.description || 'Linden Dental Studio is a small family practice in Sellwood, Portland, built around longer appointments, clear prices and no judgement.'} image={page.seo.image ?? page.image}>
   <section class="intro">
     <div class="wrap">
-      <h1 data-split>{page.title}</h1>
-      <p class="lede" data-reveal>{page.lede}</p>
+      <h1 data-split {...e.title}>{page.title}</h1>
+      <p class="lede" data-reveal {...e.lede}>{page.lede}</p>
     </div>
     <div class="wrap">
-      <div class="frame intro__img" data-parallax="6"><CmsImage image={page.image} alt={page.imageAlt} layout="full-width" loading="eager" /></div>
+      <div class="frame intro__img" data-parallax="6" {...e.image}><CmsImage image={page.image} alt={page.imageAlt} layout="full-width" loading="eager" /></div>
     </div>
   </section>
 
   <section class="section story">
     <div class="wrap story__grid">
-      <h2 data-split>{page.storyTitle}</h2>
-      <div class="story__body measure" data-reveal>
+      <h2 data-split {...e.story_title}>{page.storyTitle}</h2>
+      <div class="story__body measure" data-reveal {...e.story}>
         {page.story.map((p) => <p>{p}</p>)}
       </div>
     </div>
@@ -32,8 +33,8 @@ const principles = page.principles;
 
   <section class="principles">
     <div class="wrap">
-      <h2 class="principles__title" data-split>{page.principlesTitle}</h2>
-      <ul class="principles__list">
+      <h2 class="principles__title" data-split {...e.principles_title}>{page.principlesTitle}</h2>
+      <ul class="principles__list" {...e.principles}>
         {principles.map((p) => (
           <li data-reveal>
             <span class="principles__icon"><Icon name={p.icon} size="1.5rem" /></span>
@@ -47,16 +48,16 @@ const principles = page.principles;
 
   <section class="section" id="team" aria-labelledby="team-title">
     <div class="wrap">
-      <h2 id="team-title" data-split>{page.teamTitle}</h2>
+      <h2 id="team-title" data-split {...e.team_title}>{page.teamTitle}</h2>
       <div class="people">
         {team.map((m) => (
           <article class="person" data-reveal>
-            <div class="frame person__img" data-parallax="4"><CmsImage image={m.photo} alt={fill(site.labels.portraitAlt, { name: m.name })} width={720} height={860} /></div>
+            <div class="frame person__img" data-parallax="4" {...m.edit.photo}><CmsImage image={m.photo} alt={fill(site.labels.portraitAlt, { name: m.name })} width={720} height={860} /></div>
             <div class="person__copy">
-              <h3>{m.name}</h3>
-              <p class="person__role">{m.role}</p>
-              <p>{m.bio}</p>
-              {m.outside && <p class="person__outside"><Icon name="leaf" /> {m.outside}</p>}
+              <h3 {...m.edit.name}>{m.name}</h3>
+              <p class="person__role" {...m.edit.role}>{m.role}</p>
+              <p {...m.edit.bio}>{m.bio}</p>
+              {m.outside && <p class="person__outside"><Icon name="leaf" /> <span {...m.edit.outside}>{m.outside}</span></p>}
             </div>
           </article>
         ))}
@@ -64,7 +65,7 @@ const principles = page.principles;
     </div>
   </section>
 
-  <CtaBand title={page.ctaTitle} body={page.ctaText} />
+  <CtaBand title={page.ctaTitle} body={page.ctaText} titleEdit={e.cta_title} bodyEdit={e.cta_text} />
 </Base>
 
 <style>

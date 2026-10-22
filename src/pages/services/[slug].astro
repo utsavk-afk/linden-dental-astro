@@ -19,6 +19,10 @@ if (i < 0) return new Response(null, { status: 404 });
 const s = services[i];
 const others = services.length > 1 ? [1, 2, 3].map((n) => services[(i + n) % services.length]) : [];
 const t = page.detail;
+// Inline editing (EmDash Edit mode): this service, the services page labels, site settings.
+const e = s.edit;
+const pe = page.edit;
+const se = site.settings.edit;
 const siteUrl = new URL(url('/'), Astro.site).href;
 const jsonLd = [
   faqSchema(s.faqs),
@@ -29,19 +33,19 @@ const jsonLd = [
   <section class="hero">
     <div class="wrap hero__grid">
       <div class="hero__copy">
-        <a class="back" href={url('/services/')}><Icon name="arrow-left" /> {t.backLabel}</a>
-        <span class="hero__icon" data-reveal><Icon name={s.icon} size="1.6rem" /></span>
-        <h1 data-split>{s.title}</h1>
-        <p class="lede" data-reveal>{s.summary}</p>
+        <a class="back" href={url('/services/')}><Icon name="arrow-left" /> <span {...pe.detail_back_label}>{t.backLabel}</span></a>
+        <span class="hero__icon" data-reveal {...e.icon}><Icon name={s.icon} size="1.6rem" /></span>
+        <h1 data-split {...e.title}>{s.title}</h1>
+        <p class="lede" data-reveal {...e.summary}>{s.summary}</p>
         <dl class="facts" data-reveal>
-          <div><dt>{t.costLabel}</dt><dd>{s.price}</dd></div>
-          <div><dt>{t.timeLabel}</dt><dd>{s.duration}</dd></div>
+          <div><dt {...pe.detail_cost_label}>{t.costLabel}</dt><dd {...e.price}>{s.price}</dd></div>
+          <div><dt {...pe.detail_time_label}>{t.timeLabel}</dt><dd {...e.duration}>{s.duration}</dd></div>
         </dl>
         <div class="actions" data-reveal>
-          <a class="btn btn--lg" href={site.cta.href}>{site.cta.label} <Icon name="arrow-right" /></a>
+          <a class="btn btn--lg" href={site.cta.href}><span {...se.primary_cta_label}>{site.cta.label}</span> <Icon name="arrow-right" /></a>
         </div>
       </div>
-      <div class="frame hero__img" data-parallax="6"><CmsImage image={s.photo} alt={s.photoAlt} layout="full-width" loading="eager" /></div>
+      <div class="frame hero__img" data-parallax="6" {...e.photo}><CmsImage image={s.photo} alt={s.photoAlt} layout="full-width" loading="eager" /></div>
     </div>
   </section>
 
@@ -50,8 +54,8 @@ const jsonLd = [
       <div class="detail__intro prose" data-reveal><RichText value={s.body} /></div>
       {s.steps.length > 0 && (
       <div class="steps">
-        <h2 class="steps__title" data-split>{t.stepsTitle}</h2>
-        <ol>
+        <h2 class="steps__title" data-split {...pe.detail_steps_title}>{t.stepsTitle}</h2>
+        <ol {...e.steps}>
           {s.steps.map((st, i) => (
             <li data-reveal>
               <span class="steps__n" aria-hidden="true">{i + 1}</span>
@@ -67,7 +71,7 @@ const jsonLd = [
   {s.faqs.length > 0 && (
     <section class="faq">
       <div class="wrap faq__grid">
-        <h2 data-split>{t.faqTitle}</h2>
+        <h2 data-split {...pe.detail_faq_title}>{t.faqTitle}</h2>
         <div class="faq__list">
           {s.faqs.map((f) => (
             <details data-reveal>
@@ -83,13 +87,13 @@ const jsonLd = [
   {others.length > 0 && (
   <section class="section more">
     <div class="wrap">
-      <h2 class="more__title">{t.moreTitle}</h2>
+      <h2 class="more__title" {...pe.detail_more_title}>{t.moreTitle}</h2>
       <ul class="more__list">
         {others.map((o) => (
           <li data-reveal>
             <a href={url(`/services/${o.id}/`)}>
               <span class="more__icon"><Icon name={o.icon} /></span>
-              <span><strong>{o.title}</strong><span class="muted">{o.duration}</span></span>
+              <span><strong {...o.edit.title}>{o.title}</strong><span class="muted" {...o.edit.duration}>{o.duration}</span></span>
               <Icon name="arrow-right" class="more__go" />
             </a>
           </li>
@@ -99,7 +103,7 @@ const jsonLd = [
   </section>
   )}
 
-  <CtaBand title={t.ctaTitle || undefined} body={t.ctaText || undefined} />
+  <CtaBand title={t.ctaTitle || undefined} body={t.ctaText || undefined} titleEdit={pe.detail_cta_title} bodyEdit={pe.detail_cta_text} />
 </Base>
 
 <style>

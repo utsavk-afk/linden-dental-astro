@@ -10,6 +10,10 @@ import type { ImageMetadata } from 'astro';
 import type { CmsImage } from '../lib/cms';
 import defaultShare from '../assets/photos/hero-family.jpg';
 import { dentistSchema } from '../lib/seo';
+import { getEntryRef, SEARCH_COLLECTIONS } from '../lib/cms';
+import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from 'emdash/ui';
+import WebMcpSearch from 'emdash/ui/webmcp-search';
+import { createPublicPageContext } from 'emdash/page';
 
 // SEO: every page passes its own title/description (editable in the CMS); the rest has defaults.
 interface Props {
@@ -19,8 +23,11 @@ interface Props {
   type?: 'website' | 'article';
   jsonLd?: (Record<string, unknown> | null)[];
   progress?: boolean;
+  noindex?: boolean;        // e.g. search results
+  /** The CMS entry this page renders. Detected for /journal/<slug>/ and /services/<slug>/. */
+  content?: { collection: string; slug: string };
 }
-const { title, description, image, type = 'website', jsonLd = [], progress = false } = Astro.props;
+const { title, description, image, type = 'website', jsonLd = [], progress = false, noindex = false } = Astro.props;
 const site = await getSite();
 const { settings } = site;
 const metaDescription = description || settings.seoDefaultDescription;
@@ -41,7 +48,37 @@ if (image?.src && isCmsImage(image)) {
   const share = await getImage({ src: local, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 80 });
   shareUrl = new URL(share.src, Astro.site).href;
 }
-const schemas = [dentistSchema(siteUrl, shareUrl, settings), ...jsonLd].filter(Boolean);
+// EmDash head/body hooks. EmDashHead writes description, robots, canonical, Open Graph, Twitter
+// and the primary JSON-LD graph (BlogPosting on articles), after overlaying the entry's SEO panel
+// (meta description, share image, canonical, noindex), plus whatever plugins contribute; this
+// layout keeps <title>, og:locale, image size, twitter:site and its own JSON-LD. An Article graph
+// passed in jsonLd feeds the article dates/author instead, so posts carry one article graph.
+const detail = Astro.props.content ?? (() => {
+  const m = Astro.url.pathname.match(/^\/(journal|services)\/([^/]+)\/?$/);
+  return m ? { collection: m[1], slug: decodeURIComponent(m[2]) } : undefined;
+})();
+const ref = detail ? await getEntryRef(detail.collection, detail.slug) : null;
+const isArticle = (s: Record<string, unknown> | null) => s?.['@type'] === 'Article';
+const article = type === 'article' ? (jsonLd.find(isArticle) as Record<string, unknown> | undefined) : undefined;
+const articleAuthor = (article?.author as { name?: string } | undefined)?.name;
+const robots = import.meta.env.PUBLIC_NOINDEX || noindex ? 'noindex, nofollow' : null;
+const pageContext = createPublicPageContext({
+  Astro,
+  kind: ref ? 'content' : 'custom',
+  pageType: type,
+  title: fullTitle,
+  description: metaDescription,
+  canonical: canonical.href,
+  image: shareUrl,
+  siteName: site.name,
+  siteUrl,
+  seo: { robots },
+  ...(ref ? { content: { collection: ref.collection, id: ref.id, slug: ref.slug } } : {}),
+  ...(article ? { articleMeta: { publishedTime: String(article.datePublished ?? ''), modifiedTime: String(article.dateModified ?? ''), author: articleAuthor ?? null } } : {}),
+});
+const showShareSize = !ref?.hasSeoImage; // a share image set in the SEO panel has its own size
+const schemas = [dentistSchema(siteUrl, shareUrl, settings), ...jsonLd.filter((s) => !(article && s === article))].filter(Boolean);
+const searchRoutes = { journal: url('/journal/:slug/'), services: url('/services/:slug/') };
 ---
 <!doctype html>
 <html lang="en-US">
@@ -49,22 +86,10 @@ const schemas = [dentistSchema(siteUrl, shareUrl, settings), ...jsonLd].filter(B
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
-    <meta name="description" content={metaDescription} />
-    {import.meta.env.PUBLIC_NOINDEX && <meta name="robots" content="noindex, nofollow" />}
-    <link rel="canonical" href={canonical} />
-    <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={metaDescription} />
-    <meta property="og:type" content={type} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:site_name" content={site.name} />
+    <EmDashHead page={pageContext} />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:image" content={shareUrl} />
-    {shareSize.width && <meta property="og:image:width" content={String(shareSize.width)} />}
-    {shareSize.height && <meta property="og:image:height" content={String(shareSize.height)} />}
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={fullTitle} />
-    <meta name="twitter:description" content={metaDescription} />
-    <meta name="twitter:image" content={shareUrl} />
+    {showShareSize && shareSize.width && <meta property="og:image:width" content={String(shareSize.width)} />}
+    {showShareSize && shareSize.height && <meta property="og:image:height" content={String(shareSize.height)} />}
     {settings.twitterHandle && <meta name="twitter:site" content={settings.twitterHandle} />}
     <link rel="sitemap" href={url('/sitemap.xml')} />
     <link rel="alternate" type="application/rss+xml" title={site.name} href={url('/rss.xml')} />
@@ -87,6 +112,7 @@ const schemas = [dentistSchema(siteUrl, shareUrl, settings), ...jsonLd].filter(B
     <ClientRouter />
   </head>
   <body>
+    <EmDashBodyStart page={pageContext} />
     <a class="skip" href="#main">{site.labels.skipLink}</a>
     <Nav />
     {progress && <div class="progress" data-progress aria-hidden="true"></div>}
@@ -94,6 +120,8 @@ const schemas = [dentistSchema(siteUrl, shareUrl, settings), ...jsonLd].filter(B
       <slot />
     </main>
     <Footer />
+    <WebMcpSearch collections={SEARCH_COLLECTIONS} routeMap={searchRoutes} />
+    <EmDashBodyEnd page={pageContext} />
 
     <script>
       import { initMotion, destroyMotion } from '../scripts/motion';

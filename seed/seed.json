@@ -157,7 +157,7 @@
 			"slug": "journal",
 			"label": "Journal (blog posts)",
 			"labelSingular": "Journal post",
-			"description": "Blog posts at /journal/<slug>/. Drafts are only visible in preview.",
+			"description": "Blog posts at /journal/<slug>/. Drafts are only visible in preview. Categories and tags have their own archive pages; comments are moderated under Comments.",
 			"urlPattern": "/journal/{slug}/",
 			"routable": true,
 			"sortOrder": 2,
@@ -246,7 +246,8 @@
 					"type": "portableText",
 					"searchable": true
 				}
-			]
+			],
+			"commentsEnabled": true
 		},
 		{
 			"slug": "team",
@@ -1796,6 +1797,101 @@
 			"urlPattern": "/"
 		}
 	],
+	"taxonomies": [
+		{
+			"name": "category",
+			"label": "Categories",
+			"labelSingular": "Category",
+			"hierarchical": true,
+			"collections": [
+				"journal"
+			],
+			"terms": [
+				{
+					"slug": "kids",
+					"label": "Kids",
+					"description": "Notes for parents: first visits, brushing battles and what is normal at each age."
+				},
+				{
+					"slug": "everyday-care",
+					"label": "Everyday care",
+					"description": "The small daily habits that keep teeth and gums healthy between visits."
+				},
+				{
+					"slug": "costs",
+					"label": "Costs",
+					"description": "What things cost, how insurance works, and how our membership plan can help."
+				},
+				{
+					"slug": "treatments",
+					"label": "Treatments",
+					"description": "What happens during a filling, crown, whitening or aligner treatment, step by step."
+				},
+				{
+					"slug": "news",
+					"label": "News",
+					"description": "What is new at the studio: hours, people and changes to how we work."
+				}
+			]
+		},
+		{
+			"name": "tag",
+			"label": "Tags",
+			"labelSingular": "Tag",
+			"hierarchical": false,
+			"collections": [
+				"journal"
+			],
+			"terms": [
+				{
+					"slug": "brushing",
+					"label": "Brushing"
+				},
+				{
+					"slug": "flossing",
+					"label": "Flossing"
+				},
+				{
+					"slug": "gum-health",
+					"label": "Gum health"
+				},
+				{
+					"slug": "insurance",
+					"label": "Insurance"
+				},
+				{
+					"slug": "prices",
+					"label": "Prices"
+				},
+				{
+					"slug": "check-ups",
+					"label": "Check-ups"
+				},
+				{
+					"slug": "first-visits",
+					"label": "First visits"
+				},
+				{
+					"slug": "nervous-patients",
+					"label": "Nervous patients"
+				}
+			]
+		}
+	],
+	"bylines": [
+		{
+			"id": "byline-ana-whitlock",
+			"slug": "ana-whitlock",
+			"displayName": "Dr. Ana Whitlock, DDS",
+			"bio": "Founder and general dentist at Linden Dental Studio."
+		},
+		{
+			"id": "byline-marcus-oyelaran",
+			"slug": "marcus-oyelaran",
+			"displayName": "Dr. Marcus Oyelaran, DMD",
+			"bio": "General and restorative dentist at Linden Dental Studio."
+		}
+	],
 	"menus": [
 		{
 			"name": "primary",
@@ -1831,6 +1927,235 @@
 		}
 	],
 	"redirects": [],
+	"widgetAreas": [
+		{
+			"name": "footer",
+			"label": "Footer notes",
+			"description": "Short notes shown in the footer of every page, above the copyright line.",
+			"widgets": [
+				{
+					"type": "content",
+					"title": "Dental emergency?",
+					"content": [
+						{
+							"_type": "block",
+							"_key": "f4",
+							"style": "normal",
+							"markDefs": [
+								{
+									"_type": "link",
+									"_key": "f0",
+									"href": "tel:+15035550142"
+								}
+							],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "f2",
+									"text": "Toothache, a chipped tooth or a lost filling? Call ",
+									"marks": []
+								},
+								{
+									"_type": "span",
+									"_key": "f1",
+									"text": "(503) 555-0142",
+									"marks": [
+										"f0"
+									]
+								},
+								{
+									"_type": "span",
+									"_key": "f3",
+									"text": ". We keep same-day slots open every weekday.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "f8",
+							"style": "normal",
+							"markDefs": [
+								{
+									"_type": "link",
+									"_key": "f5",
+									"href": "/services/emergencies/"
+								}
+							],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "f7",
+									"text": "",
+									"marks": []
+								},
+								{
+									"_type": "span",
+									"_key": "f6",
+									"text": "What to do until you get here",
+									"marks": [
+										"f5"
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"sections": [
+		{
+			"slug": "insurance-we-accept",
+			"title": "Insurance we accept",
+			"description": "The plans we bill directly, plus the membership option for people without insurance.",
+			"keywords": [
+				"insurance",
+				"ppo",
+				"membership",
+				"costs"
+			],
+			"content": [
+				{
+					"_type": "block",
+					"_key": "fa",
+					"style": "h3",
+					"markDefs": [],
+					"children": [
+						{
+							"_type": "span",
+							"_key": "f9",
+							"text": "Insurance we accept",
+							"marks": []
+						}
+					]
+				},
+				{
+					"_type": "block",
+					"_key": "fc",
+					"style": "normal",
+					"markDefs": [],
+					"children": [
+						{
+							"_type": "span",
+							"_key": "fb",
+							"text": "We bill most PPO dental plans directly, and we take Oregon Health Plan for kids. Not sure about yours? Call us with your member ID and we will check before your visit.",
+							"marks": []
+						}
+					]
+				},
+				{
+					"_type": "block",
+					"_key": "fh",
+					"style": "normal",
+					"markDefs": [
+						{
+							"_type": "link",
+							"_key": "fd",
+							"href": "/book/"
+						}
+					],
+					"children": [
+						{
+							"_type": "span",
+							"_key": "ff",
+							"text": "No insurance? Membership is $29 a month and covers your check-ups and cleanings. ",
+							"marks": []
+						},
+						{
+							"_type": "span",
+							"_key": "fe",
+							"text": "Book a visit",
+							"marks": [
+								"fd"
+							]
+						},
+						{
+							"_type": "span",
+							"_key": "fg",
+							"text": " and ask us about it.",
+							"marks": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"slug": "new-patient-offer",
+			"title": "New patient offer",
+			"description": "What a first visit includes and what it costs, with a booking link.",
+			"keywords": [
+				"new patient",
+				"first visit",
+				"check-up",
+				"booking"
+			],
+			"content": [
+				{
+					"_type": "block",
+					"_key": "fj",
+					"style": "h3",
+					"markDefs": [],
+					"children": [
+						{
+							"_type": "span",
+							"_key": "fi",
+							"text": "New to Linden?",
+							"marks": []
+						}
+					]
+				},
+				{
+					"_type": "block",
+					"_key": "fl",
+					"style": "normal",
+					"markDefs": [],
+					"children": [
+						{
+							"_type": "span",
+							"_key": "fk",
+							"text": "Your first visit is a full hour: a check-up, a cleaning, x-rays if you need them, and a plan you can take home. It is $185 without insurance and usually covered in full by PPO plans.",
+							"marks": []
+						}
+					]
+				},
+				{
+					"_type": "block",
+					"_key": "fq",
+					"style": "normal",
+					"markDefs": [
+						{
+							"_type": "link",
+							"_key": "fm",
+							"href": "/book/"
+						}
+					],
+					"children": [
+						{
+							"_type": "span",
+							"_key": "fo",
+							"text": "",
+							"marks": []
+						},
+						{
+							"_type": "span",
+							"_key": "fn",
+							"text": "Book your first visit",
+							"marks": [
+								"fm"
+							]
+						},
+						{
+							"_type": "span",
+							"_key": "fp",
+							"text": ". We keep a few new patient slots open every week.",
+							"marks": []
+						}
+					]
+				}
+			]
+		}
+	],
 	"content": {
 		"team": [
 			{
@@ -2584,7 +2909,22 @@
 							]
 						}
 					]
-				}
+				},
+				"taxonomies": {
+					"category": [
+						"kids"
+					],
+					"tag": [
+						"brushing",
+						"first-visits"
+					]
+				},
+				"bylines": [
+					{
+						"byline": "byline-ana-whitlock",
+						"roleLabel": "Clinically reviewed by"
+					}
+				]
 			},
 			{
 				"id": "post-checkup-cost-without-insurance",
@@ -2731,7 +3071,23 @@
 							]
 						}
 					]
-				}
+				},
+				"taxonomies": {
+					"category": [
+						"costs"
+					],
+					"tag": [
+						"insurance",
+						"prices",
+						"check-ups"
+					]
+				},
+				"bylines": [
+					{
+						"byline": "byline-ana-whitlock",
+						"roleLabel": "Clinically reviewed by"
+					}
+				]
 			},
 			{
 				"id": "post-do-you-need-to-floss",
@@ -2892,7 +3248,22 @@
 							]
 						}
 					]
-				}
+				},
+				"taxonomies": {
+					"category": [
+						"everyday-care"
+					],
+					"tag": [
+						"flossing",
+						"gum-health"
+					]
+				},
+				"bylines": [
+					{
+						"byline": "byline-marcus-oyelaran",
+						"roleLabel": "Clinically reviewed by"
+					}
+				]
 			},
 			{
 				"id": "post-first-visit-nervous-kid",
@@ -3067,7 +3438,22 @@
 							]
 						}
 					]
-				}
+				},
+				"taxonomies": {
+					"category": [
+						"kids"
+					],
+					"tag": [
+						"first-visits",
+						"nervous-patients"
+					]
+				},
+				"bylines": [
+					{
+						"byline": "byline-marcus-oyelaran",
+						"roleLabel": "Clinically reviewed by"
+					}
+				]
 			}
 		],
 		"reviews": [

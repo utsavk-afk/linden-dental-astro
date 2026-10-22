@@ -14,25 +14,28 @@ const [posts, page, settings] = await Promise.all([
 const [feature, ...rest] = posts;
 const featureAuthor = feature ? feature.author?.name || settings.name : '';
 const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+// Inline editing (EmDash Edit mode). The byline name opens the post's author reference.
+const e = page.edit;
+const se = settings.edit;
 ---
 <Base title={page.seo.title || page.title} description={page.seo.description || undefined}>
   <section class="head">
     <div class="wrap">
-      <h1 data-split>{page.title}</h1>
-      {page.lede && <p class="lede" data-reveal>{page.lede}</p>}
+      <h1 data-split {...e.title}>{page.title}</h1>
+      {page.lede && <p class="lede" data-reveal {...e.lede}>{page.lede}</p>}
     </div>
   </section>
 
   {feature && (
   <section class="wrap feature-wrap">
     <a class="feature" href={url(`/journal/${feature.id}/`)} data-reveal>
-      <div class="frame feature__img"><CmsImage image={feature.cover} alt={feature.coverAlt} width={1200} height={900} loading="eager" /></div>
+      <div class="frame feature__img" {...feature.edit.featured_image}><CmsImage image={feature.cover} alt={feature.coverAlt} width={1200} height={900} loading="eager" /></div>
       <div class="feature__copy">
-        <p class="meta">{feature.tag} <span aria-hidden="true">/</span> {feature.readMinutes} {settings.labels.minRead}</p>
-        <h2>{feature.title}</h2>
-        <p class="muted">{feature.description}</p>
-        <p class="byline">{featureAuthor}, {fmt(feature.date)}</p>
-        <span class="link-arrow">{page.readLabel} <Icon name="arrow-right" /></span>
+        <p class="meta"><span {...feature.edit.category}>{feature.tag}</span> <span aria-hidden="true">/</span> {feature.readMinutes} <span {...se.labels_min_read}>{settings.labels.minRead}</span></p>
+        <h2 {...feature.edit.title}>{feature.title}</h2>
+        <p class="muted" {...feature.edit.excerpt}>{feature.description}</p>
+        <p class="byline"><span {...feature.edit.author}>{featureAuthor}</span>, <span {...feature.edit.publish_date}>{fmt(feature.date)}</span></p>
+        <span class="link-arrow"><span {...e.read_label}>{page.readLabel}</span> <Icon name="arrow-right" /></span>
       </div>
     </a>
   </section>
@@ -44,13 +47,13 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'long', day: 'nu
         {rest.map((p) => (
           <li data-reveal>
             <a href={url(`/journal/${p.id}/`)} class="row">
-              <div class="frame row__img"><CmsImage image={p.cover} alt={p.coverAlt} width={480} height={360} /></div>
+              <div class="frame row__img" {...p.edit.featured_image}><CmsImage image={p.cover} alt={p.coverAlt} width={480} height={360} /></div>
               <div class="row__copy">
-                <p class="meta">{p.tag} <span aria-hidden="true">/</span> {p.readMinutes} {settings.labels.minRead}</p>
-                <h2>{p.title}</h2>
-                <p class="muted">{p.description}</p>
+                <p class="meta"><span {...p.edit.category}>{p.tag}</span> <span aria-hidden="true">/</span> {p.readMinutes} <span {...se.labels_min_read}>{settings.labels.minRead}</span></p>
+                <h2 {...p.edit.title}>{p.title}</h2>
+                <p class="muted" {...p.edit.excerpt}>{p.description}</p>
               </div>
-              <p class="row__date">{fmt(p.date)}</p>
+              <p class="row__date" {...p.edit.publish_date}>{fmt(p.date)}</p>
             </a>
           </li>
         ))}
@@ -70,7 +73,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'long', day: 'nu
   .feature__img :global(img), .row__img :global(img) { transition: transform 0.9s var(--ease-out); }
   .feature:hover .feature__img :global(img), .row:hover .row__img :global(img) { transform: scale(1.04); }
   .meta { font-size: var(--step--1); font-weight: 600; color: var(--accent); }
-  .meta span { color: var(--line); margin-inline: 0.3em; }
+  .meta [aria-hidden] { color: var(--line); margin-inline: 0.3em; } /* the "/" divider, not the edit-mode field spans */
   .byline { font-size: var(--step--1); color: var(--ink-2); }
   .list { list-style: none; padding: 0; border-top: 1px solid var(--line); }
   .row { display: grid; grid-template-columns: 220px minmax(0, 1fr) auto; gap: clamp(1rem, 0.5rem + 2vw, 2.5rem); align-items: center; padding-block: 1.75rem; border-bottom: 1px solid var(--line); text-decoration: none; }

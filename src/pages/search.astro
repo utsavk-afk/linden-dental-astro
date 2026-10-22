@@ -1,0 +1,82 @@
+---
+// /search/?q=...: full-text search (EmDash FTS5) over services and journal posts, rendered on
+// the server so it works without JavaScript. Search is switched on per collection in the seed
+// (supports: "search", plus `searchable: true` on the fields to index). Results are noindex.
+import { url } from '../lib/url';
+import { searchSite } from '../lib/cms';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+
+const q = (Astro.url.searchParams.get('q') ?? '').trim().slice(0, 120);
+const hits = q ? await searchSite(q, 30) : [];
+const kind: Record<string, string> = { journal: 'Journal', services: 'Service' };
+---
+<Base title={q ? `Search: ${q}` : 'Search'} description="Search our services and journal." noindex>
+  <section class="head">
+    <div class="wrap">
+      <h1 data-split>Search</h1>
+      <form class="search" role="search" method="get" action={url('/search/')}>
+        <label for="q" class="visually-hidden">Search the site</label>
+        <input id="q" name="q" type="search" value={q} placeholder="Try floss, whitening or insurance" autocomplete="off" required minlength="2" />
+        <button class="btn" type="submit"><Icon name="magnifying-glass" /> Search</button>
+      </form>
+      {q && (
+        <p class="count muted" role="status">
+          {hits.length === 0 ? `Nothing matched “${q}”.` : hits.length === 1 ? `1 result for “${q}”` : `${hits.length} results for “${q}”`}
+        </p>
+      )}
+    </div>
+  </section>
+
+  {hits.length > 0 && (
+    <section class="section results">
+      <div class="wrap">
+        <ul class="list">
+          {hits.map((h) => (
+            <li>
+              <a class="row" href={url(h.path)}>
+                <p class="meta">{kind[h.collection] ?? h.collection}</p>
+                <h2>{h.title}</h2>
+                {h.summary && <p class="muted">{h.summary}</p>}
+                {h.snippet && <p class="muted snippet" set:html={h.snippet} />}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  {q && hits.length === 0 && (
+    <section class="section results">
+      <div class="wrap empty">
+        <p class="lede">Try a shorter or more general word, or browse everything instead.</p>
+        <div class="empty__links">
+          <a class="link-arrow" href={url('/services/')}>All services <Icon name="arrow-right" /></a>
+          <a class="link-arrow" href={url('/journal/')}>The journal <Icon name="arrow-right" /></a>
+        </div>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .head { padding-block: clamp(2rem, 1rem + 4vw, 5rem) clamp(2rem, 1rem + 3vw, 3rem); }
+  .search { display: flex; gap: 0.75rem; margin-top: 2rem; max-width: 720px; flex-wrap: wrap; }
+  .search input {
+    flex: 1 1 260px; min-height: 52px; padding: 0.85rem 1.25rem; border-radius: var(--pill);
+    border: 1px solid color-mix(in oklab, var(--ink-2) 72%, var(--bg)); background: var(--surface); color: var(--ink);
+    font-size: var(--step-1); transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .search input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent); }
+  .count { margin-top: 1.25rem; }
+  .results { padding-top: 0; }
+  .list { list-style: none; padding: 0; border-top: 1px solid var(--line); max-width: 920px; }
+  .row { display: grid; gap: 0.5rem; padding-block: 1.75rem; border-bottom: 1px solid var(--line); text-decoration: none; }
+  .row h2 { font-size: var(--step-2); transition: color 0.3s; }
+  .row:hover h2 { color: var(--accent); }
+  .meta { font-size: var(--step--1); font-weight: 600; color: var(--accent); }
+  .snippet :global(mark) { background: var(--bloom); color: var(--bloom-ink); border-radius: 4px; padding-inline: 0.15em; }
+  .empty { display: grid; gap: 1rem; justify-items: start; }
+  .empty__links { display: flex; flex-wrap: wrap; gap: 0.5rem 2rem; }
+</style>

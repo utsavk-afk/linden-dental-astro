@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Linden CMS Guide</title>
+<style>
+  :root {
+    --bg: #fbfaf7;
+    --surface: #ffffff;
+    --ink: #1c2420;
+    --ink-2: #4c5852;
+    --line: #e2dfd6;
+    --accent: #2c674b;
+    --accent-soft: #e7f0ea;
+    --new: #9a3f17;
+    --new-soft: #fbece3;
+    --warn-soft: #fff6dc;
+    --warn-line: #ead9a0;
+    --code-bg: #f1efe9;
+    --radius: 10px;
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 16.5px;
+    line-height: 1.6;
+  }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 16px 64px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0 48px;
+  }
+  @media (min-width: 980px) {
+    .wrap { grid-template-columns: 230px minmax(0, 1fr); padding: 0 32px 96px; }
+  }
+
+  header.top {
+    grid-column: 1 / -1;
+    padding: 40px 0 24px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 28px;
+  }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+  h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.15; margin: 0 0 10px; letter-spacing: -0.01em; }
+  .lede { color: var(--ink-2); max-width: 680px; margin: 0; font-size: 17.5px; }
+
+  .links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+    margin: 22px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links li {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    min-width: 0;
+  }
+  .links b { display: block; font-size: 13px; color: var(--ink-2); font-weight: 600; }
+  .links a { overflow-wrap: anywhere; font-weight: 600; }
+  .links span { display: block; font-size: 14px; color: var(--ink-2); }
+
+  /* Table of contents */
+  nav.toc { font-size: 15px; margin-bottom: 32px; }
+  nav.toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); margin: 0 0 8px; border: 0; padding: 0; }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; }
+  nav.toc li { margin: 0; }
+  nav.toc a { display: block; padding: 5px 0; color: var(--ink); text-decoration: none; border-left: 2px solid transparent; }
+  nav.toc a:hover { color: var(--accent); }
+  nav.toc ol ol a { padding-left: 14px; font-size: 14px; color: var(--ink-2); }
+  @media (max-width: 979px) {
+    nav.toc {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+    nav.toc > ol { columns: 2; column-gap: 20px; }
+    nav.toc > ol > li { break-inside: avoid; }
+    nav.toc ol ol { display: none; }
+  }
+  @media (max-width: 340px) { nav.toc > ol { columns: 1; } }
+  @media (min-width: 980px) {
+    nav.toc { position: sticky; top: 24px; align-self: start; max-height: calc(100vh - 48px); overflow: auto; padding-right: 4px; }
+  }
+
+  main { min-width: 0; max-width: 800px; }
+  section { margin: 0 0 52px; scroll-margin-top: 16px; }
+  h2 {
+    font-size: 25px;
+    line-height: 1.25;
+    margin: 0 0 14px;
+    padding-top: 6px;
+    letter-spacing: -0.005em;
+  }
+  h3 { font-size: 19px; line-height: 1.3; margin: 30px 0 8px; scroll-margin-top: 16px; }
+  h4 { font-size: 16px; margin: 20px 0 6px; }
+  p { margin: 0 0 12px; }
+  ul, ol { margin: 0 0 14px; padding-left: 22px; }
+  li { margin: 0 0 6px; }
+  li > ul, li > ol { margin: 6px 0 0; }
+
+  .ui {
+    font-weight: 600;
+    white-space: normal;
+    background: var(--accent-soft);
+    color: #1f4b36;
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: .94em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .table .ui { display: inline-block; line-height: 1.4; padding: 2px 7px; }
+  .table.map th:nth-child(1) { width: 24%; }
+  .table.map th:nth-child(2) { width: 30%; }
+  code, kbd {
+    font-family: var(--mono);
+    font-size: .88em;
+    background: var(--code-bg);
+    padding: 1px 5px;
+    border-radius: 4px;
+    overflow-wrap: anywhere;
+  }
+  kbd { border: 1px solid var(--line); border-bottom-width: 2px; }
+  pre {
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.55;
+    background: #1d2521;
+    color: #e9efe9;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    font-variant-ligatures: none;
+    margin: 0 0 14px;
+  }
+  pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+
+  .new {
+    display: inline-block;
+    vertical-align: 2px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--new);
+    background: var(--new-soft);
+    border: 1px solid #efc9b4;
+    border-radius: 999px;
+    padding: 0 7px;
+    line-height: 18px;
+    margin-left: 4px;
+  }
+  h3 .new, h2 .new { vertical-align: 4px; }
+
+  .note, .warn {
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin: 0 0 16px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .note { border-left: 4px solid var(--accent); }
+  .warn { background: var(--warn-soft); border-color: var(--warn-line); border-left: 4px solid #c89a1c; }
+  .note p:last-child, .warn p:last-child, .note ul:last-child, .warn ul:last-child { margin-bottom: 0; }
+
+  /* Numbered steps */
+  ol.steps { list-style: none; counter-reset: step; padding: 0; margin: 0 0 16px; }
+  ol.steps > li {
+    counter-increment: step;
+    position: relative;
+    padding: 2px 0 0 40px;
+    margin: 0 0 12px;
+    min-height: 28px;
+  }
+  ol.steps > li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    display: grid;
+    place-items: center;
+  }
+  ol.steps.big > li { padding-bottom: 6px; }
+  ol.steps strong { display: block; }
+
+  .howto {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 4px 20px 8px;
+    margin: 0 0 18px;
+  }
+  .howto h3 { margin-top: 16px; }
+  @media (max-width: 520px) { .howto { padding: 2px 14px 6px; } }
+
+  /* Tables */
+  .table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 15px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .table th, .table td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  .table th { background: #f3f1eb; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-2); }
+  .table tr:last-child td { border-bottom: 0; }
+  .table td:first-child { font-weight: 600; }
+  .table .group td { background: var(--accent-soft); color: #1f4b36; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; padding: 7px 12px; }
+  .table td ul { margin: 0; padding-left: 18px; }
+  .table td li { margin: 0 0 2px; }
+  .muted { color: var(--ink-2); font-size: .93em; }
+
+  @media (max-width: 720px) {
+    .table.stack, .table.stack tbody, .table.stack tr, .table.stack td { display: block; width: 100%; }
+    .table.stack thead { display: none; }
+    .table.stack { border: 0; background: none; }
+    .table.stack tr { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin: 0 0 10px; padding: 6px 0; }
+    .table.stack tr.group { background: none; border: 0; padding: 0; margin: 18px 0 6px; }
+    .table.stack tr.group td { background: none; padding: 0; }
+    .table.stack td { border: 0; padding: 4px 14px; }
+    .table.stack td[data-label]::before {
+      content: attr(data-label);
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--ink-2);
+    }
+    .table.stack td:first-child { font-size: 16.5px; padding-top: 8px; }
+    .table.stack td:first-child::before { display: none; }
+  }
+
+  .check { list-style: none; padding: 0; }
+  .check li { position: relative; padding-left: 28px; }
+  .check li::before {
+    content: "";
+    position: absolute;
+    left: 2px; top: 5px;
+    width: 15px; height: 15px;
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+  }
+
+  footer.end { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 18px; color: var(--ink-2); font-size: 14px; }
+
+  @media print {
+    @page { margin: 16mm 14mm; }
+    html { scroll-behavior: auto; }
+    body { background: #fff; font-size: 10.5pt; line-height: 1.5; }
+    .wrap { display: block; max-width: none; padding: 0; }
+    nav.toc { display: none; }
+    main { max-width: none; }
+    header.top { padding-top: 0; }
+    .links li, .howto, .note, .warn, .table { border-color: #bbb; }
+    .howto, .note, .warn, .table tr, ol.steps > li, pre { break-inside: avoid; page-break-inside: avoid; }
+    h2, h3 { break-after: avoid; page-break-after: avoid; }
+    section { margin-bottom: 28px; }
+    pre { background: #f3f3f3; color: #000; border: 1px solid #bbb; }
+    .ui, .table .ui { background: none; padding: 0; color: #000; display: inline; }
+    a { color: #000; }
+    ol.steps > li::before { background: #fff; color: #000; border: 1.5px solid #000; }
+    .new { background: #fff; color: #000; border-color: #000; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <p class="eyebrow">Linden Dental Studio · staging site</p>
+  <h1>How to edit the website</h1>
+  <p class="lede">A plain guide for the practice and the agency team. It covers where each part of the site is edited, the common tasks, SEO, using Claude, and what to do when something looks wrong.</p>
+  <ul class="links">
+    <li><b>The website</b><a href="https://stanventures-psi.fly.dev/linden-dental/">stanventures-psi.fly.dev/linden-dental/</a><span>Staging. Hidden from Google on purpose.</span></li>
+    <li><b>The CMS admin</b><a href="https://stanventures-psi.fly.dev/_emdash/admin">stanventures-psi.fly.dev/_emdash/admin</a><span>Sign in with your passkey.</span></li>
+    <li><b>Booking requests</b><a href="https://stanventures-psi.fly.dev/linden-admin">stanventures-psi.fly.dev/linden-admin</a><span>Separate password. Ask the site admin.</span></li>
+  </ul>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#quick-start">Quick start</a></li>
+    <li><a href="#admin-layout">The admin at a glance</a></li>
+    <li><a href="#where">Where is it edited?</a></li>
+    <li><a href="#how-tos">How-tos</a>
+      <ol>
+        <li><a href="#edit-page">Edit a page</a></li>
+        <li><a href="#write-post">Write and schedule a post</a></li>
+        <li><a href="#replace-photo">Replace a photo</a></li>
+        <li><a href="#add-service">Add a service</a></li>
+        <li><a href="#nav-links">Change menu links</a></li>
+        <li><a href="#redirect">Add a redirect</a></li>
+        <li><a href="#restore">Restore an old version</a></li>
+        <li><a href="#preview">Preview a draft</a></li>
+        <li><a href="#inline">Edit on the page</a></li>
+        <li><a href="#comments">Moderate comments</a></li>
+        <li><a href="#widgets">Footer notes</a></li>
+        <li><a href="#sections">Reusable sections</a></li>
+      </ol>
+    </li>
+    <li><a href="#seo">SEO checklist</a></li>
+    <li><a href="#claude">Using Claude</a></li>
+    <li><a href="#trouble">Troubleshooting</a></li>
+    <li><a href="#limits">Known limits</a></li>
+  </ol>
+</nav>
+
+<main id="main">
+
+<section id="quick-start" aria-labelledby="h-quick">
+  <h2 id="h-quick">Quick start</h2>
+  <ol class="steps big">
+    <li><strong>Get an invite.</strong> An administrator opens <span class="ui">Admin &gt; Users</span>, clicks <span class="ui">Invite User</span> and picks your role. The link works once and expires after 7 days.</li>
+    <li><strong>Create your passkey.</strong> Open the invite link. Your device asks for Windows Hello, Touch ID or your phone. There is no password to remember.</li>
+    <li><strong>Sign in.</strong> Go to the admin link above and click <span class="ui">Sign in with Passkey</span>. Use the same browser address every time, because a passkey only works at the address where you created it.</li>
+    <li><strong>Find the right screen.</strong> Use the left sidebar. The table in <a href="#where">Where is it edited?</a> says which screen controls which part of the site.</li>
+    <li><strong>Change, save, check.</strong> Edit the field and click <span class="ui">Save</span> (or <span class="ui">Publish</span> on services and posts). Changes go live straight away. There is no rebuild and nothing to deploy. Open the page in another tab to check.</li>
+  </ol>
+  <div class="note">
+    <p><strong>Tip:</strong> Add a second passkey (for example your phone) from your profile in the admin. If you lose one device, you can still sign in.</p>
+  </div>
+</section>
+
+<section id="admin-layout" aria-labelledby="h-layout">
+  <h2 id="h-layout">The admin at a glance</h2>
+  <p>The CMS is <a href="https://emdashcms.com">EmDash</a>, Cloudflare's open-source CMS for Astro sites. It works much like WordPress. The sidebar has four groups.</p>
+  <table class="table stack">
+    <thead><tr><th>Sidebar group</th><th>What is inside</th></tr></thead>
+    <tbody>
+      <tr><td data-label="Group">Top</td><td data-label="Inside"><span class="ui">Dashboard</span>, and <span class="ui">Calendar</span> (published and scheduled posts by month).</td></tr>
+      <tr><td data-label="Group">Content</td><td data-label="Inside"><span class="ui">Services</span>, <span class="ui">Journal (blog posts)</span>, <span class="ui">Team</span>, <span class="ui">Reviews</span>, <span class="ui">Media</span>, a <span class="ui">Pages</span> folder (the seven fixed pages) and a <span class="ui">Settings</span> folder (<span class="ui">Site settings and SEO</span>).</td></tr>
+      <tr><td data-label="Group">Manage</td><td data-label="Inside"><span class="ui">Comments</span> <span class="new">New</span>, <span class="ui">Menus</span>, <span class="ui">Redirects</span>, <span class="ui">Widgets</span> <span class="new">New</span>, <span class="ui">Sections</span> <span class="new">New</span>, <span class="ui">Categories</span> and <span class="ui">Tags</span> <span class="new">New</span>, <span class="ui">Bylines</span> <span class="new">New</span>.</td></tr>
+      <tr><td data-label="Group">Admin</td><td data-label="Inside"><span class="ui">Users</span>, <span class="ui">Settings</span> (holds <span class="ui">API Tokens</span>), plus developer screens. Leave <span class="ui">Content Types</span>, <span class="ui">Plugins</span> and <span class="ui">Import</span> alone. They change how the site is built.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Roles</h3>
+  <p>Each person has one role. You only see the screens your role allows.</p>
+  <table class="table stack">
+    <thead><tr><th>Role</th><th>Can do</th><th>Give it to</th></tr></thead>
+    <tbody>
+      <tr><td data-label="Role">Contributor</td><td data-label="Can do">Writes drafts. Cannot publish.</td><td data-label="Give it to">Guest writers.</td></tr>
+      <tr><td data-label="Role">Author</td><td data-label="Can do">Writes and publishes their own entries.</td><td data-label="Give it to">Staff who write posts.</td></tr>
+      <tr><td data-label="Role">Editor</td><td data-label="Can do">Edits and publishes everything. Menus, widgets, sections, categories, tags and comments.</td><td data-label="Give it to">Agency teammates.</td></tr>
+      <tr><td data-label="Role">Administrator</td><td data-label="Can do">Everything, plus users, redirects, settings and API tokens.</td><td data-label="Give it to">One or two people only.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="where" aria-labelledby="h-where">
+  <h2 id="h-where">Where is it edited?</h2>
+  <p>Each fixed page (Home, About and so on) is a screen with one entry. Open it, and every word and photo on that page is a field. Field names follow WordPress and Yoast wording, so <em>H1 heading</em> is the main heading and <em>Excerpt</em> is the short summary.</p>
+  <table class="table stack map">
+    <thead><tr><th>Part of the site</th><th>Admin screen</th><th>Fields</th></tr></thead>
+    <tbody>
+      <tr class="group"><td colspan="3">Every page</td></tr>
+      <tr><td data-label="Site area">Header: logo, phone, book button</td><td data-label="Admin screen"><span class="ui">Settings &gt; Site settings and SEO</span></td><td data-label="Fields">Site title (practice name), Logo text: main word, Logo text: small line, Phone number, Button text and Button link: book a visit (site-wide)</td></tr>
+      <tr><td data-label="Site area">Header menu links</td><td data-label="Admin screen"><span class="ui">Manage &gt; Menus &gt; Header menu</span></td><td data-label="Fields">One item per link: label and URL</td></tr>
+      <tr><td data-label="Site area">Footer: address, hours, contact</td><td data-label="Admin screen"><span class="ui">Settings &gt; Site settings and SEO</span></td><td data-label="Fields">Address line 1 and 2, Google Maps link, Opening hours, Email address, Footer: paragraph, Footer: H2 headings, Footer: link text (get directions), Footer: bottom line</td></tr>
+      <tr><td data-label="Site area">Extra footer links</td><td data-label="Admin screen"><span class="ui">Manage &gt; Menus &gt; Footer menu</span></td><td data-label="Fields">Label and URL</td></tr>
+      <tr><td data-label="Site area">Footer notes <span class="new">New</span></td><td data-label="Admin screen"><span class="ui">Manage &gt; Widgets &gt; Footer notes</span></td><td data-label="Fields">Widget title and text (for example "Dental emergency?")</td></tr>
+      <tr><td data-label="Site area">Closing "book a visit" band</td><td data-label="Admin screen"><span class="ui">Settings &gt; Site settings and SEO</span></td><td data-label="Fields">Call to action band: H2 heading and paragraph (default). About, Services and Journal pages can override it with their own Call to action band fields.</td></tr>
+      <tr><td data-label="Site area">Small interface words</td><td data-label="Admin screen"><span class="ui">Settings &gt; Site settings and SEO</span></td><td data-label="Fields">Reading time text, Step counter text, Pause and Play button text, Accessibility labels, Image alt text (team portraits)</td></tr>
+
+      <tr class="group"><td colspan="3">Home page</td></tr>
+      <tr><td data-label="Site area">Hero</td><td data-label="Admin screen"><span class="ui">Pages &gt; Home page</span></td><td data-label="Fields">H1 heading (hero, first part), H1 heading (hero, green part), Intro paragraph (hero), Image (hero), Hero card: bold text, Hero card: text</td></tr>
+      <tr><td data-label="Site area">Big statement</td><td data-label="Admin screen"><span class="ui">Pages &gt; Home page</span></td><td data-label="Fields">Paragraph (big statement), Link text and Link URL under it</td></tr>
+      <tr><td data-label="Site area">Services list</td><td data-label="Admin screen"><span class="ui">Pages &gt; Home page</span> + <span class="ui">Services</span></td><td data-label="Fields">H2 heading (services) on the Home page. The rows come from <span class="ui">Services</span>, in Menu order.</td></tr>
+      <tr><td data-label="Site area">First visit steps</td><td data-label="Admin screen"><span class="ui">Pages &gt; Home page</span></td><td data-label="Fields">H2 heading (first visit), Intro paragraph, First visit steps (H3 + paragraph + image each). An empty step image shows the calendar card.</td></tr>
+      <tr><td data-label="Site area">Team block</td><td data-label="Admin screen"><span class="ui">Pages &gt; Home page</span> + <span class="ui">Team</span></td><td data-label="Fields">H2 heading (team), Paragraph (team), Link text and URL. People come from <span class="ui">Team</span>.</td></tr>
+      <tr><td data-label="Site area">Reviews strip</td><td data-label="Admin screen"><span class="ui">Pages &gt; Home page</span> + <span class="ui">Reviews</span></td><td data-label="Fields">H2 heading (reviews). Each review is an entry in <span class="ui">Reviews</span>: Blockquote, Reviewer name, Reviewer neighbourhood, Menu order.</td></tr>
+      <tr><td data-label="Site area">Journal teaser</td><td data-label="Admin screen"><span class="ui">Pages &gt; Home page</span> + <span class="ui">Journal</span></td><td data-label="Fields">H2 heading (journal), Link text and URL. The newest posts appear by themselves.</td></tr>
+      <tr><td data-label="Site area">Visit us</td><td data-label="Admin screen"><span class="ui">Pages &gt; Home page</span></td><td data-label="Fields">H2 heading (visit us), Image (visit us), List items: insurance, parking, accessibility. Address and hours come from Site settings.</td></tr>
+      <tr><td data-label="Site area">Search and sharing</td><td data-label="Admin screen"><span class="ui">Pages &gt; Home page</span></td><td data-label="Fields">Meta title, Meta description, Open Graph image (og:image)</td></tr>
+
+      <tr class="group"><td colspan="3">Other pages</td></tr>
+      <tr><td data-label="Site area">About</td><td data-label="Admin screen"><span class="ui">Pages &gt; About page</span></td><td data-label="Fields">H1 heading, Intro paragraph, Image (hero), Our story heading and paragraphs, Principles (icon + H3 + paragraph each), Team heading, Call to action band, Meta title, Meta description, Open Graph image</td></tr>
+      <tr><td data-label="Site area">Team members</td><td data-label="Admin screen"><span class="ui">Team</span></td><td data-label="Fields">H3 heading (name), Paragraph (job title), Image (portrait), Paragraph (bio), Paragraph (outside work), Menu order</td></tr>
+      <tr><td data-label="Site area">/services/ list</td><td data-label="Admin screen"><span class="ui">Pages &gt; Services page</span></td><td data-label="Fields">H1 heading, Intro paragraph, Call to action band, Meta title, Meta description</td></tr>
+      <tr><td data-label="Site area">One service page</td><td data-label="Admin screen"><span class="ui">Services</span> (one entry each)</td><td data-label="Fields">H1 heading (service name), Excerpt, Menu order, Icon, Featured image, Price, Appointment length, Steps, FAQs, Page content, SEO panel</td></tr>
+      <tr><td data-label="Site area">Labels on every service page</td><td data-label="Admin screen"><span class="ui">Pages &gt; Services page</span></td><td data-label="Fields">All fields starting "Single service:" (back link, price and length labels, step, FAQ and other-services headings, closing band)</td></tr>
+      <tr><td data-label="Site area">/journal/ list</td><td data-label="Admin screen"><span class="ui">Pages &gt; Journal page</span></td><td data-label="Fields">H1 heading, Intro paragraph, Link text (featured post), Meta title, Meta description</td></tr>
+      <tr><td data-label="Site area">One blog post</td><td data-label="Admin screen"><span class="ui">Journal (blog posts)</span></td><td data-label="Fields">H1 heading (post title), Excerpt, Publish date, Last modified date, Author, Category, Featured image, Post content, SEO panel</td></tr>
+      <tr><td data-label="Site area">Labels on every post</td><td data-label="Admin screen"><span class="ui">Pages &gt; Journal page</span></td><td data-label="Fields">All fields starting "Single post:" (back link, author box start, more posts heading, last modified label, draft notice, closing band)</td></tr>
+      <tr><td data-label="Site area">Category and tag pages <span class="new">New</span></td><td data-label="Admin screen"><span class="ui">Manage &gt; Categories</span>, <span class="ui">Manage &gt; Tags</span></td><td data-label="Fields">Name, slug and description of each term. Pages live at <code>/journal/category/kids/</code> and <code>/journal/tag/brushing/</code>.</td></tr>
+      <tr><td data-label="Site area">Post comments <span class="new">New</span></td><td data-label="Admin screen"><span class="ui">Manage &gt; Comments</span></td><td data-label="Fields">Approve, mark pending or spam, delete</td></tr>
+      <tr><td data-label="Site area">Search page <span class="new">New</span></td><td data-label="Admin screen">None</td><td data-label="Fields"><code>/linden-dental/search</code> searches published services and posts. Nothing to fill in.</td></tr>
+      <tr><td data-label="Site area">Book a visit</td><td data-label="Admin screen"><span class="ui">Pages &gt; Book a visit page</span></td><td data-label="Fields">Every word on the page and form: H1, Intro paragraph, Next steps list, field labels, Dropdown options, Checkbox options, Error messages, Success heading and text, Meta title, Meta description</td></tr>
+      <tr><td data-label="Site area">Page not found (404)</td><td data-label="Admin screen"><span class="ui">Pages &gt; Page not found (404)</span></td><td data-label="Fields">Meta title, H1 heading, Intro paragraph, Button text and link, second link (leave its text empty to hide it)</td></tr>
+      <tr><td data-label="Site area">Design language page</td><td data-label="Admin screen"><span class="ui">Pages &gt; Design language page</span></td><td data-label="Fields">All headings and text on <code>/design/</code>. Colour values are set in code.</td></tr>
+
+      <tr class="group"><td colspan="3">Site-wide tools</td></tr>
+      <tr><td data-label="Site area">Default SEO</td><td data-label="Admin screen"><span class="ui">Settings &gt; Site settings and SEO</span></td><td data-label="Fields">Default meta title (home page), Meta title separator and suffix, Default meta description, Twitter / X handle</td></tr>
+      <tr><td data-label="Site area">Photos</td><td data-label="Admin screen"><span class="ui">Content &gt; Media</span></td><td data-label="Fields">Upload, Alt Text, caption, focal point</td></tr>
+      <tr><td data-label="Site area">Old links</td><td data-label="Admin screen"><span class="ui">Manage &gt; Redirects</span></td><td data-label="Fields">Source path, Destination path. Also lists 404 errors visitors hit.</td></tr>
+      <tr><td data-label="Site area">Reusable article blocks <span class="new">New</span></td><td data-label="Admin screen"><span class="ui">Manage &gt; Sections</span></td><td data-label="Fields">Section title and content (for example "Insurance we accept")</td></tr>
+      <tr><td data-label="Site area">Author credits <span class="new">New</span></td><td data-label="Admin screen"><span class="ui">Manage &gt; Bylines</span></td><td data-label="Fields">Display name and bio of each author. May replace the Author field on posts.</td></tr>
+      <tr><td data-label="Site area">Booking requests</td><td data-label="Admin screen"><a href="https://stanventures-psi.fly.dev/linden-admin">/linden-admin</a> (not in the CMS)</td><td data-label="Fields">Read-only list of form submissions. Separate password.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="how-tos" aria-labelledby="h-how">
+  <h2 id="h-how">How-tos</h2>
+
+  <div class="note">
+    <p><strong>Drafts and history depend on the screen.</strong> Services and Journal posts have drafts, Preview and a version history. Journal posts can also be scheduled. Pages, Team, Reviews and Site settings save straight to the live site and keep no history. Copy the old text into a note before a big rewrite.</p>
+  </div>
+
+  <div class="howto">
+    <h3 id="edit-page">Edit a page</h3>
+    <ol class="steps">
+      <li>Open <span class="ui">Pages</span> in the sidebar and pick the page, for example <span class="ui">About page</span>.</li>
+      <li>Open its single entry.</li>
+      <li>Change the fields you need. Field names tell you where the text sits, for example <em>H2 heading (our story)</em>.</li>
+      <li>Click <span class="ui">Save</span>. The page is live at once.</li>
+      <li>Open the page on the site and hard refresh (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>, or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> on a Mac).</li>
+    </ol>
+    <p class="muted">Leaving an optional field empty brings back the default wording. It does not break the page.</p>
+  </div>
+
+  <div class="howto">
+    <h3 id="write-post">Write and schedule a blog post</h3>
+    <ol class="steps">
+      <li>Open <span class="ui">Journal (blog posts)</span> and create a new entry.</li>
+      <li>Type the <em>H1 heading (post title)</em>. The slug (the web address) fills in from it. Shorten it if it is long.</li>
+      <li>Write an <em>Excerpt</em> (up to 220 characters). It shows on the journal list and in search results when there is no meta description.</li>
+      <li>Pick the <em>Author</em> and the <em>Category</em>. Add tags if the editor shows a Tags box. <span class="new">New</span></li>
+      <li>Add a <em>Featured image</em> and fill in its alt text.</li>
+      <li>Write the article in <em>Post content</em>. Use headings from H2 down, because the title is already the H1. Bold, links, lists and inline images all work.</li>
+      <li>For internal links, type the path only, for example <code>/services/kids/</code>. Do not add <code>/linden-dental</code>. The site adds it on staging.</li>
+      <li>Fill in the SEO panel (see the <a href="#seo">SEO checklist</a>).</li>
+      <li>Save as a draft and click <span class="ui">Preview</span> to read it as a visitor would.</li>
+      <li>To publish now, click <span class="ui">Publish</span>. To publish later, use <span class="ui">Schedule publication</span>, pick the date and time, and confirm. Scheduled posts show in the <span class="ui">Calendar</span>.</li>
+    </ol>
+    <p class="muted">Read time is worked out from the length. Drafts never appear on the real site, in the sitemap or in the RSS feed. On staging, drafts do show in the journal list with a draft notice, so the team can review them.</p>
+  </div>
+
+  <div class="howto">
+    <h3 id="replace-photo">Replace a photo</h3>
+    <ol class="steps">
+      <li>Open the entry that holds the photo (see the table above). For example, the home hero photo is <em>Image (hero)</em> on <span class="ui">Pages &gt; Home page</span>.</li>
+      <li>Click the image field. Choose a photo from the media library or upload a new one.</li>
+      <li>Write the alt text: what the photo shows, in one plain sentence. Example: "Dr. Whitlock showing a young patient a model of teeth."</li>
+      <li>Save (or Publish on services and posts).</li>
+    </ol>
+    <p>To fix a photo everywhere it is used, open <span class="ui">Content &gt; Media</span>, pick the photo and edit its <span class="ui">Alt Text</span> or focal point. The focal point decides which part stays visible when the photo is cropped.</p>
+    <p class="muted">Use JPEG or WebP. About 2000 px on the long side is plenty. Only upload photos the practice has the rights to.</p>
+  </div>
+
+  <div class="howto">
+    <h3 id="add-service">Add a service</h3>
+    <ol class="steps">
+      <li>Open <span class="ui">Services</span> and create a new entry.</li>
+      <li>Fill in <em>H1 heading (service name)</em> and check the slug. The page will live at <code>/services/your-slug/</code>.</li>
+      <li>Write the <em>Excerpt</em>. It is the text on the service card.</li>
+      <li>Set <em>Menu order</em>. Lower numbers show first.</li>
+      <li>Pick an <em>Icon</em> from the list.</li>
+      <li>Add the <em>Featured image</em> with alt text, the <em>Price</em> and the <em>Appointment length</em>.</li>
+      <li>Add at least one entry under <em>Steps</em> and any <em>FAQs</em>. FAQs also feed Google's FAQ data.</li>
+      <li>Write the <em>Page content</em>, fill in the SEO panel, preview, then <span class="ui">Publish</span>.</li>
+    </ol>
+    <p class="muted">The new service appears on <code>/services/</code>, in the home page list and in the sitemap by itself. It is not added to the header menu.</p>
+  </div>
+
+  <div class="howto">
+    <h3 id="nav-links">Change the header or footer links</h3>
+    <ol class="steps">
+      <li>Open <span class="ui">Manage &gt; Menus</span>.</li>
+      <li>Pick <span class="ui">Header menu</span> or <span class="ui">Footer menu</span>.</li>
+      <li>Add, rename, reorder or remove items. For a page on this site, type the path only, for example <code>/about/</code>. For another site, paste the full address starting with <code>https://</code>.</li>
+      <li>Save. The new links show on every page at once.</li>
+    </ol>
+    <p class="muted">The "Book a visit" button is not a menu item. Change it in <span class="ui">Site settings and SEO</span> (Button text and Button link: book a visit).</p>
+  </div>
+
+  <div class="howto">
+    <h3 id="redirect">Add a redirect</h3>
+    <p>Add one whenever you change the slug of a published service or post, or remove a page. Otherwise old links and Google results lead to a 404. Administrators only.</p>
+    <ol class="steps">
+      <li>Open <span class="ui">Manage &gt; Redirects</span> and click <span class="ui">New Redirect</span>.</li>
+      <li><em>Source path</em>: the old path, for example <code>/journal/old-post-name/</code>.</li>
+      <li><em>Destination path</em>: the new path. On staging, start it with <code>/linden-dental</code>, for example <code>/linden-dental/journal/new-post-name/</code>. On the real domain later, leave that part out.</li>
+      <li>Keep it permanent (301) unless the move is short-term. Use "Gone (410)" for a page that is removed for good with no replacement.</li>
+      <li>Save, then test the old link in a private window.</li>
+    </ol>
+    <p class="muted">The Redirects screen also lists 404 errors that visitors hit. Check it once a month and redirect the real ones.</p>
+  </div>
+
+  <div class="howto">
+    <h3 id="restore">Restore an old version</h3>
+    <p>Works on Services and Journal posts.</p>
+    <ol class="steps">
+      <li>Open the entry and find <span class="ui">Revisions</span>.</li>
+      <li>Pick the version you want. Use compare to see what changed.</li>
+      <li>Click <span class="ui">Restore</span>. That version becomes your draft. The live page does not change yet.</li>
+      <li>Check it, then click <span class="ui">Publish</span>.</li>
+    </ol>
+    <p class="muted">Deleted entries go to the trash first and can be restored from there.</p>
+  </div>
+
+  <div class="howto">
+    <h3 id="preview">Preview a draft</h3>
+    <ol class="steps">
+      <li>Save your changes as a draft. Do not publish.</li>
+      <li>Click <span class="ui">Preview</span> in the entry editor. A preview of the page opens with your draft in place.</li>
+      <li>Read it on desktop and phone width. Go back and edit if needed.</li>
+      <li>Publish when it is right.</li>
+    </ol>
+    <p class="muted">Visitors keep seeing the published version until you publish.</p>
+  </div>
+
+  <div class="howto">
+    <h3 id="inline">Edit text and photos on the page itself</h3>
+    <ol class="steps">
+      <li>Sign in to the admin.</li>
+      <li>In the same browser, open any page of the site. A black EmDash toolbar appears at the bottom.</li>
+      <li>Turn on <span class="ui">Edit mode</span> in the toolbar.</li>
+      <li>Click any heading or paragraph and type. It saves when you click away. The toolbar shows "Saved".</li>
+      <li>Click a photo to replace it or change its alt text.</li>
+      <li>Click an article body to open a rich editor in place.</li>
+      <li>Lists (FAQs, steps, opening hours, principles, dropdown options) open that field in the admin instead.</li>
+      <li>On services and posts, your edits wait as a draft. The toolbar shows "Unpublished changes" and a <span class="ui">Publish</span> button. Click it to go live. On the fixed pages, edits are live once saved.</li>
+      <li>Turn Edit mode off when you are done.</li>
+    </ol>
+    <h4>Text with placeholders</h4>
+    <p>Some text holds a word in curly braces that the site fills in. Edit these in the admin, not on the page, and keep the brace word exactly as it is.</p>
+    <table class="table stack">
+      <thead><tr><th>Field</th><th>Screen</th><th>Placeholder</th></tr></thead>
+      <tbody>
+        <tr><td data-label="Field">Step counter text ("Step 1 of 4")</td><td data-label="Screen">Site settings and SEO</td><td data-label="Placeholder"><code>{n}</code>, <code>{total}</code></td></tr>
+        <tr><td data-label="Field">Logo home link label, portrait alt text</td><td data-label="Screen">Site settings and SEO</td><td data-label="Placeholder"><code>{name}</code></td></tr>
+        <tr><td data-label="Field">Single post: author box paragraph start</td><td data-label="Screen">Journal page</td><td data-label="Placeholder"><code>{role}</code></td></tr>
+        <tr><td data-label="Field">Success paragraph</td><td data-label="Screen">Book a visit page</td><td data-label="Placeholder"><code>{phone}</code></td></tr>
+      </tbody>
+    </table>
+    <p class="muted">The toolbar's close button hides it in this browser. Opening the admin again brings it back.</p>
+  </div>
+
+  <div class="howto">
+    <h3 id="comments">Moderate comments <span class="new">New</span></h3>
+    <ol class="steps">
+      <li>Open <span class="ui">Manage &gt; Comments</span>. A number on the menu item shows how many are waiting.</li>
+      <li>Read each one. Approve it, mark it as spam, or leave it pending.</li>
+      <li>Delete anything that shares medical details about a named patient.</li>
+    </ol>
+    <p class="muted">Comments from people signed in to the CMS are approved automatically. Reply as the practice in plain, friendly words, and never give a diagnosis in a comment.</p>
+  </div>
+
+  <div class="howto">
+    <h3 id="widgets">Edit the footer notes <span class="new">New</span></h3>
+    <ol class="steps">
+      <li>Open <span class="ui">Manage &gt; Widgets</span>.</li>
+      <li>Open the <span class="ui">Footer notes</span> area. These short notes show above the copyright line on every page.</li>
+      <li>Edit a widget's title and text, drag to reorder, or add a new one. Keep each note to two short sentences.</li>
+    </ol>
+  </div>
+
+  <div class="howto">
+    <h3 id="sections">Use a reusable section in an article <span class="new">New</span></h3>
+    <ol class="steps">
+      <li>Create or edit sections under <span class="ui">Manage &gt; Sections</span>. Two exist already: "Insurance we accept" and "New patient offer".</li>
+      <li>In a post or service body, use <span class="ui">Insert Section</span> and pick one.</li>
+      <li>The section's text is copied into the article. You can adjust it there.</li>
+    </ol>
+    <p class="muted">Because it is a copy, editing the section later does not change articles that already use it. Update those by hand.</p>
+  </div>
+</section>
+
+<section id="seo" aria-labelledby="h-seo">
+  <h2 id="h-seo">SEO checklist</h2>
+  <div class="warn">
+    <p><strong>Staging is hidden from Google on purpose.</strong> Every page sends "noindex". Do not try to change that. It is switched off by a developer at launch on the real domain.</p>
+  </div>
+
+  <h3>Rules for every page</h3>
+  <ul class="check">
+    <li><strong>Meta title:</strong> the field allows 70 characters. The suffix "| Linden Dental Studio" is added for you, unless the title already names the practice. So keep your part to about 40 characters.</li>
+    <li><strong>Meta description:</strong> the field allows 170 characters. Aim for 140 to 160. Say what the page offers and who it is for.</li>
+    <li><strong>One H1:</strong> the H1 heading field is the only H1. In article bodies, start at H2.</li>
+    <li><strong>Alt text:</strong> every content photo has one. Describe the photo plainly. No keyword lists.</li>
+    <li><strong>Slugs:</strong> short, lowercase, words joined by hyphens. Changing a live slug needs a <a href="#redirect">redirect</a>.</li>
+    <li><strong>Share image:</strong> 1200 x 630 px works best. Empty means the default family photo is used.</li>
+    <li><strong>Empty fields fall back.</strong> No meta title means the page title is used. No description means the summary, then the Site settings default.</li>
+  </ul>
+
+  <h3>Per page</h3>
+  <table class="table stack">
+    <thead><tr><th>Page</th><th>Where</th><th>Check</th></tr></thead>
+    <tbody>
+      <tr><td data-label="Page">Home</td><td data-label="Where"><span class="ui">Pages &gt; Home page</span></td><td data-label="Check">Meta title, Meta description, Open Graph image, both H1 parts, hero image alt text</td></tr>
+      <tr><td data-label="Page">About</td><td data-label="Where"><span class="ui">Pages &gt; About page</span></td><td data-label="Check">Meta title, Meta description, Open Graph image, H1, hero image alt text</td></tr>
+      <tr><td data-label="Page">Services list</td><td data-label="Where"><span class="ui">Pages &gt; Services page</span></td><td data-label="Check">Meta title, Meta description, H1, Intro paragraph</td></tr>
+      <tr><td data-label="Page">Each service</td><td data-label="Where"><span class="ui">Services</span>, SEO panel</td><td data-label="Check">Meta title, Meta Description, OG Image, H1, Excerpt, featured image alt text, FAQs filled in. Leave Canonical URL empty and noindex off unless told otherwise.</td></tr>
+      <tr><td data-label="Page">Journal list</td><td data-label="Where"><span class="ui">Pages &gt; Journal page</span></td><td data-label="Check">Meta title, Meta description, H1</td></tr>
+      <tr><td data-label="Page">Each post</td><td data-label="Where"><span class="ui">Journal</span>, SEO panel</td><td data-label="Check">Meta title, Meta Description, OG Image, Excerpt, featured image alt text, Author, Publish date. Set Last modified date when you update a post in a real way.</td></tr>
+      <tr><td data-label="Page">Book a visit</td><td data-label="Where"><span class="ui">Pages &gt; Book a visit page</span></td><td data-label="Check">Meta title, Meta description, H1</td></tr>
+      <tr><td data-label="Page">Design page</td><td data-label="Where"><span class="ui">Pages &gt; Design language page</span></td><td data-label="Check">Meta title, Meta description</td></tr>
+      <tr><td data-label="Page">404</td><td data-label="Where"><span class="ui">Pages &gt; Page not found (404)</span></td><td data-label="Check">Meta title. Make sure the button links to a page that exists.</td></tr>
+      <tr><td data-label="Page">Whole site</td><td data-label="Where"><span class="ui">Settings &gt; Site settings and SEO</span></td><td data-label="Check">Default meta title, title suffix, default description, Twitter / X handle. Practice name, address, phone and hours feed Google's business data on every page, so keep them exactly as on the Google Business Profile.</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">Done for you, no action needed: sitemap, robots.txt, RSS feed, social cards, and structured data (Dentist listing, FAQs on services, Article on posts, breadcrumbs).</p>
+</section>
+
+<section id="claude" aria-labelledby="h-claude">
+  <h2 id="h-claude">Using Claude with an API token</h2>
+  <p>EmDash has a built-in MCP server. Claude Code can connect to it and do CMS work for you: list, read, create and update entries, publish, schedule, view and restore revisions, upload media, edit menus, categories and tags, and read settings. It works with your permissions, so check its work like a colleague's.</p>
+
+  <h3>1. Create a token</h3>
+  <ol class="steps">
+    <li>Open <span class="ui">Admin &gt; Settings &gt; API Tokens</span> and click <span class="ui">Create New Token</span>. (Administrators see this screen.)</li>
+    <li>Name it after the person and device, for example "Claude, Priya laptop".</li>
+    <li>Pick the fewest scopes that do the job. For writing posts: <em>Content Read</em>, <em>Content Write</em>, <em>Media Read</em>, <em>Media Write</em>. Add <em>Taxonomies Manage</em> for categories and tags, and <em>Menus Manage</em> only if Claude must edit menus. Do not pick <em>Admin</em> or <em>Schema Write</em>.</li>
+    <li>Set an expiry: 30 or 90 days. Avoid "No expiry".</li>
+    <li>Click <span class="ui">Create Token</span> and copy it. It is shown once only.</li>
+  </ol>
+
+  <h3>2. Connect Claude Code</h3>
+  <p>Run this once in a terminal, with your token in place of <code>YOUR_TOKEN</code>:</p>
+  <pre><code>claude mcp add --transport http linden-cms https://stanventures-psi.fly.dev/_emdash/api/mcp --header "Authorization: Bearer YOUR_TOKEN"</code></pre>
+  <p>Then start Claude Code and type <code>/mcp</code>. You should see <code>linden-cms</code> as connected.</p>
+
+  <h3>3. Ask in plain words</h3>
+  <ul>
+    <li>"Add a journal post about whitening myths as a draft. Category Treatments. H2 subheadings, about 600 words, excerpt under 220 characters."</li>
+    <li>"List all journal posts in linden-cms with their status and publish date."</li>
+    <li>"Rewrite the meta description of the Clear aligners service. Keep it under 160 characters. Show me before you save."</li>
+    <li>"Schedule the whitening myths draft for 3 November at 9:00 Portland time."</li>
+    <li>"Show the revisions of the flossing post and tell me what changed last."</li>
+  </ul>
+  <p>Ask for drafts, then read them with <a href="#preview">Preview</a> and publish yourself.</p>
+
+  <div class="warn">
+    <p><strong>Keep the token secret.</strong></p>
+    <ul>
+      <li>A token acts as you. Anyone who has it can do what you can.</li>
+      <li>Never paste it into a chat, email, ticket, doc or Slack. Never commit it to a code repository.</li>
+      <li>The command above saves it in your Claude Code settings on your computer. Do not share that file.</li>
+      <li>If a token may have leaked, revoke it at once on the API Tokens screen and create a new one.</li>
+      <li>Revoke tokens you no longer use.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="trouble" aria-labelledby="h-trouble">
+  <h2 id="h-trouble">Troubleshooting</h2>
+  <table class="table stack">
+    <thead><tr><th>Problem</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td data-label="Problem">My change does not show</td><td data-label="Fix">Hard refresh (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>). On services and posts, check you clicked Publish, not only Save. Check you edited the right screen: labels shared by all posts live on the Journal page, not on the post.</td></tr>
+      <tr><td data-label="Problem">Site looks broken after a developer deploy</td><td data-label="Fix">Hard refresh. Your browser may still hold the old files. Content is never touched by a deploy.</td></tr>
+      <tr><td data-label="Problem">Edit mode shows nothing, or no toolbar</td><td data-label="Fix">Make sure you are signed in to the admin in the same browser, at <code>stanventures-psi.fly.dev</code>. A private window does not share your sign-in. If you closed the toolbar, open the admin once to bring it back.</td></tr>
+      <tr><td data-label="Problem">Passkey prompt fails or "No matching passkey"</td><td data-label="Fix">Use the device where you created it, at the same address. If you lost it, ask an administrator for a new invite.</td></tr>
+      <tr><td data-label="Problem">"Someone is editing this entry"</td><td data-label="Fix">A teammate has it open. Open it read-only, or agree with them before you take over.</td></tr>
+      <tr><td data-label="Problem">Save failed</td><td data-label="Fix">Look for a red field: a required field is empty or text is over the length limit. Copy your text, reload and try again.</td></tr>
+      <tr><td data-label="Problem">Text shows <code>{name}</code> or similar on the site</td><td data-label="Fix">A placeholder was changed. Restore it exactly (see <a href="#inline">placeholders</a>).</td></tr>
+      <tr><td data-label="Problem">A link goes to a 404 on staging</td><td data-label="Fix">Internal links should be paths like <code>/services/kids/</code>, without <code>/linden-dental</code>. Outside links need the full <code>https://</code> address.</td></tr>
+      <tr><td data-label="Problem">An old link 404s after a slug change</td><td data-label="Fix">Add a <a href="#redirect">redirect</a>.</td></tr>
+      <tr><td data-label="Problem">A photo is cropped badly</td><td data-label="Fix">Set its focal point in <span class="ui">Content &gt; Media</span>.</td></tr>
+      <tr><td data-label="Problem">A draft shows in the journal list</td><td data-label="Fix">Normal on staging, with a draft notice, so the team can review. Drafts are hidden on the real site.</td></tr>
+      <tr><td data-label="Problem">A new team member does not show on the home page</td><td data-label="Fix">The home team block has four places. A fifth person needs a small layout change by a developer. They still show on the About page.</td></tr>
+      <tr><td data-label="Problem">Cannot see Redirects, Users or API Tokens</td><td data-label="Fix">Those need the Administrator role. Ask an administrator.</td></tr>
+      <tr><td data-label="Problem">Where are the booking form requests?</td><td data-label="Fix">At <a href="https://stanventures-psi.fly.dev/linden-admin">/linden-admin</a>, with its own password. They are not in the CMS.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="limits" aria-labelledby="h-limits">
+  <h2 id="h-limits">Known limits</h2>
+  <ul>
+    <li><strong>Staging address.</strong> The site lives under <code>/linden-dental</code> on staging, while the admin sits at the root (<code>/_emdash/admin</code>). Type internal links without the prefix. Redirect destinations on staging need it.</li>
+    <li><strong>Fields are fixed in code.</strong> You cannot add, rename or remove a field from the admin. Ask a developer.</li>
+    <li><strong>New page types need a developer.</strong> The seven fixed pages each have one entry. A new kind of page, such as a careers page or a landing page, is built in code first.</li>
+    <li><strong>No history on pages.</strong> Pages, Team, Reviews and Site settings have no drafts or revisions.</li>
+    <li><strong>Icons come from a fixed list.</strong> A new icon needs a developer.</li>
+    <li><strong>Design changes need a deploy.</strong> Colours, fonts, layout and motion are code. Content never needs a deploy.</li>
+    <li><strong>Leave developer screens alone.</strong> <span class="ui">Content Types</span>, <span class="ui">Plugins</span> and <span class="ui">Import</span> change how the site is built and can break pages.</li>
+    <li><strong>Concept content.</strong> The practice, people and reviews are fictional, and phone numbers use the 555 test range. Replace them before any real launch.</li>
+  </ul>
+</section>
+
+</main>
+
+<footer class="end">
+  <p>Linden Dental Studio CMS guide · written for the staging site, October 2026 · Items marked <span class="new">New</span> are being added now and may change.</p>
+</footer>
+
+</div>
+</body>
+</html>

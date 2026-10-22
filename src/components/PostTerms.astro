@@ -1,0 +1,42 @@
+---
+// A post's categories and tags as links to their archive pages (/journal/category/<slug>/,
+// /journal/tag/<slug>/). Terms are assigned in the admin, in the post's Categories and Tags panels.
+import { url } from '../lib/url';
+import { getPostExtras } from '../lib/cms';
+
+interface Props {
+  /** The post slug (Post.id). */
+  slug: string;
+  label?: string;
+}
+
+const { slug, label = 'Filed under' } = Astro.props;
+const extras = await getPostExtras(slug, { includeDrafts: !!import.meta.env.PUBLIC_SHOW_DRAFTS });
+const links = extras
+  ? [
+      ...extras.categories.map((t) => ({ href: url(`/journal/category/${t.slug}/`), label: t.label, kind: 'category' })),
+      ...extras.tags.map((t) => ({ href: url(`/journal/tag/${t.slug}/`), label: t.label, kind: 'tag' })),
+    ]
+  : [];
+---
+{links.length > 0 && (
+  <nav class="post-terms" aria-label={label}>
+    <p class="label">{label}</p>
+    <ul>
+      {links.map((l) => <li><a href={l.href} class:list={[`is-${l.kind}`]}>{l.label}</a></li>)}
+    </ul>
+  </nav>
+)}
+
+<style>
+  .post-terms { display: grid; gap: 0.75rem; margin-top: 2.5rem; font-size: var(--step-0); }
+  p.label { margin: 0; } /* inside .prose, whose paragraphs carry a bottom margin */
+  ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  a {
+    display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.1rem; border-radius: var(--pill);
+    border: 1px solid var(--line); text-decoration: none; font-weight: 500; font-size: var(--step--1);
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+  a:hover { background: var(--surface); border-color: var(--ink-2); }
+  .is-category { background: var(--bg-2); border-color: var(--bg-2); color: var(--accent); font-weight: 600; }
+</style>

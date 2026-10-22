@@ -1,0 +1,25 @@
+---
+// "Clinically reviewed by ..." line for a post, from its EmDash byline credits (the Bylines panel
+// on a journal post; people are managed under Bylines in the admin). The post author stays the
+// team reference; bylines carry extra credits such as the clinician who checked the advice.
+import { getPostExtras } from '../lib/cms';
+import Icon from './Icon.astro';
+
+interface Props {
+  /** The post slug (Post.id). */
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const extras = await getPostExtras(slug, { includeDrafts: !!import.meta.env.PUBLIC_SHOW_DRAFTS });
+const credits = extras?.credits ?? [];
+---
+{credits.map((c) => (
+  <p class="reviewed"><Icon name="shield-check" /> <span>{c.role || 'With'}{' '}<strong>{c.name}</strong></span></p>
+))}
+
+<style>
+  .reviewed { display: inline-flex; align-items: center; gap: 0.45rem; font-size: var(--step--1); color: var(--ink-2); }
+  .reviewed :global(svg) { color: var(--accent); flex: none; }
+  strong { font-weight: 600; color: var(--ink); }
+</style>

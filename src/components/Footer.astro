@@ -1,48 +1,54 @@
 ---
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
+import FooterWidgets from './FooterWidgets.astro';
 import { getSite } from '../data/site';
 const site = await getSite();
 const year = new Date().getFullYear();
-const { footer } = site;
+const { footer, settings } = site;
+const e = settings.edit;
+// Intro reads "<tagline>. <footer intro>"; each part is its own span so both can be edited inline.
 const intro = [site.tagline && `${site.tagline}.`, footer.intro].filter(Boolean).join(' ');
 ---
 <footer class="footer">
   <div class="wrap footer__grid">
     <div class="footer__brand">
       <Logo />
-      {intro && <p class="muted">{intro}</p>}
+      {intro && <p class="muted">{site.tagline && <><span {...e.tagline}>{site.tagline}</span>.</>}{site.tagline && footer.intro && ' '}{footer.intro && <span {...e.footer_intro}>{footer.intro}</span>}</p>}
     </div>
 
     <div>
-      <h2 class="footer__h">{footer.visitHeading}</h2>
+      <h2 class="footer__h" {...e.footer_visit_heading}>{footer.visitHeading}</h2>
       <address>
-        {site.address.map((l) => <span>{l}</span>)}
+        {settings.addressLine1 && <span {...e.address_line_1}>{settings.addressLine1}</span>}
+        {settings.addressLine2 && <span {...e.address_line_2}>{settings.addressLine2}</span>}
       </address>
-      <a class="link-arrow" href={site.mapHref}>{footer.directionsLabel} <Icon name="arrow-up-right" /></a>
+      <a class="link-arrow" href={site.mapHref}><span {...e.footer_directions_label}>{footer.directionsLabel}</span> <Icon name="arrow-up-right" /></a>
     </div>
 
     <div>
-      <h2 class="footer__h">{footer.hoursHeading}</h2>
-      <dl class="footer__hours">
+      <h2 class="footer__h" {...e.footer_hours_heading}>{footer.hoursHeading}</h2>
+      <dl class="footer__hours" {...e.hours}>
         {site.hours.map((h) => (<><dt>{h.days}</dt><dd>{h.time}</dd></>))}
       </dl>
     </div>
 
     <div>
-      <h2 class="footer__h">{footer.contactHeading}</h2>
+      <h2 class="footer__h" {...e.footer_contact_heading}>{footer.contactHeading}</h2>
       <ul class="footer__list">
-        <li><a href={site.phoneHref}>{site.phone}</a></li>
-        <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+        <li><a href={site.phoneHref} {...e.phone}>{site.phone}</a></li>
+        <li><a href={`mailto:${site.email}`} {...e.email}>{site.email}</a></li>
         {site.nav.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
         {footer.extraLinks.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
       </ul>
     </div>
   </div>
 
+  <div class="wrap"><FooterWidgets /></div>
+
   <div class="wrap footer__base">
-    <p>&copy; {year} {site.name}</p>
-    {footer.note && <p>{footer.note}</p>}
+    <p>&copy; {year} <span {...e.name}>{site.name}</span></p>
+    {footer.note && <p {...e.footer_note}>{footer.note}</p>}
   </div>
 </footer>
 

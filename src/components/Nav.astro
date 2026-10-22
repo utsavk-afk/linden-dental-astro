@@ -2,8 +2,10 @@
 import { url, publicPath } from '../lib/url';
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
+import SiteSearch from './SiteSearch.astro';
 import { getSite, fill } from '../data/site';
 const site = await getSite();
+const e = site.settings.edit;
 const path = publicPath(Astro.url.pathname);
 const isCurrent = (href: string) => path.startsWith(href);
 ---
@@ -20,11 +22,12 @@ const isCurrent = (href: string) => path.startsWith(href);
     </nav>
 
     <div class="nav__actions">
-      <a class="nav__phone" href={site.phoneHref}><Icon name="phone" /> {site.phone}</a>
+      <SiteSearch class="nav__search" />
+      <a class="nav__phone" href={site.phoneHref}><Icon name="phone" /> <span {...e.phone}>{site.phone}</span></a>
       <button class="nav__icon" type="button" data-theme-toggle aria-label={site.labels.themeToggle}>
         <span class="i-sun"><Icon name="sun" /></span><span class="i-moon"><Icon name="moon" /></span>
       </button>
-      <a class="btn nav__cta" href={site.cta.href}>{site.cta.label}</a>
+      <a class="btn nav__cta" href={site.cta.href} {...e.primary_cta_label}>{site.cta.label}</a>
       <button class="nav__icon nav__menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="menu-sheet">
         <span class="visually-hidden">{site.labels.menu}</span>
         <span class="i-open"><Icon name="list" size="1.4em" /></span><span class="i-close"><Icon name="x" size="1.4em" /></span>
@@ -35,10 +38,11 @@ const isCurrent = (href: string) => path.startsWith(href);
   <div class="menu" id="menu-sheet" data-menu hidden>
     <ul class="wrap">
       {site.nav.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
-      <li><a href={site.cta.href}>{site.cta.label}</a></li>
+      <li><a href={url('/search/')}>Search</a></li>
+      <li><a href={site.cta.href} {...e.primary_cta_label}>{site.cta.label}</a></li>
     </ul>
     <div class="wrap menu__foot">
-      <a class="btn btn--ghost" href={site.phoneHref}><Icon name="phone" /> {site.phone}</a>
+      <a class="btn btn--ghost" href={site.phoneHref}><Icon name="phone" /> <span {...e.phone}>{site.phone}</span></a>
     </div>
   </div>
 </header>
@@ -65,6 +69,8 @@ const isCurrent = (href: string) => path.startsWith(href);
   .nav__links a:hover { background: var(--bg-2); }
   .nav__links a[aria-current='page'] { background: var(--bg-2); color: var(--accent); }
   .nav__actions { display: flex; align-items: center; gap: 0.5rem; }
+  .nav__search { width: 220px; }
+  @media (max-width: 1100px) { .nav__search { display: none; } }
   .nav__phone { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 500; text-decoration: none; padding: 0.5rem 0.75rem; color: var(--ink-2); }
   .nav__phone:hover { color: var(--ink); }
   .nav__icon {

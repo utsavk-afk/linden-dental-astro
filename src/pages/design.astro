@@ -14,19 +14,20 @@ const swatches = palette.map((c) => {
   return { ...c, name: words?.name || c.token.slice(2), use: words?.use || '' };
 });
 const { principles, colour, type, components, motion, inspiration } = page;
+const e = page.edit; // inline-edit annotations (EmDash Edit mode); lists open their repeater in the admin
 ---
 <Base title={page.seo.title || page.title} description={page.seo.description || undefined}>
   <section class="head">
     <div class="wrap">
-      <h1 data-split>{page.title}</h1>
-      {page.lede && <p class="lede" data-reveal>{page.lede}</p>}
+      <h1 data-split {...e.title}>{page.title}</h1>
+      {page.lede && <p class="lede" data-reveal {...e.lede}>{page.lede}</p>}
     </div>
   </section>
 
   <section class="section block">
     <div class="wrap">
-      <h2>{principles.title}</h2>
-      <ul class="principles">
+      <h2 {...e.principles_title}>{principles.title}</h2>
+      <ul class="principles" {...e.principles_items}>
         {principles.items.map((p) => (
           <li data-reveal><h3>{p.title}</h3><p class="muted">{p.text}</p></li>
         ))}
@@ -36,9 +37,9 @@ const { principles, colour, type, components, motion, inspiration } = page;
 
   <section class="section block">
     <div class="wrap">
-      <h2>{colour.title}</h2>
-      {colour.intro && <p class="muted measure">{colour.intro}</p>}
-      <div class="swatches">
+      <h2 {...e.colour_title}>{colour.title}</h2>
+      {colour.intro && <p class="muted measure" {...e.colour_intro}>{colour.intro}</p>}
+      <div class="swatches" {...e.colour_swatches}>
         {swatches.map((c) => (
           <div class="swatch" data-reveal>
             <div class="swatch__chips"><span style={`background:${c.light}`}></span><span style={`background:${c.dark}`}></span></div>
@@ -54,9 +55,9 @@ const { principles, colour, type, components, motion, inspiration } = page;
 
   <section class="section block">
     <div class="wrap">
-      <h2>{type.title}</h2>
-      {type.intro && <p class="muted measure">{type.intro}</p>}
-      <div class="specimen">
+      <h2 {...e.type_title}>{type.title}</h2>
+      {type.intro && <p class="muted measure" {...e.type_intro}>{type.intro}</p>}
+      <div class="specimen" {...e.type_specimens}>
         {type.specimens.map((s) => (
           <div class="specimen__row" data-reveal>
             <span class="specimen__meta"><strong>{s.label}</strong><code>{s.step.slice(2)}</code></span>
@@ -69,16 +70,16 @@ const { principles, colour, type, components, motion, inspiration } = page;
 
   <section class="section block">
     <div class="wrap">
-      <h2>{components.title}</h2>
-      {components.intro && <p class="muted measure">{components.intro}</p>}
+      <h2 {...e.components_title}>{components.title}</h2>
+      {components.intro && <p class="muted measure" {...e.components_intro}>{components.intro}</p>}
       <div class="components">
         <div class="components__cell" data-reveal>
           <Logo />
         </div>
         <div class="components__cell" data-reveal>
-          <a class="btn" href={url('/book/')}>{components.primaryButton} <Icon name="arrow-right" /></a>
-          <a class="btn btn--ghost" href={url('/design/')}><Icon name="phone" /> {components.secondaryButton}</a>
-          <a class="link-arrow" href={url('/design/')}>{components.textLink} <Icon name="arrow-right" /></a>
+          <a class="btn" href={url('/book/')}><span {...e.components_primary_button}>{components.primaryButton}</span> <Icon name="arrow-right" /></a>
+          <a class="btn btn--ghost" href={url('/design/')}><Icon name="phone" /> <span {...e.components_secondary_button}>{components.secondaryButton}</span></a>
+          <a class="link-arrow" href={url('/design/')}><span {...e.components_text_link}>{components.textLink}</span> <Icon name="arrow-right" /></a>
         </div>
         <div class="components__cell components__cell--radii" data-reveal>
           <span style="border-radius:var(--r-lg)">28</span><span style="border-radius:var(--r-md)">18</span><span style="border-radius:var(--r-sm)">12</span><span style="border-radius:var(--pill)">pill</span>
@@ -89,9 +90,9 @@ const { principles, colour, type, components, motion, inspiration } = page;
 
   <section class="section block">
     <div class="wrap">
-      <h2>{motion.title}</h2>
-      {motion.intro && <p class="muted measure">{motion.intro}</p>}
-      <dl class="motion">
+      <h2 {...e.motion_title}>{motion.title}</h2>
+      {motion.intro && <p class="muted measure" {...e.motion_intro}>{motion.intro}</p>}
+      <dl class="motion" {...e.motion_items}>
         {motion.items.map((m) => (
           <div data-reveal>
             <dt>{m.name}</dt>
@@ -104,9 +105,9 @@ const { principles, colour, type, components, motion, inspiration } = page;
 
   <section class="section block">
     <div class="wrap">
-      <h2>{inspiration.title}</h2>
-      {inspiration.intro && <p class="muted measure">{inspiration.intro}</p>}
-      <ul class="refs">
+      <h2 {...e.inspiration_title}>{inspiration.title}</h2>
+      {inspiration.intro && <p class="muted measure" {...e.inspiration_intro}>{inspiration.intro}</p>}
+      <ul class="refs" {...e.inspiration_items}>
         {inspiration.items.map((r) => (
           <li data-reveal>
             <a href={r.url || undefined} rel="noopener">

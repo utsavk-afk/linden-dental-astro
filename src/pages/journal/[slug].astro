@@ -7,6 +7,9 @@ import Icon from '../../components/Icon.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import CmsImage from '../../components/CmsImage.astro';
 import RichText from '../../components/RichText.astro';
+import PostTerms from '../../components/PostTerms.astro';
+import PostReviewedBy from '../../components/PostReviewedBy.astro';
+import PostComments from '../../components/PostComments.astro';
 
 // Rendered per request. getPost returns drafts for EmDash previews; staging (PUBLIC_SHOW_DRAFTS)
 // also opens drafts by URL, so fall back to the list that includes them.
@@ -21,6 +24,10 @@ const author = p.author;
 const authorName = author?.name || settings.name;
 const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const t = page.post;
+// Inline editing (EmDash Edit mode): this post, the journal page labels, site settings.
+const e = p.edit;
+const pe = page.edit;
+const se = settings.edit;
 const siteUrl = new URL(url('/'), Astro.site).href;
 const pageUrl = new URL(publicPath(Astro.url.pathname), Astro.site).href;
 const jsonLd = [
@@ -30,44 +37,48 @@ const jsonLd = [
 ---
 <Base title={p.seoTitle || p.title} description={p.seoDescription || p.description} image={p.cover} type="article" jsonLd={jsonLd} progress>
   <article data-article>
-    {p.draft && <p class="draft-banner" role="note">{page.post.draftBanner}</p>}
+    {p.draft && <p class="draft-banner" role="note" {...pe.post_draft_banner}>{page.post.draftBanner}</p>}
     <header class="wrap head">
-      <a class="back" href={url('/journal/')}><Icon name="arrow-left" /> {t.backLabel}</a>
-      <p class="meta" data-reveal>{p.tag} <span aria-hidden="true">/</span> {p.readMinutes} {settings.labels.minRead}</p>
-      <h1 data-split>{p.title}</h1>
-      <p class="lede" data-reveal>{p.description}</p>
-      <p class="byline" data-reveal>{authorName}, <time datetime={p.date.toISOString()}>{fmt(p.date)}</time>{p.updatedDate && <> <span aria-hidden="true">/</span> {page.post.updatedLabel} <time datetime={p.updatedDate.toISOString()}>{fmt(p.updatedDate)}</time></>}</p>
+      <a class="back" href={url('/journal/')}><Icon name="arrow-left" /> <span {...pe.post_back_label}>{t.backLabel}</span></a>
+      <p class="meta" data-reveal><span {...e.category}>{p.tag}</span> <span aria-hidden="true">/</span> {p.readMinutes} <span {...se.labels_min_read}>{settings.labels.minRead}</span></p>
+      <h1 data-split {...e.title}>{p.title}</h1>
+      <p class="lede" data-reveal {...e.excerpt}>{p.description}</p>
+      <p class="byline" data-reveal><span {...e.author}>{authorName}</span>, <time datetime={p.date.toISOString()} {...e.publish_date}>{fmt(p.date)}</time>{p.updatedDate && <> <span aria-hidden="true">/</span> <span {...pe.post_updated_label}>{page.post.updatedLabel}</span> <time datetime={p.updatedDate.toISOString()} {...e.updated_date}>{fmt(p.updatedDate)}</time></>}</p>
+      <PostReviewedBy slug={p.id} />
     </header>
     <div class="wrap">
-      <div class="frame cover" data-parallax="5"><CmsImage image={p.cover} alt={p.coverAlt} layout="full-width" loading="eager" /></div>
+      <div class="frame cover" data-parallax="5" {...e.featured_image}><CmsImage image={p.cover} alt={p.coverAlt} layout="full-width" loading="eager" /></div>
     </div>
     <div class="wrap body">
-      <div class="prose"><RichText value={p.body} /></div>
+      <div class="prose"><RichText value={p.body} /><PostTerms slug={p.id} /></div>
       {author && (
         <aside class="author">
-          <div class="frame author__img"><CmsImage image={author.photo} alt="" width={160} height={160} /></div>
-          <div><strong>{author.name}</strong><p class="muted">{t.authorLine.replace('{role}', author.role)} {author.bio.split('. ')[0].replace(/\.$/, '')}.</p></div>
+          <div class="frame author__img" {...author.edit.photo}><CmsImage image={author.photo} alt="" width={160} height={160} /></div>
+          {/* The line under the name mixes post_author_line ({role} filled in) with the bio's first sentence, so it is not editable inline. */}
+          <div><strong {...author.edit.name}>{author.name}</strong><p class="muted">{t.authorLine.replace('{role}', author.role)} {author.bio.split('. ')[0].replace(/\.$/, '')}.</p></div>
         </aside>
       )}
     </div>
   </article>
 
+  <PostComments slug={p.id} />
+
   <section class="section next">
     <div class="wrap">
-      <h2 class="next__title">{t.nextTitle}</h2>
+      <h2 class="next__title" {...pe.post_next_title}>{t.nextTitle}</h2>
       <div class="next__grid">
         {next.map((n) => (
           <a class="next__item" href={url(`/journal/${n.id}/`)} data-reveal>
-            <div class="frame next__img"><CmsImage image={n.cover} alt={n.coverAlt} width={720} height={480} /></div>
-            <p class="meta">{n.tag}</p>
-            <h3>{n.title}</h3>
+            <div class="frame next__img" {...n.edit.featured_image}><CmsImage image={n.cover} alt={n.coverAlt} width={720} height={480} /></div>
+            <p class="meta" {...n.edit.category}>{n.tag}</p>
+            <h3 {...n.edit.title}>{n.title}</h3>
           </a>
         ))}
       </div>
     </div>
   </section>
 
-  <CtaBand title={t.ctaTitle || undefined} body={t.ctaText || undefined} />
+  <CtaBand title={t.ctaTitle || undefined} body={t.ctaText || undefined} titleEdit={pe.post_cta_title} bodyEdit={pe.post_cta_text} />
 </Base>
 
 <style>
@@ -76,7 +87,7 @@ const jsonLd = [
   .back { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; text-decoration: none; color: var(--ink-2); font-weight: 500; margin-bottom: 0.5rem; }
   .head h1 { font-size: var(--step-4); }
   .meta { font-size: var(--step--1); font-weight: 600; color: var(--accent); }
-  .meta span { color: var(--line); margin-inline: 0.3em; }
+  .meta [aria-hidden] { color: var(--line); margin-inline: 0.3em; } /* the "/" divider, not the edit-mode field spans */
   .byline { color: var(--ink-2); font-size: var(--step--1); }
   .cover { height: clamp(280px, 50vw, 600px); }
   .body { display: grid; grid-template-columns: minmax(0, 68ch) minmax(0, 280px); justify-content: space-between; gap: 3rem; padding-block: clamp(2.5rem, 1.5rem + 3vw, 5rem); }

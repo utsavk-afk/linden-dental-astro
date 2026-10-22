@@ -10,21 +10,25 @@ const { intro, nextSteps, form: f, options, messages: m, success, seo } = page;
 // PUBLIC_ env vars are inlined at build time; set for the staging backend. Empty means the form only simulates a send.
 const endpoint = import.meta.env.PUBLIC_BOOKING_ENDPOINT || '';
 const successText = success.text.replaceAll('{phone}', site.phone);
+// Inline editing (EmDash Edit mode). Fields shown with placeholders filled in are not annotated,
+// since saving the page text would overwrite the placeholder.
+const e = page.edit;
+const se = site.settings.edit;
 ---
 <Base title={seo.title || intro.title} description={seo.description || undefined}>
   <section class="book">
     <div class="wrap book__grid">
       <div class="book__info">
-        <h1 data-split>{intro.title}</h1>
-        <p class="lede" data-reveal>{intro.lede}</p>
+        <h1 data-split {...e.intro_title}>{intro.title}</h1>
+        <p class="lede" data-reveal {...e.intro_lede}>{intro.lede}</p>
         {nextSteps.length > 0 && (
-        <ol class="next" data-reveal>
+        <ol class="next" data-reveal {...e.next_steps}>
           {nextSteps.map((s) => <li><Icon name={s.icon} /><span><strong>{s.lead}</strong> {s.text}</span></li>)}
         </ol>
         )}
         <div class="call" data-reveal>
-          <p class="muted">{intro.callLabel}</p>
-          <a class="btn btn--ghost btn--lg" href={site.phoneHref}><Icon name="phone" /> {site.phone}</a>
+          <p class="muted" {...e.intro_call_label}>{intro.callLabel}</p>
+          <a class="btn btn--ghost btn--lg" href={site.phoneHref}><Icon name="phone" /> <span {...se.phone}>{site.phone}</span></a>
         </div>
       </div>
 
@@ -37,36 +41,36 @@ const successText = success.text.replaceAll('{phone}', site.phone);
         >
           <div class="hp" aria-hidden="true"><label for="company">Company</label><input id="company" name="company" type="text" tabindex="-1" autocomplete="off" /></div>
           <fieldset class="seg">
-            <legend>{f.whoLegend}</legend>
+            <legend {...e.form_who_legend}>{f.whoLegend}</legend>
             <div class="seg__opts">
-              <label><input type="radio" name="who" value="me" checked /> <span>{f.whoMe}</span></label>
-              <label><input type="radio" name="who" value="child" /> <span>{f.whoChild}</span></label>
-              <label><input type="radio" name="who" value="family" /> <span>{f.whoFamily}</span></label>
+              <label><input type="radio" name="who" value="me" checked /> <span {...e.form_who_me}>{f.whoMe}</span></label>
+              <label><input type="radio" name="who" value="child" /> <span {...e.form_who_child}>{f.whoChild}</span></label>
+              <label><input type="radio" name="who" value="family" /> <span {...e.form_who_family}>{f.whoFamily}</span></label>
             </div>
           </fieldset>
 
           <div class="row2">
             <div class="field">
-              <label for="name">{f.name}</label>
+              <label for="name" {...e.form_name}>{f.name}</label>
               <input id="name" name="name" type="text" autocomplete="name" required aria-describedby="name-error" />
               <p class="error" id="name-error" aria-live="polite"></p>
             </div>
             <div class="field">
-              <label for="phone">{f.phone}</label>
+              <label for="phone" {...e.form_phone}>{f.phone}</label>
               <input id="phone" name="phone" type="tel" autocomplete="tel" required pattern="[0-9 \(\)\+\-\.]{7,}" aria-describedby="phone-error" />
               <p class="error" id="phone-error" aria-live="polite"></p>
             </div>
           </div>
 
           <div class="field">
-            <label for="email">{f.email}</label>
+            <label for="email" {...e.form_email}>{f.email}</label>
             <input id="email" name="email" type="email" autocomplete="email" required aria-describedby="email-help email-error" />
-            <p class="help" id="email-help">{f.emailHelp}</p>
+            <p class="help" id="email-help" {...e.form_email_help}>{f.emailHelp}</p>
             <p class="error" id="email-error" aria-live="polite"></p>
           </div>
 
           <div class="field">
-            <label for="reason">{f.reason}</label>
+            <label for="reason" {...e.form_reason}>{f.reason}</label>
             <div class="select">
               <select id="reason" name="reason" required aria-describedby="reason-error">
                 <option value="" selected disabled>{f.reasonPlaceholder}</option>
@@ -78,7 +82,7 @@ const successText = success.text.replaceAll('{phone}', site.phone);
 
           {options.days.length > 0 && (
           <fieldset class="checks">
-            <legend>{f.days}</legend>
+            <legend {...e.form_days}>{f.days}</legend>
             <div class="checks__opts">
               {options.days.map((d) => <label><input type="checkbox" name="days" value={d} /> <span>{d}</span></label>)}
             </div>
@@ -88,24 +92,24 @@ const successText = success.text.replaceAll('{phone}', site.phone);
           <label class="toggle">
             <input type="checkbox" name="nervous" />
             <span class="toggle__ui" aria-hidden="true"></span>
-            <span><strong>{f.nervousLead}</strong> {f.nervousText}</span>
+            <span><strong {...e.form_nervous_lead}>{f.nervousLead}</strong> <span {...e.form_nervous_text}>{f.nervousText}</span></span>
           </label>
 
           <div class="field">
-            <label for="notes">{f.notes} <span class="optional">{f.optional}</span></label>
+            <label for="notes"><span {...e.form_notes}>{f.notes}</span> <span class="optional" {...e.form_optional}>{f.optional}</span></label>
             <textarea id="notes" name="notes" rows="4"></textarea>
           </div>
 
           <button class="btn btn--lg submit" type="submit"><span class="submit__label">{f.submit}</span><span class="submit__busy">{f.sending}</span> <Icon name="arrow-right" /></button>
           <p class="form-error" data-form-error role="alert" hidden></p>
-          <p class="fine">{endpoint ? f.fineStaging : f.fineConcept}</p>
+          <p class="fine" {...(endpoint ? e.form_fine_staging : e.form_fine_concept)}>{endpoint ? f.fineStaging : f.fineConcept}</p>
         </form>
 
         <div class="success" data-book-success hidden tabindex="-1">
           <span class="success__icon"><Icon name="check" size="1.6rem" /></span>
-          <h2>{success.headingPrefix} <span data-first-name></span>{success.headingSuffix}</h2>
-          <p class="muted">{successText}</p>
-          <a class="link-arrow" href={href(success.link.link)}>{success.link.label} <Icon name="arrow-right" /></a>
+          <h2><span {...e.success_heading_prefix}>{success.headingPrefix}</span> <span data-first-name></span><span {...e.success_heading_suffix}>{success.headingSuffix}</span></h2>
+          <p class="muted" {...(successText === success.text ? e.success_text : {})}>{successText}</p>
+          <a class="link-arrow" href={href(success.link.link)}><span {...e.success_link_label}>{success.link.label}</span> <Icon name="arrow-right" /></a>
         </div>
       </div>
     </div>

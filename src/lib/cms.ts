@@ -1,7 +1,17 @@
 // Data access for the EmDash CMS (content lives in the database; see seed/seed.json for the model).
 // Every function returns the shape its templates expect,
 // fills missing fields with defaults, and never throws on empty or missing content.
-import { getEmDashCollection, getEmDashEntry, getEmDashReferences, getMenu, getRequestContext } from 'emdash';
+import { createNoop, getEmDashCollection, getEmDashEntry, getEmDashReferences, getMenu, getRequestContext } from 'emdash';
+import type { EditProxy } from 'emdash';
+
+/**
+ * Inline editing ("Edit mode" in the EmDash toolbar). Every object below carries `edit`: spread
+ * `{...obj.edit.<field_slug>}` on the element that shows that field (slug = the EmDash field slug,
+ * e.g. hero_title). Outside edit mode it spreads nothing. Portable Text needs no annotation:
+ * RichText passes EmDash's own array through, and PortableText swaps in the inline editor.
+ */
+export type { EditProxy };
+const noEdit = (): EditProxy => createNoop() as EditProxy;
 
 // ---------------------------------------------------------------------------
 // Types and helpers
@@ -87,13 +97,14 @@ async function safe<T>(label: string, fallback: T, fn: () => Promise<T>): Promis
   }
 }
 
-type Entry = { id: string; data: Plain };
+type Entry = { id: string; data: Plain; edit: EditProxy };
+const editOf = (e: unknown): EditProxy => ((e as { edit?: EditProxy } | null)?.edit ?? noEdit());
 
 async function collection(type: string, status?: 'published' | 'draft'): Promise<Entry[]> {
   return safe(`collection ${type}`, [] as Entry[], async () => {
     const { entries, error } = await getEmDashCollection(type, { ...(status ? { status } : {}), limit: 500 });
     if (error) console.error(`[cms] collection ${type}:`, error);
-    return ((entries ?? []) as unknown as Entry[]).map((e) => ({ id: e.id, data: isPlain(e.data) ? e.data : {} }));
+    return ((entries ?? []) as unknown as Entry[]).map((e) => ({ id: e.id, data: isPlain(e.data) ? e.data : {}, edit: editOf(e) }));
   });
 }
 
@@ -101,13 +112,19 @@ async function entry(type: string, slug: string): Promise<Entry | null> {
   return safe(`entry ${type}/${slug}`, null as Entry | null, async () => {
     const { entry: e, error } = await getEmDashEntry(type, slug);
     if (error && error.name !== 'LiveEntryNotFoundError') console.error(`[cms] entry ${type}/${slug}:`, error);
-    return e ? { id: e.id, data: isPlain(e.data) ? (e.data as Plain) : {} } : null;
+    return e ? { id: e.id, data: isPlain(e.data) ? (e.data as Plain) : {}, edit: editOf(e) } : null;
   });
 }
 
-/** The data of a one-entry page settings collection (slug "main"), or {}. */
-async function single(type: string): Promise<Plain> {
-  return (await entry(type, 'main'))?.data ?? {};
+/** A one-entry page settings collection (slug "main"): its data ({} when missing) and edit proxy. */
+async function singleEntry(type: string): Promise<{ data: Plain; edit: EditProxy }> {
+  const e = await entry(type, 'main');
+  return { data: e?.data ?? {}, edit: e?.edit ?? noEdit() };
+}
+
+/** True when the EmDash toolbar's Edit mode is on for this request. */
+export function isEditMode(): boolean {
+  return (getRequestContext() as { editMode?: boolean } | undefined)?.editMode === true;
 }
 
 async function menuLinks(name: string): Promise<Link[]> {
@@ -167,11 +184,11 @@ const settingsShape = () => ({
   seoDefaultDescription: '',
   twitterHandle: '',
 });
-export type Settings = ReturnType<typeof settingsShape>;
+export type Settings = ReturnType<typeof settingsShape> & { edit: EditProxy };
 
 async function loadSettings(): Promise<Settings> {
-  const [d, nav, extraLinks] = await Promise.all([single('site_settings'), menuLinks('primary'), menuLinks('footer')]);
-  return withDefaults(settingsShape(), {
+  const [{ data: d, edit }, nav, extraLinks] = await Promise.all([singleEntry('site_settings'), menuLinks('primary'), menuLinks('footer')]);
+  return { ...withDefaults(settingsShape(), {
     name: d.name,
     logoWord: d.logo_word,
     logoSub: d.logo_sub,
@@ -210,20 +227,36 @@ async function loadSettings(): Promise<Settings> {
     seoTitleSuffix: d.seo_title_suffix,
     seoDefaultDescription: d.seo_default_description,
     twitterHandle: d.twitter_handle,
-  });
+  }), edit };
 }
 
 const SETTINGS_TTL_MS = 3000;
 let settingsCache: { at: number; value: Promise<Settings> } | null = null;
 
+// Edit mode and previews must not share the public cache (edit annotations, draft values), so they
+// get one load per request instead, keyed on EmDash's request context object.
+const requestSettings = new WeakMap<object, Promise<Settings>>();
+
 /** Site settings, with defaults filled in. Memoised for a few seconds. */
 export function getSettings(): Promise<Settings> {
+  const ctx = getRequestContext() as object | undefined;
+  if (ctx && isPreviewRequest()) {
+    let value = requestSettings.get(ctx);
+    if (!value) {
+      value = loadSettings().catch((error) => {
+        console.error('[cms] settings failed:', error);
+        return { ...settingsShape(), edit: noEdit() };
+      });
+      requestSettings.set(ctx, value);
+    }
+    return value;
+  }
   const now = Date.now();
   if (!settingsCache || now - settingsCache.at > SETTINGS_TTL_MS) {
     const value = loadSettings().catch((error) => {
       console.error('[cms] settings failed:', error);
       settingsCache = null;
-      return settingsShape();
+      return { ...settingsShape(), edit: noEdit() };
     });
     settingsCache = { at: now, value };
   }
@@ -233,19 +266,19 @@ export function getSettings(): Promise<Settings> {
 // ---------------------------------------------------------------------------
 // Reviews and team
 // ---------------------------------------------------------------------------
-export type Review = { quote: string; name: string; where: string };
+export type Review = { quote: string; name: string; where: string; edit: EditProxy };
 
 /** Reviews in menu order: [{ quote, name, where }]. */
 export async function getReviews(): Promise<Review[]> {
   const entries = await collection('reviews');
   return entries
-    .map((e) => ({ order: n(e.data.order), quote: s(e.data.quote), name: s(e.data.name), where: s(e.data.where) }))
+    .map((e) => ({ order: n(e.data.order), quote: s(e.data.quote), name: s(e.data.name), where: s(e.data.where), edit: e.edit }))
     .filter((r) => r.quote || r.name)
     .sort((a, b) => a.order - b.order)
-    .map(({ quote, name, where }) => ({ quote, name, where }));
+    .map(({ quote, name, where, edit }) => ({ quote, name, where, edit }));
 }
 
-export type TeamMember = { id: string; name: string; role: string; photo: CmsImage | null; bio: string; outside: string; order: number };
+export type TeamMember = { id: string; name: string; role: string; photo: CmsImage | null; bio: string; outside: string; order: number; edit: EditProxy };
 
 const toTeamMember = (e: Entry): TeamMember => ({
   id: e.id,
@@ -255,6 +288,7 @@ const toTeamMember = (e: Entry): TeamMember => ({
   bio: s(e.data.bio),
   outside: s(e.data.outside),
   order: n(e.data.order),
+  edit: e.edit,
 });
 
 /** Team members in menu order. */
@@ -281,6 +315,7 @@ export type Service = {
   seoDescription: string;
   body: PortableTextValue;
   draft: boolean;
+  edit: EditProxy;
 };
 
 function toService(e: Entry): Service {
@@ -303,6 +338,7 @@ function toService(e: Entry): Service {
     seoDescription: seo.description,
     body: pt(d.content),
     draft: s(d.status) === 'draft',
+    edit: e.edit,
   };
 }
 
@@ -335,6 +371,7 @@ export type Post = {
   body: PortableTextValue;
   draft: boolean;
   readMinutes: number;
+  edit: EditProxy;
 };
 
 /** Words in a Portable Text value (span text only). */
@@ -364,7 +401,7 @@ async function authorOf(e: Entry, team: TeamMember[]): Promise<TeamMember | null
   const refData = isPlain(ref.data) ? ref.data : {};
   return (
     team.find((t) => t.id === ref.id || t.id === s(refData.slug)) ??
-    toTeamMember({ id: ref.id, data: refData })
+    toTeamMember({ id: ref.id, data: refData, edit: editOf(ref) })
   );
 }
 
@@ -388,6 +425,7 @@ async function toPost(e: Entry, team: TeamMember[]): Promise<Post> {
     body,
     draft: s(d.status) !== 'published',
     readMinutes: readMinutesOf(body),
+    edit: e.edit,
   };
 }
 
@@ -429,8 +467,8 @@ export async function getPost(slug: string, options: { includeDrafts?: boolean }
 const seoShape = () => ({ title: '', description: '' });
 
 export async function getServicesPage() {
-  const d = await single('services_page');
-  return withDefaults(
+  const { data: d, edit } = await singleEntry('services_page');
+  return { edit, ...withDefaults(
     {
       title: '',
       lede: '',
@@ -456,12 +494,12 @@ export async function getServicesPage() {
       },
       seo: { title: d.meta_title, description: d.meta_description },
     },
-  );
+  ) };
 }
 
 export async function getJournalPage() {
-  const d = await single('journal_page');
-  return withDefaults(
+  const { data: d, edit } = await singleEntry('journal_page');
+  return { edit, ...withDefaults(
     {
       title: '',
       lede: '',
@@ -484,7 +522,7 @@ export async function getJournalPage() {
       },
       seo: { title: d.meta_title, description: d.meta_description },
     },
-  );
+  ) };
 }
 
 const FORM_KEYS = [
@@ -497,8 +535,8 @@ const blankRecord = <K extends string>(keys: readonly K[]) => Object.fromEntries
 const pick = (d: Plain, prefix: string, keys: readonly string[]) => Object.fromEntries(keys.map((k) => [k, d[`${prefix}_${snake(k)}`]]));
 
 export async function getBookPage() {
-  const d = await single('book_page');
-  return withDefaults(
+  const { data: d, edit } = await singleEntry('book_page');
+  return { edit, ...withDefaults(
     {
       intro: { title: '', lede: '', callLabel: '' },
       nextSteps: [{ icon: 'envelope-simple', lead: '', text: '' }],
@@ -525,12 +563,12 @@ export async function getBookPage() {
       },
       seo: { title: d.meta_title, description: d.meta_description },
     },
-  );
+  ) };
 }
 
 export async function getNotFoundPage() {
-  const d = await single('not_found_page');
-  return withDefaults(
+  const { data: d, edit } = await singleEntry('not_found_page');
+  return { edit, ...withDefaults(
     { pageTitle: '', title: '', lede: '', primary: linkShape(), secondary: linkShape() },
     {
       pageTitle: d.page_title,
@@ -539,12 +577,12 @@ export async function getNotFoundPage() {
       primary: { label: d.primary_label, link: d.primary_link },
       secondary: { label: d.secondary_label, link: d.secondary_link },
     },
-  );
+  ) };
 }
 
 export async function getDesignPage() {
-  const d = await single('design_page');
-  return withDefaults(
+  const { data: d, edit } = await singleEntry('design_page');
+  return { edit, ...withDefaults(
     {
       title: '',
       lede: '',
@@ -573,7 +611,7 @@ export async function getDesignPage() {
       inspiration: { title: d.inspiration_title, intro: d.inspiration_intro, items: arr(d.inspiration_items) },
       seo: { title: d.meta_title, description: d.meta_description },
     },
-  );
+  ) };
 }
 
 export type PageSeo = { title: string; description: string; image: CmsImage | null };
@@ -606,11 +644,12 @@ export type HomePage = {
   parking: string;
   access: string;
   seo: PageSeo;
+  edit: EditProxy;
 };
 
 /** Home page copy: same keys as the old src/content/pages/home.json, images as CmsImage. */
 export async function getHomePage(): Promise<HomePage> {
-  const d = await single('home_page');
+  const { data: d, edit } = await singleEntry('home_page');
   const heroImage = toImage(d.hero_image);
   const findImage = toImage(d.find_image);
   const link = (label: unknown, href: unknown): Link => ({ label: s(label), link: s(href) });
@@ -645,6 +684,7 @@ export async function getHomePage(): Promise<HomePage> {
     parking: s(d.parking),
     access: s(d.access),
     seo: { title: s(d.meta_title), description: s(d.meta_description), image: toImage(d.og_image) },
+    edit,
   };
 }
 
@@ -661,11 +701,12 @@ export type AboutPage = {
   ctaTitle: string;
   ctaText: string;
   seo: PageSeo;
+  edit: EditProxy;
 };
 
 /** About page copy: same keys as the old src/content/pages/about.json, images as CmsImage. */
 export async function getAboutPage(): Promise<AboutPage> {
-  const d = await single('about_page');
+  const { data: d, edit } = await singleEntry('about_page');
   const image = toImage(d.image);
   return {
     title: s(d.title),
@@ -680,5 +721,174 @@ export async function getAboutPage(): Promise<AboutPage> {
     ctaTitle: s(d.cta_title),
     ctaText: s(d.cta_text),
     seo: { title: s(d.meta_title), description: s(d.meta_description), image: toImage(d.og_image) },
+    edit,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Journal taxonomies, reviewers, comments, search, widgets and sections
+// (category/tag archives, PostTerms, PostReviewedBy, PostComments, search page, FooterWidgets)
+// ---------------------------------------------------------------------------
+import { getEntryTerms, getSection, getTaxonomyTerms, getTerm, getWidgetArea, search } from 'emdash';
+import type { TaxonomyTerm } from 'emdash';
+
+/** A category or tag. `count` is the number of published posts filed under it. */
+export type Term = { slug: string; label: string; description: string; count: number; children: Term[] };
+
+const toTerm = (t: TaxonomyTerm): Term => ({
+  slug: t.slug,
+  label: t.label,
+  description: s(t.description),
+  count: n(t.count, 0),
+  children: (t.children ?? []).map(toTerm),
+});
+/** A term and every term nested under it (categories are hierarchical). */
+const withDescendants = (t: Term): Term[] => [t, ...t.children.flatMap(withDescendants)];
+
+/** All terms of a journal taxonomy ("category" or "tag"); categories come back as a tree. */
+export async function getTerms(taxonomy: string): Promise<Term[]> {
+  return safe(`terms ${taxonomy}`, [] as Term[], async () => (await getTaxonomyTerms(taxonomy)).map(toTerm));
+}
+
+/** One term by slug (with its child terms), or null. */
+export async function getTermBySlug(taxonomy: string, slug: string): Promise<Term | null> {
+  return safe(`term ${taxonomy}/${slug}`, null as Term | null, async () => {
+    const t = await getTerm(taxonomy, slug);
+    return t ? toTerm(t) : null;
+  });
+}
+
+/**
+ * Journal posts filed under a term (or under one of its child terms), newest first. Like
+ * getPosts: published only, plus drafts when includeDrafts is true.
+ */
+export async function getPostsByTerm(taxonomy: string, term: Term, options: { includeDrafts?: boolean } = {}): Promise<Post[]> {
+  const slugs = withDescendants(term).map((t) => t.slug);
+  const byTerm = (status: 'published' | 'draft') =>
+    safe(`posts by ${taxonomy}/${term.slug}`, [] as Entry[], async () => {
+      const { entries, error } = await getEmDashCollection('journal', { status, where: { [taxonomy]: slugs }, limit: 500 });
+      if (error) console.error(`[cms] posts by ${taxonomy}/${term.slug}:`, error);
+      return ((entries ?? []) as unknown as Entry[]).map((e) => ({ id: e.id, data: isPlain(e.data) ? e.data : {}, edit: editOf(e) }));
+    });
+  const [published, drafts, team] = await Promise.all([
+    byTerm('published'),
+    options.includeDrafts ? byTerm('draft') : Promise.resolve([] as Entry[]),
+    getTeam(),
+  ]);
+  const seen = new Set(published.map((e) => e.id));
+  const posts = await Promise.all([...published, ...drafts.filter((e) => !seen.has(e.id))].map((e) => toPost(e, team)));
+  return posts.sort((a, b) => +b.date - +a.date);
+}
+
+/** A byline credit on a post, e.g. { role: 'Clinically reviewed by', name: 'Dr. Ana Whitlock, DDS' }. */
+export type Credit = { role: string; name: string; slug: string };
+
+export type PostExtras = {
+  /** EmDash row id (a ULID). Comments are keyed by it, not by the slug. */
+  rowId: string;
+  categories: Term[];
+  tags: Term[];
+  credits: Credit[];
+};
+
+/**
+ * The EmDash-only extras of a post: its row id (for comments), categories, tags and byline
+ * credits. Returns null for an unknown slug. Drafts are found when includeDrafts is true.
+ */
+export async function getPostExtras(slug: string, options: { includeDrafts?: boolean } = {}): Promise<PostExtras | null> {
+  let e = await entry('journal', slug);
+  if (!e && options.includeDrafts) e = (await collection('journal', 'draft')).find((d) => d.id === slug || s(d.data.slug) === slug) ?? null;
+  if (!e) return null;
+  const rowId = s(e.data.id) || e.id;
+  // Entries come back with data.terms ({ category: [...], tag: [...] }); ask directly if not.
+  const hydrated = isPlain(e.data.terms) ? (e.data.terms as Record<string, TaxonomyTerm[]>) : null;
+  const termsOf = async (taxonomy: string) =>
+    (hydrated?.[taxonomy] ?? (await safe(`terms of ${slug}`, [] as TaxonomyTerm[], () => getEntryTerms('journal', rowId, taxonomy)))).map(toTerm);
+  const [categories, tags] = await Promise.all([termsOf('category'), termsOf('tag')]);
+  const credits = arr(e.data.bylines).map((c) => {
+    const b = isPlain(c.byline) ? c.byline : {};
+    return { role: s(c.roleLabel), name: s(b.displayName), slug: s(b.slug) };
+  }).filter((c) => c.name);
+  return { rowId, categories, tags, credits };
+}
+
+/** Site search result. `path` is a site path without the link prefix (wrap it in url()). */
+export type SearchHit = { collection: string; title: string; path: string; snippet: string; summary: string };
+
+/** Where each searchable collection's entries live on the site. */
+const SEARCH_ROUTES: Record<string, (slug: string) => string> = {
+  journal: (slug) => `/journal/${slug}/`,
+  services: (slug) => `/services/${slug}/`,
+};
+export const SEARCH_COLLECTIONS = Object.keys(SEARCH_ROUTES);
+
+/**
+ * Full-text search (EmDash FTS5, published entries only) over services and journal posts.
+ * `snippet` is HTML from EmDash: escaped text with <mark> around the matched words.
+ */
+export async function searchSite(query: string, limit = 20): Promise<SearchHit[]> {
+  const q = query.trim();
+  if (q.length < 2) return [];
+  return safe(`search "${q}"`, [] as SearchHit[], async () => {
+    const { items } = await search(q, { collections: SEARCH_COLLECTIONS, limit });
+    // Snippets often repeat the title, so the result list shows the summary / excerpt instead.
+    const [services, posts] = items.length ? await Promise.all([getServices(), getPosts()]) : [[], []];
+    const summary = new Map<string, string>([
+      ...services.map((x) => [`services/${x.id}`, x.summary] as [string, string]),
+      ...posts.map((x) => [`journal/${x.id}`, x.description] as [string, string]),
+    ]);
+    return items
+      .filter((hit) => hit.slug && SEARCH_ROUTES[hit.collection])
+      .map((hit) => {
+        const title = s(hit.title) || s(hit.slug);
+        // A match in the title comes back as a snippet of the title itself; drop that repeat.
+        const plain = (v: string) => v.replace(/<[^>]+>/g, '').replace(/[^a-z0-9]+/gi, ' ').trim().toLowerCase();
+        const snippet = s(hit.snippet);
+        return {
+          collection: hit.collection,
+          title,
+          path: SEARCH_ROUTES[hit.collection](s(hit.slug)),
+          snippet: plain(snippet) === plain(title) ? '' : snippet,
+          summary: summary.get(`${hit.collection}/${s(hit.slug)}`) ?? '',
+        };
+      });
+  });
+}
+
+/** A widget from an EmDash widget area (Widgets screen in the admin). */
+export type Widget = { id: string; type: string; title: string; content: PortableTextValue; menu: Link[] };
+
+/** The widgets of a widget area, in admin order. Menu widgets come with their links. */
+export async function getWidgets(area: string): Promise<Widget[]> {
+  return safe(`widgets ${area}`, [] as Widget[], async () => {
+    const found = await getWidgetArea(area);
+    return Promise.all(
+      (found?.widgets ?? []).map(async (w) => ({
+        id: w.id,
+        type: w.type,
+        title: s(w.title),
+        content: pt(w.content),
+        menu: w.type === 'menu' && w.menuName ? await menuLinks(w.menuName) : [],
+      })),
+    );
+  });
+}
+
+/**
+ * A section's Portable Text (Sections screen in the admin), for rendering one in a template
+ * with RichText. Editors normally insert sections into rich text instead (the copy is inline).
+ */
+export async function getSectionContent(slug: string): Promise<PortableTextValue> {
+  return safe(`section ${slug}`, [] as PortableTextValue, async () => pt((await getSection(slug))?.content));
+}
+
+/**
+ * The EmDash row of a routable entry (journal post, service) by slug, for Base.astro's
+ * EmDashHead context: `id` is the row id the SEO panel overlay is keyed by, and `hasSeoImage`
+ * says whether the panel overrides the share image.
+ */
+export async function getEntryRef(collection: string, slug: string): Promise<{ collection: string; id: string; slug: string; hasSeoImage: boolean } | null> {
+  const e = await entry(collection, slug);
+  if (!e) return null;
+  return { collection, id: s(e.data.id) || e.id, slug, hasSeoImage: !!seoPanel(e.data).image };
 }

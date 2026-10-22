@@ -1,0 +1,11 @@
+---
+// /journal/category/<slug>/: posts in one category (EmDash taxonomy "category", hierarchical,
+// so a parent category also lists the posts of its child categories).
+import { getTermBySlug } from '../../../lib/cms';
+import TermArchive from '../../../components/TermArchive.astro';
+
+const slug = Astro.params.slug ?? '';
+// Unknown slug: a null-body 404 makes Astro render src/pages/404.astro with status 404.
+if (!(await getTermBySlug('category', slug))) return new Response(null, { status: 404 });
+---
+<TermArchive taxonomy="category" slug={slug} kicker="Category" />

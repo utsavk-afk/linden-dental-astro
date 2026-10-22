@@ -1,0 +1,76 @@
+---
+// A journal archive for one category or tag: heading and description from the term (edited in
+// the admin under Journal > Categories / Tags), the other terms as links, then the posts.
+// Used by src/pages/journal/category/[slug].astro and src/pages/journal/tag/[slug].astro.
+import { url, publicPath } from '../lib/url';
+import { getTerms, getTermBySlug, getPostsByTerm, getJournalPage } from '../lib/cms';
+import type { Term } from '../lib/cms';
+import { breadcrumbSchema } from '../lib/seo';
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import PostList from './PostList.astro';
+
+interface Props {
+  taxonomy: 'category' | 'tag';
+  slug: string;
+  /** Small label above the heading, e.g. "Category". */
+  kicker: string;
+  /** Shown when no published post has this term yet. */
+  emptyText?: string;
+}
+
+const { taxonomy, slug, kicker, emptyText = 'Nothing here yet. New posts land on the journal first.' } = Astro.props;
+const term = await getTermBySlug(taxonomy, slug);
+// Unknown slug: the caller turns this into the site's 404 page.
+const [posts, all, page] = term
+  ? await Promise.all([getPostsByTerm(taxonomy, term, { includeDrafts: !!import.meta.env.PUBLIC_SHOW_DRAFTS }), getTerms(taxonomy), getJournalPage()])
+  : [[], [], null];
+const flat = (list: Term[]): Term[] => list.flatMap((t) => [t, ...flat(t.children)]);
+const others = flat(all).filter((t) => t.count > 0 || t.slug === slug);
+const base = `/journal/${taxonomy}/`;
+const siteUrl = new URL(url('/'), Astro.site).href;
+const pageUrl = new URL(publicPath(Astro.url.pathname), Astro.site).href;
+const jsonLd = term && page
+  ? [breadcrumbSchema([{ name: 'Home', url: siteUrl }, { name: page.title, url: new URL(url('/journal/'), Astro.site).href }, { name: term.label, url: pageUrl }])]
+  : [];
+---
+{term && page && (
+<Base title={term.label} description={term.description || page.seo.description || page.lede || undefined} jsonLd={jsonLd}>
+  <section class="head">
+    <div class="wrap">
+      <a class="back" href={url('/journal/')}><Icon name="arrow-left" /> {page.title}</a>
+      <p class="label kicker">{kicker}</p>
+      <h1 data-split>{term.label}</h1>
+      {term.description && <p class="lede" data-reveal>{term.description}</p>}
+      {others.length > 1 && (
+        <ul class="terms" data-reveal>
+          {others.map((t) => (
+            <li><a href={url(`${base}${t.slug}/`)} aria-current={t.slug === slug ? 'page' : undefined}>{t.label}</a></li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+
+  {posts.length > 0
+    ? <PostList posts={posts} />
+    : <section class="section empty"><div class="wrap"><p class="muted">{emptyText}</p><a class="link-arrow" href={url('/journal/')}>{page.title} <Icon name="arrow-right" /></a></div></section>}
+</Base>
+)}
+
+<style>
+  .head { padding-block: clamp(2rem, 1rem + 4vw, 5rem) clamp(2rem, 1rem + 3vw, 4rem); }
+  .back { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; text-decoration: none; color: var(--ink-2); font-weight: 500; margin-bottom: 1rem; }
+  .kicker { margin-bottom: 0.75rem; }
+  .head .lede { margin-top: 1.25rem; }
+  .terms { list-style: none; padding: 0; margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .terms a {
+    display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.1rem; border-radius: var(--pill);
+    border: 1px solid var(--line); text-decoration: none; font-weight: 500; font-size: var(--step--1);
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+  .terms a:hover { background: var(--surface); border-color: var(--ink-2); }
+  .terms a[aria-current='page'] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .empty { padding-top: 0; display: grid; }
+  .empty .wrap { display: grid; gap: 1rem; justify-items: start; }
+</style>

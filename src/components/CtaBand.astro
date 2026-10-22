@@ -1,20 +1,26 @@
 ---
 import Icon from './Icon.astro';
 import { getSite } from '../data/site';
-interface Props { title?: string; body?: string }
+import type { EditProxy } from '../lib/cms';
+type Ref = EditProxy[string] | undefined;
+// titleEdit/bodyEdit: the page's inline-edit annotations for its own title/body fields.
+interface Props { title?: string; body?: string; titleEdit?: Ref; bodyEdit?: Ref }
 // Default wording comes from Site settings > Call to action band; pages can pass their own.
 // An empty override (field cleared in the CMS) also falls back to the default.
 const site = await getSite();
+const e = site.settings.edit;
 const title = Astro.props.title || site.ctaBand.title;
 const body = Astro.props.body || site.ctaBand.text;
+const titleEdit = Astro.props.title ? Astro.props.titleEdit : e.cta_band_title;
+const bodyEdit = Astro.props.body ? Astro.props.bodyEdit : e.cta_band_text;
 ---
 <section class="band">
   <div class="wrap band__inner">
-    <h2 data-split>{title}</h2>
-    <p class="lede" data-reveal>{body}</p>
+    <h2 data-split {...titleEdit}>{title}</h2>
+    <p class="lede" data-reveal {...bodyEdit}>{body}</p>
     <div class="band__actions" data-reveal>
-      <a class="btn btn--lg" href={site.cta.href}>{site.cta.label} <Icon name="arrow-right" /></a>
-      <a class="btn btn--ghost btn--lg" href={site.phoneHref}><Icon name="phone" /> {site.phone}</a>
+      <a class="btn btn--lg" href={site.cta.href}><span {...e.primary_cta_label}>{site.cta.label}</span> <Icon name="arrow-right" /></a>
+      <a class="btn btn--ghost btn--lg" href={site.phoneHref}><Icon name="phone" /> <span {...e.phone}>{site.phone}</span></a>
     </div>
   </div>
 </section>

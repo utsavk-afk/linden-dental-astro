@@ -8,15 +8,16 @@ import { getNotFoundPage } from '../lib/cms';
 export const prerender = false;
 
 const page = await getNotFoundPage();
+const e = page.edit; // inline-edit annotations (EmDash Edit mode)
 ---
 <Base title={page.pageTitle || page.title}>
   <section class="nf">
     <div class="wrap">
-      <h1>{page.title}</h1>
-      {page.lede && <p class="lede">{page.lede}</p>}
+      <h1 {...e.title}>{page.title}</h1>
+      {page.lede && <p class="lede" {...e.lede}>{page.lede}</p>}
       <div class="nf__actions">
-        {page.primary.label && <a class="btn btn--lg" href={href(page.primary.link)}>{page.primary.label} <Icon name="arrow-right" /></a>}
-        {page.secondary.label && <a class="link-arrow" href={href(page.secondary.link)}>{page.secondary.label} <Icon name="arrow-right" /></a>}
+        {page.primary.label && <a class="btn btn--lg" href={href(page.primary.link)}><span {...e.primary_label}>{page.primary.label}</span> <Icon name="arrow-right" /></a>}
+        {page.secondary.label && <a class="link-arrow" href={href(page.secondary.link)}><span {...e.secondary_label}>{page.secondary.label}</span> <Icon name="arrow-right" /></a>}
       </div>
     </div>
   </section>

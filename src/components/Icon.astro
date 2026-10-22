@@ -3,7 +3,7 @@
 interface Props { name: string; size?: string; label?: string; class?: string }
 const { name, size = '1.25em', label, class: cls } = Astro.props;
 const icons = import.meta.glob(
-  '/node_modules/@phosphor-icons/core/assets/regular/{arrow-right,arrow-up-right,arrow-left,phone,calendar-blank,map-pin,clock,list,x,leaf,tooth,smiley,first-aid-kit,shield-check,sparkle,chat-circle,hand-heart,plus,check,star,sun,moon,instagram-logo,envelope-simple,baby,heartbeat,coffee,armchair,clipboard-text,wallet,hand-waving,car,wheelchair}.svg',
+  '/node_modules/@phosphor-icons/core/assets/regular/{arrow-right,arrow-up-right,arrow-left,phone,calendar-blank,map-pin,clock,list,x,leaf,tooth,smiley,first-aid-kit,shield-check,sparkle,chat-circle,hand-heart,plus,check,star,sun,moon,instagram-logo,envelope-simple,baby,heartbeat,coffee,armchair,clipboard-text,wallet,hand-waving,car,wheelchair,magnifying-glass}.svg',
   { query: '?raw', import: 'default', eager: true },
 ) as Record<string, string>;
 const raw = icons[`/node_modules/@phosphor-icons/core/assets/regular/${name}.svg`];

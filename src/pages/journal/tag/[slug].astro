@@ -1,0 +1,10 @@
+---
+// /journal/tag/<slug>/: posts with one tag (EmDash taxonomy "tag").
+import { getTermBySlug } from '../../../lib/cms';
+import TermArchive from '../../../components/TermArchive.astro';
+
+const slug = Astro.params.slug ?? '';
+// Unknown slug: a null-body 404 makes Astro render src/pages/404.astro with status 404.
+if (!(await getTermBySlug('tag', slug))) return new Response(null, { status: 404 });
+---
+<TermArchive taxonomy="tag" slug={slug} kicker="Tag" />

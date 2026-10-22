@@ -202,11 +202,22 @@ function nav() {
   });
 }
 
+/**
+ * EmDash Edit mode (an editor toggled it in the toolbar): text is edited in place, so nothing
+ * may be split into lines/words or start hidden. The page then behaves as with reduced motion.
+ */
+const isEditMode = () => !!document.querySelector('#emdash-toolbar[data-edit-mode="true"]');
+
 export function initMotion() {
   const root = document.documentElement;
   mm = gsap.matchMedia();
   const MOTION = '(prefers-reduced-motion: no-preference)';
   mm.add('all', () => { nav(); });
+  if (isEditMode()) {
+    root.classList.remove('motion');
+    window.__motionReady = true;
+    return;
+  }
   mm.add('(prefers-reduced-motion: reduce)', () => { root.classList.remove('motion'); });
   // Separate contexts so crossing the 900px breakpoint (or plugging in a mouse) only
   // rebuilds the pan or the hover photo, instead of replaying the whole page intro.

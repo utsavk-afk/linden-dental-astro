@@ -64,6 +64,8 @@ These three paths are inlined at build time (EmDash serialises the config), so s
 | `/book/` | `src/pages/book.astro` |
 | `/design/` | `src/pages/design.astro`, the living design-language page |
 | `/sitemap.xml`, `/robots.txt`, `/rss.xml` | `src/pages/sitemap.xml.ts`, `robots.txt.ts`, `rss.xml.ts` (override EmDash's built-in versions so URLs carry the link prefix) |
+| `/journal/category/<slug>/`, `/journal/tag/<slug>/` | `src/pages/journal/category/[slug].astro`, `tag/[slug].astro` (both render `src/components/TermArchive.astro`) |
+| `/search/?q=` | `src/pages/search.astro`, EmDash full-text search over services and posts (noindex) |
 | 404 | `src/pages/404.astro`, rendered on demand for every unmatched route |
 
 ## Project structure
@@ -147,6 +149,11 @@ The content model comes from `seed/seed.json`: 12 collections and 2 menus.
 | Menus > primary, footer | Header navigation and the extra footer links |
 | Redirects | Old URL to new URL, for changed slugs |
 | Media library | Every uploaded photo |
+| Journal > Categories, Tags | Post topics (category is hierarchical). Each term has an archive page; its description is the archive intro |
+| Comments | Moderation queue for journal comments (a first-time commenter is held for approval) |
+| Widgets > Footer notes | Short notes in the footer of every page (the emergency line) |
+| Sections | Reusable blocks ("Insurance we accept", "New patient offer") that editors insert into rich text from the slash menu. Inserting copies the blocks into the post, so later edits to a section do not change posts that already use it |
+| Bylines | Extra credits on posts, used for "Clinically reviewed by" (the post author stays the team reference) |
 
 Each page (Home, About, Services page, Journal page, Book, 404, Design, Site settings) is its own collection with a single entry whose slug is `main`. Services, Journal, Team and Reviews are normal collections with one entry per item. Services and journal posts also get EmDash's built-in SEO panel per entry (meta title, meta description, OG image, canonical, noindex).
 
@@ -271,6 +278,15 @@ C:\Gemini\psi-monitor\deploy\deploy-linden-dental.ps1 -VerifyOnly  # checks only
 ```
 
 It syncs this repo into `psi-monitor/linden-site`, runs `fly deploy`, waits for `/linden-dental/` to answer, then checks the pages, the admin and the booking API. Content lives on the Fly volume at `/app/data/linden`, so a deploy never touches it, and CMS edits never need a deploy.
+
+**New content-model features on an existing database.** The setup wizard applies `seed/seed.json` only to an empty database, so seed additions (taxonomies, bylines, widget areas, sections, comment settings) never reach staging by themselves. After deploying, run `scripts/upgrade-staging.mjs` inside the machine. It snapshots the database first, adds what is missing through EmDash's seed engine, never touches content, menus or settings, and is safe to run again:
+
+```sh
+fly ssh console -a stanventures-psi -C "node /app/linden/scripts/upgrade-staging.mjs --db /app/data/linden/emdash.db --dry-run"
+fly ssh console -a stanventures-psi -C "node /app/linden/scripts/upgrade-staging.mjs --db /app/data/linden/emdash.db --restart"
+```
+
+Redirects on staging: the site sees paths without `/linden-dental`, so a redirect's source is `/old-path/`, but its destination needs the prefix (`/linden-dental/new-path/`).
 
 ### On a real client domain
 

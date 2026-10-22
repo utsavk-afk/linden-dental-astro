@@ -10,12 +10,13 @@ const [services, page] = await Promise.all([getServices(), getServicesPage()]);
 // Cards show the headline price: the text up to the first full stop followed by a space
 // ("$185 without insurance. Usually covered..." -> "$185 without insurance."), so "$185.50" stays whole.
 const shortPrice = (price: string) => `${price.split(/\.\s/)[0].trim().replace(/\.$/, '')}.`;
+const e = page.edit; // inline-edit annotations (EmDash Edit mode)
 ---
 <Base title={page.seo.title || page.title} description={page.seo.description || undefined}>
   <section class="head">
     <div class="wrap">
-      <h1 data-split>{page.title}</h1>
-      {page.lede && <p class="lede" data-reveal>{page.lede}</p>}
+      <h1 data-split {...e.title}>{page.title}</h1>
+      {page.lede && <p class="lede" data-reveal {...e.lede}>{page.lede}</p>}
     </div>
   </section>
 
@@ -23,18 +24,19 @@ const shortPrice = (price: string) => `${price.split(/\.\s/)[0].trim().replace(/
     <div class="wrap cards">
       {services.map((s, i) => (
         <a href={url(`/services/${s.id}/`)} class={`card card--${i}`} data-reveal>
-          <div class="frame card__img"><CmsImage image={s.photo} alt={s.photoAlt} width={i === 0 || i === 6 ? 1100 : 640} height={640} /></div>
+          <div class="frame card__img" {...s.edit.photo}><CmsImage image={s.photo} alt={s.photoAlt} width={i === 0 || i === 6 ? 1100 : 640} height={640} /></div>
           <div class="card__body">
-            <h2 class="card__title"><Icon name={s.icon} /> {s.title}</h2>
-            <p class="muted">{s.summary}</p>
-            <p class="card__price">{shortPrice(s.price)}</p>
+            <h2 class="card__title"><Icon name={s.icon} /> <span {...s.edit.title}>{s.title}</span></h2>
+            <p class="muted" {...s.edit.summary}>{s.summary}</p>
+            {/* The card shows a shortened price; only an unshortened one is safe to edit inline. */}
+            <p class="card__price" {...(shortPrice(s.price) === s.price ? s.edit.price : {})}>{shortPrice(s.price)}</p>
           </div>
         </a>
       ))}
     </div>
   </section>
 
-  <CtaBand title={page.ctaTitle || undefined} body={page.ctaText || undefined} />
+  <CtaBand title={page.ctaTitle || undefined} body={page.ctaText || undefined} titleEdit={e.cta_title} bodyEdit={e.cta_text} />
 </Base>
 
 <style>

@@ -1,0 +1,66 @@
+---
+// As-you-type site search for the header: EmDash's LiveSearch (emdash/ui/search) over services
+// and journal posts, calling /_emdash/api/search. Results link through the staging prefix
+// (routeMap), and Enter without a highlighted result opens the full results page at /search/.
+import LiveSearch from 'emdash/ui/search';
+import { url } from '../lib/url';
+import { SEARCH_COLLECTIONS } from '../lib/cms';
+
+interface Props {
+  label?: string;
+  placeholder?: string;
+  class?: string;
+}
+
+const { label = 'Search the site', placeholder = 'Search', class: className } = Astro.props;
+const routeMap = { journal: url('/journal/:slug/'), services: url('/services/:slug/') };
+---
+<div class:list={['site-search', className]} data-site-search={label}>
+  <LiveSearch
+    placeholder={placeholder}
+    collections={SEARCH_COLLECTIONS}
+    routeMap={routeMap}
+    searchPage={url('/search/')}
+    limit={6}
+    showSnippets={false}
+    minChars={2}
+    locale={null}
+  >
+    <div slot="loading" class="emdash-live-search-loading">Searching...</div>
+    <div slot="no-results" class="emdash-live-search-no-results">Nothing yet. Press Enter for all results.</div>
+  </LiveSearch>
+</div>
+
+<script>
+  // LiveSearch renders a bare input; give it an accessible name (the wrapper's data attribute).
+  const label = () => {
+    document.querySelectorAll<HTMLElement>('[data-site-search]').forEach((el) => {
+      el.querySelector('input')?.setAttribute('aria-label', el.dataset.siteSearch ?? 'Search');
+    });
+  };
+  label();
+  document.addEventListener('astro:page-load', label);
+</script>
+
+<style>
+  .site-search {
+    --emdash-search-bg: var(--surface);
+    --emdash-search-text: var(--ink);
+    --emdash-search-muted: var(--ink-2);
+    --emdash-search-border: var(--line);
+    --emdash-search-border-focus: var(--accent);
+    --emdash-search-hover: var(--bg-2);
+    --emdash-search-highlight: var(--accent);
+  }
+  .site-search :global(.emdash-live-search) { display: block; }
+  .site-search :global(.emdash-live-search-input) {
+    min-height: 44px; padding: 0.5rem 1.1rem; border-radius: var(--pill); font-size: var(--step--1);
+    border-color: color-mix(in oklab, var(--ink-2) 72%, var(--bg));
+  }
+  .site-search :global(.emdash-live-search-input:focus) { box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent); }
+  .site-search :global(.emdash-live-search-results) {
+    min-width: min(360px, 90vw); left: auto; border-radius: var(--r-md); box-shadow: var(--shadow); overflow: hidden auto;
+  }
+  .site-search :global(.emdash-live-search-result) { padding: 0.8rem 1rem; }
+  .site-search :global(.emdash-live-search-result-collection) { color: var(--accent); font-weight: 600; }
+</style>

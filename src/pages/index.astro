@@ -18,26 +18,29 @@ const steps = page.visitSteps;
 const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
 const { manifestoCta, teamCta, journalCta, reviewsLabel } = page;
 const { labels } = site;
+// Inline editing (EmDash Edit mode): annotations for this page and for site settings.
+const e = page.edit;
+const se = site.settings.edit;
 ---
 <Base title={page.seo.title || undefined} description={page.seo.description || undefined} image={page.seo.image ?? page.heroImage}>
   <!-- HERO -->
   <section class="hero" data-hero>
     <div class="wrap hero__grid">
       <div class="hero__copy">
-        <h1 data-split>{page.heroTitle} <span class="accent-word">{page.heroAccent}</span></h1>
-        <p class="lede" data-hero-fade>{page.heroLede}</p>
+        <h1 data-split><span {...e.hero_title}>{page.heroTitle}</span> <span class="accent-word" {...e.hero_accent}>{page.heroAccent}</span></h1>
+        <p class="lede" data-hero-fade {...e.hero_lede}>{page.heroLede}</p>
         <div class="hero__actions" data-hero-fade>
-          <a class="btn btn--lg" href={site.cta.href}>{site.cta.label} <Icon name="arrow-right" /></a>
-          <a class="btn btn--ghost btn--lg" href={site.phoneHref}><Icon name="phone" /> {site.phone}</a>
+          <a class="btn btn--lg" href={site.cta.href}><span {...se.primary_cta_label}>{site.cta.label}</span> <Icon name="arrow-right" /></a>
+          <a class="btn btn--ghost btn--lg" href={site.phoneHref}><Icon name="phone" /> <span {...se.phone}>{site.phone}</span></a>
         </div>
       </div>
       <div class="hero__media">
-        <div class="frame hero__frame" data-hero-frame>
+        <div class="frame hero__frame" data-hero-frame {...e.hero_image}>
           <CmsImage image={page.heroImage} alt={page.heroImageAlt} layout="full-width" loading="eager" fetchpriority="high" />
         </div>
         <div class="hero__card" data-hero-card>
           <span class="hero__card-icon"><Icon name="clock" /></span>
-          <p><strong>{page.heroCardTitle}</strong><span>{page.heroCardText}</span></p>
+          <p><strong {...e.hero_card_title}>{page.heroCardTitle}</strong><span {...e.hero_card_text}>{page.heroCardText}</span></p>
         </div>
       </div>
     </div>
@@ -46,24 +49,24 @@ const { labels } = site;
   <!-- MANIFESTO -->
   <section class="section manifesto">
     <div class="wrap">
-      <p class="manifesto__text" data-scrub-words>{page.manifesto}</p>
-      <a class="link-arrow manifesto__link" href={href(manifestoCta.link)} data-reveal>{manifestoCta.label} <Icon name="arrow-right" /></a>
+      <p class="manifesto__text" data-scrub-words {...e.manifesto}>{page.manifesto}</p>
+      <a class="link-arrow manifesto__link" href={href(manifestoCta.link)} data-reveal><span {...e.manifesto_cta_label}>{manifestoCta.label}</span> <Icon name="arrow-right" /></a>
     </div>
   </section>
 
   <!-- SERVICES INDEX -->
   <section class="section services" aria-labelledby="services-title">
     <div class="wrap">
-      <h2 id="services-title" data-split>{page.servicesTitle}</h2>
+      <h2 id="services-title" data-split {...e.services_title}>{page.servicesTitle}</h2>
       <div class="services__list" data-hover-reveal>
         <ul>
           {services.map((s) => (
             <li data-hover-row data-reveal>
               <a href={url(`/services/${s.id}/`)} class="svc">
-                <span class="svc__thumb frame"><CmsImage image={s.photo} alt="" width={160} height={160} /></span>
+                <span class="svc__thumb frame" {...s.edit.photo}><CmsImage image={s.photo} alt="" width={160} height={160} /></span>
                 <span class="svc__icon"><Icon name={s.icon} /></span>
-                <span class="svc__title">{s.title}</span>
-                <span class="svc__summary">{s.summary}</span>
+                <span class="svc__title" {...s.edit.title}>{s.title}</span>
+                <span class="svc__summary" {...s.edit.summary}>{s.summary}</span>
                 <span class="svc__go"><Icon name="arrow-right" /></span>
               </a>
             </li>
@@ -78,10 +81,10 @@ const { labels } = site;
 
   <!-- FIRST VISIT (pinned horizontal pan on desktop) -->
   <section class="visit" data-hpan aria-labelledby="visit-title">
-    <div class="visit__track" data-hpan-track tabindex="0" role="group" aria-labelledby="visit-title" style={`--steps:${steps.length}`}>
+    <div class="visit__track" data-hpan-track tabindex="0" role="group" aria-labelledby="visit-title" style={`--steps:${steps.length}`} {...e.visit_steps}>
       <div class="visit__intro">
-        <h2 id="visit-title">{page.visitTitle}</h2>
-        <p class="lede">{page.visitLede}</p>
+        <h2 id="visit-title" {...e.visit_title}>{page.visitTitle}</h2>
+        <p class="lede" {...e.visit_lede}>{page.visitLede}</p>
       </div>
       {steps.map((st, i) => (
         <article class={`visit__step ${st.image ? '' : 'visit__step--tint'}`} data-hpan-step>
@@ -103,14 +106,14 @@ const { labels } = site;
   <section class="section team" aria-labelledby="team-title">
     <div class="wrap team__grid">
       <div class="team__lead" data-reveal>
-        <h2 id="team-title" data-split>{page.teamTitle}</h2>
-        <p class="muted">{page.teamText}</p>
-        <a class="link-arrow" href={href(teamCta.link)}>{teamCta.label} <Icon name="arrow-right" /></a>
+        <h2 id="team-title" data-split {...e.team_title}>{page.teamTitle}</h2>
+        <p class="muted" {...e.team_text}>{page.teamText}</p>
+        <a class="link-arrow" href={href(teamCta.link)}><span {...e.team_cta_label}>{teamCta.label}</span> <Icon name="arrow-right" /></a>
       </div>
       {team.map((m, i) => (
         <figure class={`team__cell team__cell--${bentoAreas[i] ?? 'extra'}`} data-reveal>
-          <div class="frame team__img" data-parallax="5"><CmsImage image={m.photo} alt={fill(site.labels.portraitAlt, { name: m.name })} width={640} height={800} /></div>
-          <figcaption><strong>{m.name}</strong><span>{m.role}</span></figcaption>
+          <div class="frame team__img" data-parallax="5" {...m.edit.photo}><CmsImage image={m.photo} alt={fill(site.labels.portraitAlt, { name: m.name })} width={640} height={800} /></div>
+          <figcaption><strong {...m.edit.name}>{m.name}</strong><span {...m.edit.role}>{m.role}</span></figcaption>
         </figure>
       ))}
     </div>
@@ -120,15 +123,15 @@ const { labels } = site;
   {reviews.length > 0 && (
   <section class="reviews" aria-labelledby="reviews-title">
     <div class="wrap reviews__head">
-      <h2 id="reviews-title" class="reviews__title" data-split>{page.reviewsTitle}</h2>
+      <h2 id="reviews-title" class="reviews__title" data-split {...e.reviews_title}>{page.reviewsTitle}</h2>
       <button class="btn btn--ghost reviews__pause" type="button" data-marquee-toggle data-label-pause={labels.pause} data-label-play={labels.play} aria-pressed="false"><span class="reviews__pause-label">{labels.pause}</span></button>
     </div>
     <div class="marquee" tabindex="0" role="group" aria-label={reviewsLabel}>
       <div class="marquee__track">
         {[...reviews, ...reviews].map((r, i) => (
           <figure class="review" aria-hidden={i >= reviews.length ? 'true' : undefined}>
-            <blockquote>&ldquo;{r.quote}&rdquo;</blockquote>
-            <figcaption>{r.where ? `${r.name}, ${r.where}` : r.name}</figcaption>
+            <blockquote>&ldquo;<span {...r.edit.quote}>{r.quote}</span>&rdquo;</blockquote>
+            <figcaption><span {...r.edit.name}>{r.name}</span>{r.where && <>, <span {...r.edit.where}>{r.where}</span></>}</figcaption>
           </figure>
         ))}
       </div>
@@ -141,23 +144,23 @@ const { labels } = site;
   <section class="section journal" aria-labelledby="journal-title">
     <div class="wrap">
       <div class="journal__head">
-        <h2 id="journal-title" data-split>{page.journalTitle}</h2>
-        <a class="link-arrow" href={href(journalCta.link)} data-reveal>{journalCta.label} <Icon name="arrow-right" /></a>
+        <h2 id="journal-title" data-split {...e.journal_title}>{page.journalTitle}</h2>
+        <a class="link-arrow" href={href(journalCta.link)} data-reveal><span {...e.journal_cta_label}>{journalCta.label}</span> <Icon name="arrow-right" /></a>
       </div>
       <div class="journal__grid">
         <a class="post post--feature" href={url(`/journal/${feature.id}/`)} data-reveal>
-          <div class="frame post__img"><CmsImage image={feature.cover} alt={feature.coverAlt} width={960} height={720} /></div>
-          <p class="post__meta">{feature.tag} <span aria-hidden="true">/</span> {feature.readMinutes} {labels.minRead}</p>
-          <h3>{feature.title}</h3>
-          <p class="muted">{feature.description}</p>
+          <div class="frame post__img" {...feature.edit.featured_image}><CmsImage image={feature.cover} alt={feature.coverAlt} width={960} height={720} /></div>
+          <p class="post__meta"><span {...feature.edit.category}>{feature.tag}</span> <span aria-hidden="true">/</span> {feature.readMinutes} <span {...se.labels_min_read}>{labels.minRead}</span></p>
+          <h3 {...feature.edit.title}>{feature.title}</h3>
+          <p class="muted" {...feature.edit.excerpt}>{feature.description}</p>
         </a>
         <div class="journal__more">
           {more.map((p) => (
             <a class="post post--row" href={url(`/journal/${p.id}/`)} data-reveal>
-              <div class="frame post__thumb"><CmsImage image={p.cover} alt={p.coverAlt} width={360} height={360} /></div>
+              <div class="frame post__thumb" {...p.edit.featured_image}><CmsImage image={p.cover} alt={p.coverAlt} width={360} height={360} /></div>
               <div>
-                <p class="post__meta">{p.tag} <span aria-hidden="true">/</span> {fmt(p.date)}</p>
-                <h3>{p.title}</h3>
+                <p class="post__meta"><span {...p.edit.category}>{p.tag}</span> <span aria-hidden="true">/</span> <span {...p.edit.publish_date}>{fmt(p.date)}</span></p>
+                <h3 {...p.edit.title}>{p.title}</h3>
               </div>
             </a>
           ))}
@@ -170,21 +173,24 @@ const { labels } = site;
   <!-- VISIT US -->
   <section class="section find" aria-labelledby="find-title">
     <div class="wrap find__grid">
-      <div class="frame find__img" data-parallax="7"><CmsImage image={page.findImage} alt={page.findImageAlt} width={1100} height={1200} /></div>
+      <div class="frame find__img" data-parallax="7" {...e.find_image}><CmsImage image={page.findImage} alt={page.findImageAlt} width={1100} height={1200} /></div>
       <div class="find__copy">
-        <h2 id="find-title" data-split>{page.findTitle}</h2>
-        <address data-reveal>{site.address.map((l) => <span>{l}</span>)}</address>
-        <dl class="find__hours" data-reveal>
+        <h2 id="find-title" data-split {...e.find_title}>{page.findTitle}</h2>
+        <address data-reveal>
+          {site.settings.addressLine1 && <span {...se.address_line_1}>{site.settings.addressLine1}</span>}
+          {site.settings.addressLine2 && <span {...se.address_line_2}>{site.settings.addressLine2}</span>}
+        </address>
+        <dl class="find__hours" data-reveal {...se.hours}>
           {site.hours.map((h) => (<div><dt>{h.days}</dt><dd>{h.time}</dd></div>))}
         </dl>
         <ul class="find__facts" data-reveal>
-          <li><Icon name="wallet" /> {page.insurance}</li>
-          <li><Icon name="car" /> {page.parking}</li>
-          <li><Icon name="wheelchair" /> {page.access}</li>
+          <li><Icon name="wallet" /> <span {...e.insurance}>{page.insurance}</span></li>
+          <li><Icon name="car" /> <span {...e.parking}>{page.parking}</span></li>
+          <li><Icon name="wheelchair" /> <span {...e.access}>{page.access}</span></li>
         </ul>
         <div class="find__actions" data-reveal>
-          <a class="btn btn--lg" href={site.cta.href}>{site.cta.label} <Icon name="arrow-right" /></a>
-          <a class="link-arrow" href={site.mapHref}>{site.footer.directionsLabel} <Icon name="arrow-up-right" /></a>
+          <a class="btn btn--lg" href={site.cta.href}><span {...se.primary_cta_label}>{site.cta.label}</span> <Icon name="arrow-right" /></a>
+          <a class="link-arrow" href={site.mapHref}><span {...se.footer_directions_label}>{site.footer.directionsLabel}</span> <Icon name="arrow-up-right" /></a>
         </div>
       </div>
     </div>
@@ -290,6 +296,8 @@ const { labels } = site;
   .marquee { overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
   .marquee__track { display: flex; gap: 1.25rem; width: max-content; animation: marquee 60s linear infinite; }
   .marquee:hover .marquee__track, .marquee:focus-visible .marquee__track, .marquee.is-paused .marquee__track { animation-play-state: paused; }
+  /* EmDash Edit mode: hold the reviews still so quotes can be edited in place. */
+  :global(body:has(#emdash-toolbar[data-edit-mode="true"])) .marquee__track { animation: none; }
   .reviews__head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 2.5rem; }
   .reviews__head .reviews__title { margin-bottom: 0; }
   .reviews__pause { padding: 0.6em 1.1em; font-size: var(--step--1); }
@@ -315,7 +323,7 @@ const { labels } = site;
   .post__img :global(img), .post__thumb :global(img) { transition: transform 0.9s var(--ease-out); }
   .post:hover .post__img :global(img), .post:hover .post__thumb :global(img) { transform: scale(1.04); }
   .post__meta { font-size: var(--step--1); font-weight: 600; color: var(--accent); }
-  .post__meta span { color: var(--line); margin-inline: 0.3em; }
+  .post__meta [aria-hidden] { color: var(--line); margin-inline: 0.3em; } /* the "/" divider, not the edit-mode field spans */
   .journal__more { display: grid; align-content: start; }
   .post--row { grid-template-columns: 140px 1fr; gap: 1.25rem; align-items: center; padding-block: 1.25rem; border-bottom: 1px solid var(--line); }
   .post--row:first-child { padding-top: 0; }

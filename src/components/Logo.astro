@@ -5,10 +5,11 @@ import { getSite } from '../data/site';
 interface Props { compact?: boolean }
 const { compact = false } = Astro.props;
 const site = await getSite();
+const e = site.settings.edit;
 ---
 <span class="logo">
   <span class="logo__mark"><Icon name="leaf" size="1.05em" /></span>
-  <span class="logo__word">{site.logo.word}{!compact && site.logo.sub && ' '}{!compact && site.logo.sub && <span class="logo__sub">{site.logo.sub}</span>}</span>
+  <span class="logo__word"><span {...e.logo_word}>{site.logo.word}</span>{!compact && site.logo.sub && ' '}{!compact && site.logo.sub && <span class="logo__sub" {...e.logo_sub}>{site.logo.sub}</span>}</span>
 </span>
 
 <style>
