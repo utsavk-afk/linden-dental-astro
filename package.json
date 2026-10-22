@@ -11,7 +11,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "photos": "node scripts/photos.mjs",
-    "prebuild": "node scripts/photos.mjs"
+    "prebuild": "node scripts/photos.mjs && node scripts/patch-emdash-admin.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^10.1.4",

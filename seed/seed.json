@@ -16,7 +16,7 @@
 			"label": "Services",
 			"labelSingular": "Service",
 			"description": "Each service has its own page at /services/<slug>/ and a card on the services and home pages.",
-			"urlPattern": "/services/{slug}",
+			"urlPattern": "/services/{slug}/",
 			"routable": true,
 			"sortOrder": 1,
 			"supports": [
@@ -158,7 +158,7 @@
 			"label": "Journal (blog posts)",
 			"labelSingular": "Journal post",
 			"description": "Blog posts at /journal/<slug>/. Drafts are only visible in preview.",
-			"urlPattern": "/journal/{slug}",
+			"urlPattern": "/journal/{slug}/",
 			"routable": true,
 			"sortOrder": 2,
 			"supports": [
@@ -302,7 +302,8 @@
 					"required": true,
 					"defaultValue": 10
 				}
-			]
+			],
+			"urlPattern": "/about/"
 		},
 		{
 			"slug": "reviews",
@@ -343,7 +344,8 @@
 					"required": true,
 					"defaultValue": 10
 				}
-			]
+			],
+			"urlPattern": "/"
 		},
 		{
 			"slug": "home_page",
@@ -562,7 +564,8 @@
 					"label": "Open Graph image (og:image)",
 					"type": "image"
 				}
-			]
+			],
+			"urlPattern": "/"
 		},
 		{
 			"slug": "about_page",
@@ -705,7 +708,8 @@
 					"label": "Open Graph image (og:image)",
 					"type": "image"
 				}
-			]
+			],
+			"urlPattern": "/about/"
 		},
 		{
 			"slug": "services_page",
@@ -803,7 +807,8 @@
 						"maxLength": 170
 					}
 				}
-			]
+			],
+			"urlPattern": "/services/"
 		},
 		{
 			"slug": "journal_page",
@@ -891,7 +896,8 @@
 						"maxLength": 170
 					}
 				}
-			]
+			],
+			"urlPattern": "/journal/"
 		},
 		{
 			"slug": "book_page",
@@ -1221,7 +1227,8 @@
 						"maxLength": 170
 					}
 				}
-			]
+			],
+			"urlPattern": "/book/"
 		},
 		{
 			"slug": "not_found_page",
@@ -1274,7 +1281,8 @@
 					"label": "Link URL: second action",
 					"type": "string"
 				}
-			]
+			],
+			"urlPattern": "/404/"
 		},
 		{
 			"slug": "design_page",
@@ -1553,7 +1561,8 @@
 						"maxLength": 170
 					}
 				}
-			]
+			],
+			"urlPattern": "/design/"
 		},
 		{
 			"slug": "site_settings",
@@ -1783,7 +1792,8 @@
 					"label": "Twitter / X handle (twitter:site)",
 					"type": "string"
 				}
-			]
+			],
+			"urlPattern": "/"
 		}
 	],
 	"menus": [
