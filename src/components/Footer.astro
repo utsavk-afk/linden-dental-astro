@@ -1,7 +1,8 @@
 ---
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
-import { site } from '../data/site';
+import { getSite } from '../data/site';
+const site = await getSite();
 const year = new Date().getFullYear();
 const { footer } = site;
 const intro = [site.tagline && `${site.tagline}.`, footer.intro].filter(Boolean).join(' ');

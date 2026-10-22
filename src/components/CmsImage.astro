@@ -1,0 +1,37 @@
+---
+// Renders an EmDash image (a CmsImage from src/lib/cms.ts) with emdash/ui's optimised Image,
+// or nothing when the image is empty. Any extra attribute (data-*, style, id, decoding...) is
+// passed straight through to the <img>.
+import { Image } from 'emdash/ui';
+import type { CmsImage } from '../lib/cms';
+
+interface Props {
+  image: CmsImage | null | undefined;
+  alt?: string;
+  width?: number;
+  height?: number;
+  layout?: 'constrained' | 'full-width' | 'fixed' | 'none';
+  sizes?: string;
+  loading?: 'eager' | 'lazy';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { image, alt, width, height, layout, sizes, loading, fetchpriority, class: className, ...rest } = Astro.props;
+const optional = Object.fromEntries(
+  Object.entries({ layout, sizes, loading, fetchpriority }).filter(([, v]) => v !== undefined && v !== null && v !== ''),
+);
+---
+{image?.src && (
+  <Image
+    image={image as never}
+    alt={alt ?? image.alt ?? ''}
+    width={width}
+    height={height}
+    priority={fetchpriority === 'high' || undefined}
+    class={className}
+    {...optional}
+    {...rest}
+  />
+)}

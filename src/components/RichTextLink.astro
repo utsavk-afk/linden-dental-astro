@@ -1,0 +1,17 @@
+---
+// Portable Text link mark for RichText.astro: like emdash/ui's Link mark, but site paths
+// ("/book/") get the staging prefix via href() from src/lib/url.ts.
+import { sanitizeHref } from 'emdash';
+import { href as siteHref } from '../lib/url';
+
+interface Props {
+  node: { markDef?: { href?: string; blank?: boolean } };
+}
+
+const { node } = Astro.props;
+const raw = node?.markDef?.href ?? '';
+const internal = raw.startsWith('/') && !raw.startsWith('//');
+const href = internal ? siteHref(raw) : sanitizeHref(raw);
+const blank = !href.startsWith('#') && !!node?.markDef?.blank;
+---
+<a href={href} target={blank ? '_blank' : undefined} rel={blank ? 'noopener noreferrer' : undefined}><slot /></a>

@@ -1,0 +1,3691 @@
+{
+	"$schema": "https://emdashcms.com/seed.schema.json",
+	"version": "1",
+	"meta": {
+		"name": "Linden Dental Studio",
+		"description": "Content model and content for the Linden Dental Studio site.",
+		"author": "Linden Dental Studio"
+	},
+	"settings": {
+		"title": "Linden Dental Studio",
+		"tagline": "Family dentistry in Sellwood, Portland"
+	},
+	"collections": [
+		{
+			"slug": "services",
+			"label": "Services",
+			"labelSingular": "Service",
+			"description": "Each service has its own page at /services/<slug>/ and a card on the services and home pages.",
+			"urlPattern": "/services/{slug}",
+			"routable": true,
+			"sortOrder": 1,
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search",
+				"seo"
+			],
+			"titleField": "title",
+			"admin": {
+				"listColumns": [
+					"order",
+					"price"
+				]
+			},
+			"fields": [
+				{
+					"slug": "title",
+					"label": "H1 heading (service name)",
+					"type": "string",
+					"required": true,
+					"searchable": true,
+					"validation": {
+						"maxLength": 110
+					}
+				},
+				{
+					"slug": "summary",
+					"label": "Excerpt",
+					"type": "text",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "order",
+					"label": "Menu order",
+					"type": "integer",
+					"required": true,
+					"defaultValue": 10
+				},
+				{
+					"slug": "icon",
+					"label": "Icon",
+					"type": "select",
+					"required": true,
+					"validation": {
+						"options": [
+							"tooth",
+							"smiley",
+							"hand-heart",
+							"shield-check",
+							"first-aid-kit",
+							"sparkle",
+							"sun",
+							"clock",
+							"wallet",
+							"hand-waving",
+							"chat-circle",
+							"heartbeat",
+							"baby",
+							"leaf",
+							"calendar-blank"
+						]
+					},
+					"defaultValue": "tooth"
+				},
+				{
+					"slug": "photo",
+					"label": "Featured image",
+					"type": "image",
+					"required": true
+				},
+				{
+					"slug": "price",
+					"label": "Price",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "duration",
+					"label": "Appointment length",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "steps",
+					"label": "Steps (H3 + paragraph each)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "title",
+								"label": "H3 heading (step title)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "body",
+								"label": "Paragraph (step text)",
+								"type": "text",
+								"required": true
+							}
+						],
+						"minItems": 1
+					}
+				},
+				{
+					"slug": "faqs",
+					"label": "FAQs (question + answer)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "q",
+								"label": "Question",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "a",
+								"label": "Answer (paragraph)",
+								"type": "text",
+								"required": true
+							}
+						]
+					}
+				},
+				{
+					"slug": "content",
+					"label": "Page content",
+					"type": "portableText",
+					"searchable": true
+				}
+			]
+		},
+		{
+			"slug": "journal",
+			"label": "Journal (blog posts)",
+			"labelSingular": "Journal post",
+			"description": "Blog posts at /journal/<slug>/. Drafts are only visible in preview.",
+			"urlPattern": "/journal/{slug}",
+			"routable": true,
+			"sortOrder": 2,
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"scheduling",
+				"search",
+				"seo"
+			],
+			"titleField": "title",
+			"dateField": "publish_date",
+			"admin": {
+				"listColumns": [
+					"category",
+					"publish_date"
+				]
+			},
+			"fields": [
+				{
+					"slug": "title",
+					"label": "H1 heading (post title)",
+					"type": "string",
+					"required": true,
+					"searchable": true,
+					"validation": {
+						"maxLength": 110
+					}
+				},
+				{
+					"slug": "excerpt",
+					"label": "Excerpt",
+					"type": "text",
+					"required": true,
+					"searchable": true,
+					"validation": {
+						"maxLength": 220
+					}
+				},
+				{
+					"slug": "publish_date",
+					"label": "Publish date",
+					"type": "datetime",
+					"required": true
+				},
+				{
+					"slug": "updated_date",
+					"label": "Last modified date",
+					"type": "datetime"
+				},
+				{
+					"slug": "author",
+					"label": "Author",
+					"type": "reference",
+					"required": true,
+					"validation": {
+						"targetCollection": "team"
+					}
+				},
+				{
+					"slug": "category",
+					"label": "Category",
+					"type": "select",
+					"required": true,
+					"validation": {
+						"options": [
+							"Kids",
+							"Everyday care",
+							"Costs",
+							"Treatments",
+							"News"
+						]
+					},
+					"defaultValue": "Everyday care"
+				},
+				{
+					"slug": "featured_image",
+					"label": "Featured image",
+					"type": "image",
+					"required": true
+				},
+				{
+					"slug": "content",
+					"label": "Post content",
+					"type": "portableText",
+					"searchable": true
+				}
+			]
+		},
+		{
+			"slug": "team",
+			"label": "Team",
+			"labelSingular": "Team member",
+			"description": "The people on the About and home pages. Journal posts pick their author from here.",
+			"routable": false,
+			"sortOrder": 3,
+			"titleField": "name",
+			"admin": {
+				"listColumns": [
+					"role",
+					"order"
+				]
+			},
+			"fields": [
+				{
+					"slug": "name",
+					"label": "H3 heading (name)",
+					"type": "string",
+					"required": true,
+					"validation": {
+						"maxLength": 80
+					}
+				},
+				{
+					"slug": "role",
+					"label": "Paragraph (job title)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "photo",
+					"label": "Image (portrait)",
+					"type": "image",
+					"required": true
+				},
+				{
+					"slug": "bio",
+					"label": "Paragraph (bio)",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "outside",
+					"label": "Paragraph (outside work)",
+					"type": "string"
+				},
+				{
+					"slug": "order",
+					"label": "Menu order",
+					"type": "integer",
+					"required": true,
+					"defaultValue": 10
+				}
+			]
+		},
+		{
+			"slug": "reviews",
+			"label": "Reviews",
+			"labelSingular": "Review",
+			"description": "The scrolling reviews strip on the home page, in menu order.",
+			"routable": false,
+			"sortOrder": 4,
+			"titleField": "name",
+			"admin": {
+				"listColumns": [
+					"where",
+					"order"
+				]
+			},
+			"fields": [
+				{
+					"slug": "quote",
+					"label": "Blockquote (review text)",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "name",
+					"label": "Reviewer name (caption)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "where",
+					"label": "Reviewer neighbourhood (caption)",
+					"type": "string"
+				},
+				{
+					"slug": "order",
+					"label": "Menu order",
+					"type": "integer",
+					"required": true,
+					"defaultValue": 10
+				}
+			]
+		},
+		{
+			"slug": "home_page",
+			"label": "Home page",
+			"labelSingular": "Home page",
+			"description": "Every word and photo on the home page. Services, team, reviews and journal posts come from their own collections.",
+			"routable": false,
+			"group": "Pages",
+			"sortOrder": 10,
+			"admin": {
+				"quickCreate": false
+			},
+			"titleField": "hero_title",
+			"fields": [
+				{
+					"slug": "hero_title",
+					"label": "H1 heading (hero, first part)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "hero_accent",
+					"label": "H1 heading (hero, green part)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "hero_lede",
+					"label": "Intro paragraph (hero)",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "hero_image",
+					"label": "Image (hero)",
+					"type": "image",
+					"required": true
+				},
+				{
+					"slug": "hero_card_title",
+					"label": "Hero card: bold text",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "hero_card_text",
+					"label": "Hero card: text",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "manifesto",
+					"label": "Paragraph (big statement)",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "manifesto_cta_label",
+					"label": "Link text: under the big statement",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "manifesto_cta_link",
+					"label": "Link URL: under the big statement",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "services_title",
+					"label": "H2 heading (services)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "visit_title",
+					"label": "H2 heading (first visit)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "visit_lede",
+					"label": "Intro paragraph (first visit)",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "visit_steps",
+					"label": "First visit steps (H3 + paragraph + image each)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "title",
+								"label": "H3 heading (step title)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "body",
+								"label": "Paragraph (step text)",
+								"type": "text",
+								"required": true
+							},
+							{
+								"slug": "image",
+								"label": "Image (step, optional: empty shows the calendar card)",
+								"type": "image"
+							}
+						],
+						"minItems": 1
+					}
+				},
+				{
+					"slug": "team_title",
+					"label": "H2 heading (team)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "team_text",
+					"label": "Paragraph (team)",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "team_cta_label",
+					"label": "Link text: meet the team",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "team_cta_link",
+					"label": "Link URL: meet the team",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "reviews_title",
+					"label": "H2 heading (reviews)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "reviews_label",
+					"label": "Accessibility label: reviews carousel (aria-label)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "journal_title",
+					"label": "H2 heading (journal)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "journal_cta_label",
+					"label": "Link text: all journal posts",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "journal_cta_link",
+					"label": "Link URL: all journal posts",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "find_title",
+					"label": "H2 heading (visit us)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "find_image",
+					"label": "Image (visit us)",
+					"type": "image",
+					"required": true
+				},
+				{
+					"slug": "insurance",
+					"label": "List item (insurance)",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "parking",
+					"label": "List item (parking)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "access",
+					"label": "List item (accessibility)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "meta_title",
+					"label": "Meta title",
+					"type": "string",
+					"validation": {
+						"maxLength": 70
+					}
+				},
+				{
+					"slug": "meta_description",
+					"label": "Meta description",
+					"type": "text",
+					"validation": {
+						"maxLength": 170
+					}
+				},
+				{
+					"slug": "og_image",
+					"label": "Open Graph image (og:image)",
+					"type": "image"
+				}
+			]
+		},
+		{
+			"slug": "about_page",
+			"label": "About page",
+			"labelSingular": "About page",
+			"description": "The About page. Team members are edited under Team. Empty call to action fields use the Site settings wording.",
+			"routable": false,
+			"group": "Pages",
+			"sortOrder": 11,
+			"admin": {
+				"quickCreate": false
+			},
+			"titleField": "title",
+			"fields": [
+				{
+					"slug": "title",
+					"label": "H1 heading (hero)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "lede",
+					"label": "Intro paragraph",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "image",
+					"label": "Image (hero)",
+					"type": "image",
+					"required": true
+				},
+				{
+					"slug": "story_title",
+					"label": "H2 heading (our story)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "story",
+					"label": "Paragraphs (our story)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "paragraph",
+								"label": "Paragraph",
+								"type": "text",
+								"required": true
+							}
+						],
+						"minItems": 1
+					}
+				},
+				{
+					"slug": "principles_title",
+					"label": "H2 heading (principles)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "principles",
+					"label": "Principles (icon + H3 + paragraph each)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "icon",
+								"label": "Icon",
+								"type": "select",
+								"required": true,
+								"options": [
+									"tooth",
+									"smiley",
+									"hand-heart",
+									"shield-check",
+									"first-aid-kit",
+									"sparkle",
+									"sun",
+									"clock",
+									"wallet",
+									"hand-waving",
+									"chat-circle",
+									"heartbeat",
+									"baby",
+									"leaf",
+									"calendar-blank"
+								]
+							},
+							{
+								"slug": "title",
+								"label": "H3 heading",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "body",
+								"label": "Paragraph",
+								"type": "text",
+								"required": true
+							}
+						],
+						"minItems": 1
+					}
+				},
+				{
+					"slug": "team_title",
+					"label": "H2 heading (team)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "cta_title",
+					"label": "Call to action band: H2 heading",
+					"type": "string"
+				},
+				{
+					"slug": "cta_text",
+					"label": "Call to action band: paragraph",
+					"type": "text"
+				},
+				{
+					"slug": "meta_title",
+					"label": "Meta title",
+					"type": "string",
+					"validation": {
+						"maxLength": 70
+					}
+				},
+				{
+					"slug": "meta_description",
+					"label": "Meta description",
+					"type": "text",
+					"validation": {
+						"maxLength": 170
+					}
+				},
+				{
+					"slug": "og_image",
+					"label": "Open Graph image (og:image)",
+					"type": "image"
+				}
+			]
+		},
+		{
+			"slug": "services_page",
+			"label": "Services page",
+			"labelSingular": "Services page",
+			"description": "The /services/ list page, plus the labels shared by every service page.",
+			"routable": false,
+			"group": "Pages",
+			"sortOrder": 12,
+			"admin": {
+				"quickCreate": false
+			},
+			"titleField": "title",
+			"fields": [
+				{
+					"slug": "title",
+					"label": "H1 heading (hero)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "lede",
+					"label": "Intro paragraph",
+					"type": "text"
+				},
+				{
+					"slug": "cta_title",
+					"label": "Call to action band: H2 heading",
+					"type": "string"
+				},
+				{
+					"slug": "cta_text",
+					"label": "Call to action band: paragraph",
+					"type": "text"
+				},
+				{
+					"slug": "detail_back_label",
+					"label": "Single service: link text (back to services)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "detail_cost_label",
+					"label": "Single service: label (price)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "detail_time_label",
+					"label": "Single service: label (appointment length)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "detail_steps_title",
+					"label": "Single service: H2 heading (steps)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "detail_faq_title",
+					"label": "Single service: H2 heading (FAQs)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "detail_more_title",
+					"label": "Single service: H2 heading (other services)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "detail_cta_title",
+					"label": "Single service: call to action band H2 heading",
+					"type": "string"
+				},
+				{
+					"slug": "detail_cta_text",
+					"label": "Single service: call to action band paragraph",
+					"type": "text"
+				},
+				{
+					"slug": "meta_title",
+					"label": "Meta title",
+					"type": "string",
+					"validation": {
+						"maxLength": 70
+					}
+				},
+				{
+					"slug": "meta_description",
+					"label": "Meta description",
+					"type": "text",
+					"validation": {
+						"maxLength": 170
+					}
+				}
+			]
+		},
+		{
+			"slug": "journal_page",
+			"label": "Journal page",
+			"labelSingular": "Journal page",
+			"description": "The /journal/ list page, plus the labels shared by every journal post.",
+			"routable": false,
+			"group": "Pages",
+			"sortOrder": 13,
+			"admin": {
+				"quickCreate": false
+			},
+			"titleField": "title",
+			"fields": [
+				{
+					"slug": "title",
+					"label": "H1 heading (hero)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "lede",
+					"label": "Intro paragraph",
+					"type": "text"
+				},
+				{
+					"slug": "read_label",
+					"label": "Link text (featured post)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "post_back_label",
+					"label": "Single post: link text (back to journal)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "post_author_line",
+					"label": "Single post: author box paragraph start ({role} = author role)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "post_next_title",
+					"label": "Single post: H2 heading (more posts)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "post_updated_label",
+					"label": "Single post: last modified label",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "post_draft_banner",
+					"label": "Single post: draft notice",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "post_cta_title",
+					"label": "Single post: call to action band H2 heading",
+					"type": "string"
+				},
+				{
+					"slug": "post_cta_text",
+					"label": "Single post: call to action band paragraph",
+					"type": "text"
+				},
+				{
+					"slug": "meta_title",
+					"label": "Meta title",
+					"type": "string",
+					"validation": {
+						"maxLength": 70
+					}
+				},
+				{
+					"slug": "meta_description",
+					"label": "Meta description",
+					"type": "text",
+					"validation": {
+						"maxLength": 170
+					}
+				}
+			]
+		},
+		{
+			"slug": "book_page",
+			"label": "Book a visit page",
+			"labelSingular": "Book a visit page",
+			"description": "Every visible word on the booking page and form.",
+			"routable": false,
+			"group": "Pages",
+			"sortOrder": 14,
+			"admin": {
+				"quickCreate": false
+			},
+			"titleField": "intro_title",
+			"fields": [
+				{
+					"slug": "intro_title",
+					"label": "H1 heading",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "intro_lede",
+					"label": "Intro paragraph",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "intro_call_label",
+					"label": "Paragraph (above the phone button)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "next_steps",
+					"label": "Next steps list (icon + bold text + text each)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "icon",
+								"label": "Icon",
+								"type": "select",
+								"required": true,
+								"options": [
+									"envelope-simple",
+									"clipboard-text",
+									"coffee",
+									"armchair",
+									"phone",
+									"map-pin",
+									"car",
+									"wheelchair",
+									"tooth",
+									"smiley",
+									"hand-heart",
+									"shield-check",
+									"first-aid-kit",
+									"sparkle",
+									"sun",
+									"clock",
+									"wallet",
+									"hand-waving",
+									"chat-circle",
+									"heartbeat",
+									"baby",
+									"leaf",
+									"calendar-blank"
+								]
+							},
+							{
+								"slug": "lead",
+								"label": "Bold text (strong)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "text",
+								"label": "Text after the bold part",
+								"type": "text",
+								"required": true
+							}
+						]
+					}
+				},
+				{
+					"slug": "form_who_legend",
+					"label": "Fieldset legend (who is it for)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_who_me",
+					"label": "Radio button label 1 (for me)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_who_child",
+					"label": "Radio button label 2 (for a child)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_who_family",
+					"label": "Radio button label 3 (for a family)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_name",
+					"label": "Field label: name",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_phone",
+					"label": "Field label: phone",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_email",
+					"label": "Field label: email",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_email_help",
+					"label": "Help text (email field)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_reason",
+					"label": "Field label: reason for visit (dropdown)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_reason_placeholder",
+					"label": "Dropdown placeholder (reason)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_days",
+					"label": "Fieldset legend (times)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_nervous_lead",
+					"label": "Toggle switch label: bold text (nervous)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_nervous_text",
+					"label": "Toggle switch label: text after the bold part",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "form_notes",
+					"label": "Field label: notes",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_optional",
+					"label": "Optional field marker",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_submit",
+					"label": "Submit button text",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_sending",
+					"label": "Submit button text while sending",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "form_fine_staging",
+					"label": "Paragraph: small print (staging backend)",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "form_fine_concept",
+					"label": "Paragraph: small print (concept, no backend)",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "options_reasons",
+					"label": "Dropdown options (reason for visit)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "option",
+								"label": "Dropdown option",
+								"type": "string",
+								"required": true
+							}
+						],
+						"minItems": 1
+					}
+				},
+				{
+					"slug": "options_days",
+					"label": "Checkbox options (times that usually work)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "option",
+								"label": "Checkbox label",
+								"type": "string",
+								"required": true
+							}
+						],
+						"maxItems": 6
+					}
+				},
+				{
+					"slug": "messages_name",
+					"label": "Error message: name missing",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "messages_email_missing",
+					"label": "Error message: email missing",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "messages_email_invalid",
+					"label": "Error message: email looks wrong",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "messages_phone_missing",
+					"label": "Error message: phone missing",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "messages_phone_pattern",
+					"label": "Error message: phone has letters or symbols",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "messages_reason",
+					"label": "Error message: no reason picked",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "messages_field_invalid",
+					"label": "Error message: other field problem",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "messages_send_failed",
+					"label": "Error message: send failed",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "messages_retry",
+					"label": "Error message: retry suffix",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "success_heading_prefix",
+					"label": "Success H2 heading: text before the name",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "success_heading_suffix",
+					"label": "Success H2 heading: text after the name",
+					"type": "string"
+				},
+				{
+					"slug": "success_text",
+					"label": "Success paragraph ({phone} = practice phone)",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "success_link_label",
+					"label": "Success link text",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "success_link_link",
+					"label": "Success link URL",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "meta_title",
+					"label": "Meta title",
+					"type": "string",
+					"validation": {
+						"maxLength": 70
+					}
+				},
+				{
+					"slug": "meta_description",
+					"label": "Meta description",
+					"type": "text",
+					"validation": {
+						"maxLength": 170
+					}
+				}
+			]
+		},
+		{
+			"slug": "not_found_page",
+			"label": "Page not found (404)",
+			"labelSingular": "Page not found (404)",
+			"description": "The page shown for any broken or old link.",
+			"routable": false,
+			"group": "Pages",
+			"sortOrder": 15,
+			"admin": {
+				"quickCreate": false
+			},
+			"titleField": "title",
+			"fields": [
+				{
+					"slug": "page_title",
+					"label": "Meta title",
+					"type": "string"
+				},
+				{
+					"slug": "title",
+					"label": "H1 heading",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "lede",
+					"label": "Intro paragraph",
+					"type": "text"
+				},
+				{
+					"slug": "primary_label",
+					"label": "Button text: main action",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "primary_link",
+					"label": "Button link: main action",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "secondary_label",
+					"label": "Link text: second action (empty hides it)",
+					"type": "string"
+				},
+				{
+					"slug": "secondary_link",
+					"label": "Link URL: second action",
+					"type": "string"
+				}
+			]
+		},
+		{
+			"slug": "design_page",
+			"label": "Design language page",
+			"labelSingular": "Design language page",
+			"description": "The /design/ design language page. Colour values live in code.",
+			"routable": false,
+			"group": "Pages",
+			"sortOrder": 16,
+			"admin": {
+				"quickCreate": false
+			},
+			"titleField": "title",
+			"fields": [
+				{
+					"slug": "title",
+					"label": "H1 heading (hero)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "lede",
+					"label": "Intro paragraph",
+					"type": "text"
+				},
+				{
+					"slug": "principles_title",
+					"label": "H2 heading (principles)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "principles_items",
+					"label": "Principle cards (H3 + paragraph each)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "title",
+								"label": "H3 heading",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "text",
+								"label": "Paragraph",
+								"type": "text",
+								"required": true
+							}
+						],
+						"minItems": 1
+					}
+				},
+				{
+					"slug": "colour_title",
+					"label": "H2 heading (colour)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "colour_intro",
+					"label": "Paragraph (colour intro)",
+					"type": "text"
+				},
+				{
+					"slug": "colour_swatches",
+					"label": "Colour swatches (name + paragraph each)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "token",
+								"label": "Colour token",
+								"type": "select",
+								"required": true,
+								"options": [
+									"--bg",
+									"--bg-2",
+									"--surface",
+									"--ink",
+									"--ink-2",
+									"--accent",
+									"--bloom"
+								]
+							},
+							{
+								"slug": "name",
+								"label": "Colour name (bold text)",
+								"type": "string"
+							},
+							{
+								"slug": "use",
+								"label": "Paragraph (where it is used)",
+								"type": "text"
+							}
+						]
+					}
+				},
+				{
+					"slug": "type_title",
+					"label": "H2 heading (type)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "type_intro",
+					"label": "Paragraph (type intro)",
+					"type": "text"
+				},
+				{
+					"slug": "type_specimens",
+					"label": "Type specimen rows (label + sample each)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "step",
+								"label": "Type size",
+								"type": "select",
+								"required": true,
+								"options": [
+									"--step-5",
+									"--step-4",
+									"--step-3",
+									"--step-2",
+									"--step-1",
+									"--step-0"
+								]
+							},
+							{
+								"slug": "label",
+								"label": "Row label (bold text)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "sample",
+								"label": "Sample sentence (shown at that size)",
+								"type": "string",
+								"required": true
+							}
+						],
+						"minItems": 1
+					}
+				},
+				{
+					"slug": "components_title",
+					"label": "H2 heading (components)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "components_intro",
+					"label": "Paragraph (components intro)",
+					"type": "text"
+				},
+				{
+					"slug": "components_primary_button",
+					"label": "Button text (demo primary button)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "components_secondary_button",
+					"label": "Button text (demo secondary button)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "components_text_link",
+					"label": "Link text (demo arrow link)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "motion_title",
+					"label": "H2 heading (motion)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "motion_intro",
+					"label": "Paragraph (motion intro)",
+					"type": "text"
+				},
+				{
+					"slug": "motion_items",
+					"label": "Motion effects (name + two paragraphs each)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "name",
+								"label": "Effect name (definition term)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "why",
+								"label": "Paragraph (why it is there)",
+								"type": "text",
+								"required": true
+							},
+							{
+								"slug": "how",
+								"label": "Paragraph (how it works)",
+								"type": "text",
+								"required": true
+							}
+						],
+						"minItems": 1
+					}
+				},
+				{
+					"slug": "inspiration_title",
+					"label": "H2 heading (inspiration)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "inspiration_intro",
+					"label": "Paragraph (inspiration intro)",
+					"type": "text"
+				},
+				{
+					"slug": "inspiration_items",
+					"label": "References (studio + link + text each)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "who",
+								"label": "Studio name (bold text)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "where",
+								"label": "Location",
+								"type": "string"
+							},
+							{
+								"slug": "title",
+								"label": "Link text (project title)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "url",
+								"label": "Link URL",
+								"type": "url",
+								"required": true
+							},
+							{
+								"slug": "took",
+								"label": "Text (what we took from it)",
+								"type": "text"
+							}
+						],
+						"minItems": 1
+					}
+				},
+				{
+					"slug": "meta_title",
+					"label": "Meta title",
+					"type": "string",
+					"validation": {
+						"maxLength": 70
+					}
+				},
+				{
+					"slug": "meta_description",
+					"label": "Meta description",
+					"type": "text",
+					"validation": {
+						"maxLength": 170
+					}
+				}
+			]
+		},
+		{
+			"slug": "site_settings",
+			"label": "Site settings and SEO",
+			"labelSingular": "Site settings and SEO",
+			"description": "Practice details, footer, interface labels and SEO defaults. The header and footer links are under Menus.",
+			"routable": false,
+			"group": "Settings",
+			"sortOrder": 20,
+			"admin": {
+				"quickCreate": false
+			},
+			"titleField": "name",
+			"fields": [
+				{
+					"slug": "name",
+					"label": "Site title (practice name)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "logo_word",
+					"label": "Logo text: main word",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "logo_sub",
+					"label": "Logo text: small line",
+					"type": "string"
+				},
+				{
+					"slug": "tagline",
+					"label": "Tagline",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "phone",
+					"label": "Phone number",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "email",
+					"label": "Email address",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "address_line_1",
+					"label": "Address line 1 (street)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "address_line_2",
+					"label": "Address line 2 (city, state and ZIP)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "map_link",
+					"label": "Google Maps link (directions URL)",
+					"type": "url",
+					"required": true
+				},
+				{
+					"slug": "hours",
+					"label": "Opening hours (days + times each)",
+					"type": "repeater",
+					"validation": {
+						"subFields": [
+							{
+								"slug": "days",
+								"label": "Days (definition term)",
+								"type": "string",
+								"required": true
+							},
+							{
+								"slug": "time",
+								"label": "Opening times",
+								"type": "string",
+								"required": true
+							}
+						],
+						"minItems": 1
+					}
+				},
+				{
+					"slug": "primary_cta_label",
+					"label": "Button text: book a visit (site-wide)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "primary_cta_link",
+					"label": "Button link: book a visit (site-wide)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "cta_band_title",
+					"label": "Call to action band: H2 heading (default)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "cta_band_text",
+					"label": "Call to action band: paragraph (default)",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "footer_intro",
+					"label": "Footer: paragraph (under the logo)",
+					"type": "text"
+				},
+				{
+					"slug": "footer_visit_heading",
+					"label": "Footer: H2 heading (address column)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "footer_hours_heading",
+					"label": "Footer: H2 heading (hours column)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "footer_contact_heading",
+					"label": "Footer: H2 heading (contact column)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "footer_directions_label",
+					"label": "Footer: link text (get directions)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "footer_note",
+					"label": "Footer: bottom line (small print)",
+					"type": "string"
+				},
+				{
+					"slug": "labels_skip_link",
+					"label": "Accessibility label: skip to content link (screen reader text)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "labels_menu",
+					"label": "Accessibility label: mobile menu button (screen reader text)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "labels_theme_toggle",
+					"label": "Accessibility label: dark theme button (aria-label)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "labels_min_read",
+					"label": "Reading time text",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "labels_step_of",
+					"label": "Step counter text ({n} of {total})",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "labels_pause",
+					"label": "Button text: pause reviews",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "labels_play",
+					"label": "Button text: play reviews",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "labels_main_nav",
+					"label": "Accessibility label: header menu (aria-label)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "labels_home_link",
+					"label": "Accessibility label: logo home link ({name} = practice name)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "labels_portrait_alt",
+					"label": "Image alt text (team portraits, {name} = person)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "seo_default_title",
+					"label": "Default meta title (home page)",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "seo_title_suffix",
+					"label": "Meta title separator and suffix",
+					"type": "string"
+				},
+				{
+					"slug": "seo_default_description",
+					"label": "Default meta description",
+					"type": "text",
+					"required": true
+				},
+				{
+					"slug": "twitter_handle",
+					"label": "Twitter / X handle (twitter:site)",
+					"type": "string"
+				}
+			]
+		}
+	],
+	"menus": [
+		{
+			"name": "primary",
+			"label": "Header menu",
+			"items": [
+				{
+					"type": "custom",
+					"label": "About",
+					"url": "/about/"
+				},
+				{
+					"type": "custom",
+					"label": "Services",
+					"url": "/services/"
+				},
+				{
+					"type": "custom",
+					"label": "Journal",
+					"url": "/journal/"
+				}
+			]
+		},
+		{
+			"name": "footer",
+			"label": "Footer menu (extra contact column links)",
+			"items": [
+				{
+					"type": "custom",
+					"label": "Design language",
+					"url": "/design/"
+				}
+			]
+		}
+	],
+	"redirects": [],
+	"content": {
+		"team": [
+			{
+				"id": "team-ana-whitlock",
+				"slug": "ana-whitlock",
+				"status": "published",
+				"data": {
+					"name": "Dr. Ana Whitlock, DDS",
+					"role": "Founder, general dentist",
+					"photo": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/team/ana-whitlock/photo.jpg",
+							"filename": "team-ana-whitlock.jpg",
+							"alt": "Portrait of Dr. Ana Whitlock, DDS"
+						}
+					},
+					"bio": "Ana opened Linden in 2016 after nine years in a busy downtown group practice where appointments ran on a fifteen-minute clock. She wanted the opposite: longer slots, fewer patients a day, and time to explain things.",
+					"outside": "Sellwood Park on weekends with her two kids and a very slow beagle.",
+					"order": 1
+				}
+			},
+			{
+				"id": "team-danielle-okafor",
+				"slug": "danielle-okafor",
+				"status": "published",
+				"data": {
+					"name": "Danielle Okafor, RDH",
+					"role": "Dental hygienist",
+					"photo": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/team/danielle-okafor/photo.jpg",
+							"filename": "team-danielle-okafor.jpg",
+							"alt": "Portrait of Danielle Okafor, RDH"
+						}
+					},
+					"bio": "Danielle does most of our cleanings and nearly all of our first visits with kids. She is the reason a lot of four-year-olds ask to come back.",
+					"outside": "Bakes sourdough badly and keeps trying anyway.",
+					"order": 3
+				}
+			},
+			{
+				"id": "team-june-halvorsen",
+				"slug": "june-halvorsen",
+				"status": "published",
+				"data": {
+					"name": "June Halvorsen",
+					"role": "Patient coordinator",
+					"photo": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/team/june-halvorsen/photo.jpg",
+							"filename": "team-june-halvorsen.jpg",
+							"alt": "Portrait of June Halvorsen"
+						}
+					},
+					"bio": "June runs the front desk, insurance paperwork and the schedule. If you call us, she is who answers, and she will tell you the price before you book.",
+					"outside": "Grows far too many tomatoes for one household.",
+					"order": 4
+				}
+			},
+			{
+				"id": "team-marcus-oyelaran",
+				"slug": "marcus-oyelaran",
+				"status": "published",
+				"data": {
+					"name": "Dr. Marcus Oyelaran, DMD",
+					"role": "General and restorative dentist",
+					"photo": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/team/marcus-oyelaran/photo.jpg",
+							"filename": "team-marcus-oyelaran.jpg",
+							"alt": "Portrait of Dr. Marcus Oyelaran, DMD"
+						}
+					},
+					"bio": "Marcus handles most of our fillings, crowns and emergency visits. Patients tell us he narrates everything he does, which is on purpose. He trained at OHSU and has been with Linden since 2019.",
+					"outside": "Coaches a Saturday-afternoon youth soccer team in Westmoreland.",
+					"order": 2
+				}
+			}
+		],
+		"services": [
+			{
+				"id": "service-checkups",
+				"slug": "checkups",
+				"status": "published",
+				"data": {
+					"title": "Check-ups and cleanings",
+					"summary": "A full exam, a gentle clean and a plain-English rundown of what we saw. Every six months for most people.",
+					"order": 1,
+					"icon": "tooth",
+					"photo": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/services/checkups/photo.jpg",
+							"filename": "service-checkups.jpg",
+							"alt": "A dentist showing a patient how to angle a toothbrush along the gum line."
+						}
+					},
+					"price": "$185 without insurance. Usually covered in full by PPO plans.",
+					"duration": "60 minutes",
+					"steps": [
+						{
+							"title": "Talk first",
+							"body": "We ask what has changed since last time and whether anything hurts. You stay sitting up for this part."
+						},
+						{
+							"title": "Exam and x-rays",
+							"body": "A check of every tooth and your gums, plus low-dose digital x-rays once a year."
+						},
+						{
+							"title": "Clean and polish",
+							"body": "Our hygienist removes build-up by hand, then polishes. Tell us if anything feels sharp and we slow down."
+						},
+						{
+							"title": "Your plan",
+							"body": "You leave with what we found, what can wait, and what anything would cost. Written down."
+						}
+					],
+					"faqs": [
+						{
+							"q": "How often should I come in?",
+							"a": "Every six months suits most adults and kids. If your gums need closer watching we may suggest every three or four months, and we will explain why."
+						},
+						{
+							"q": "Will my insurance cover it?",
+							"a": "Most PPO plans cover two check-ups a year in full. June checks your plan before your visit and tells you if anything is not covered."
+						},
+						{
+							"q": "Do I have to have x-rays?",
+							"a": "No. We recommend them once a year because they show problems between teeth that we cannot see. You can always say no."
+						}
+					],
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k1",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k0",
+									"text": "A check-up at Linden takes an hour, which is longer than most practices book. That extra time is where the explaining happens.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k3",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k2",
+									"text": "We do not lecture. If we spot something, we show you on the screen, tell you whether it needs doing now or can be watched, and give you the price before anything is scheduled.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "service-clear-aligners",
+				"slug": "clear-aligners",
+				"status": "published",
+				"data": {
+					"title": "Clear aligners",
+					"summary": "Straighter teeth without metal braces, planned on a 3D scan, with check-ins every six to eight weeks.",
+					"order": 6,
+					"icon": "sparkle",
+					"photo": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/services/clear-aligners/photo.jpg",
+							"filename": "service-clear-aligners.jpg",
+							"alt": "A hand lifting a clear aligner out of its open case."
+						}
+					},
+					"price": "$3,900 to $5,400 depending on the case. Monthly payment plans available.",
+					"duration": "Usually 6 to 18 months",
+					"steps": [
+						{
+							"title": "Scan and preview",
+							"body": "A 3D scan, no goopy moulds, and a preview of how your teeth should move."
+						},
+						{
+							"title": "Fit your first set",
+							"body": "We fit the first aligners and show you how to put them in and take them out."
+						},
+						{
+							"title": "Check in",
+							"body": "A short visit every six to eight weeks to make sure things are on track."
+						},
+						{
+							"title": "Keep it straight",
+							"body": "A retainer at the end, so the result lasts."
+						}
+					],
+					"faqs": [
+						{
+							"q": "Am I a good fit for aligners?",
+							"a": "Most mild to moderate crowding and gaps can be treated with aligners. A free consult and scan will tell us for sure."
+						},
+						{
+							"q": "How many hours a day do I wear them?",
+							"a": "About 22. You take them out to eat and to brush."
+						}
+					],
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k5",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k4",
+									"text": "Aligners work well for most adults and older teens with mild to moderate crowding. We start with a free consult and scan, and we will tell you if braces would do a better job.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "service-emergencies",
+				"slug": "emergencies",
+				"status": "published",
+				"data": {
+					"title": "Emergency care",
+					"summary": "Toothache, a chipped tooth or a lost filling. We keep slots open every weekday for same-day and next-day visits.",
+					"order": 5,
+					"icon": "first-aid-kit",
+					"photo": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/services/emergencies/photo.jpg",
+							"filename": "service-emergencies.jpg",
+							"alt": "A dentist holding up a patient's x-ray and pointing out the problem tooth."
+						}
+					},
+					"price": "$95 for the emergency exam and x-ray. Treatment priced on the day.",
+					"duration": "30 minutes to start",
+					"steps": [
+						{
+							"title": "Call before 10 am",
+							"body": "Ring us and June will find you a slot, usually the same day."
+						},
+						{
+							"title": "Find the cause",
+							"body": "An exam and a single x-ray to see what is going on."
+						},
+						{
+							"title": "Stop the pain",
+							"body": "We treat the pain first. Longer work can be booked once you are comfortable."
+						}
+					],
+					"faqs": [
+						{
+							"q": "What counts as an emergency?",
+							"a": "Pain that keeps you up at night, swelling, a broken or knocked-out tooth, or a lost crown. If you are not sure, call and ask."
+						},
+						{
+							"q": "What if it is after hours?",
+							"a": "Our voicemail has an on-call number for current patients. For facial swelling that affects breathing or swallowing, go to the ER."
+						},
+						{
+							"q": "I knocked a tooth out. What do I do?",
+							"a": "Pick it up by the crown, not the root, rinse it briefly, and keep it in milk. Call us straight away. The first hour matters most."
+						}
+					],
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k7",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k6",
+									"text": "Tooth pain does not wait for your next check-up. We hold back a few appointments every weekday so we can see people the same day they call.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k9",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k8",
+									"text": "You do not need to be a current patient. Call, tell June what happened, and we will tell you what it is likely to cost before you come in.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "service-fillings-crowns",
+				"slug": "fillings-crowns",
+				"status": "published",
+				"data": {
+					"title": "Fillings and crowns",
+					"summary": "Tooth-coloured fillings and same-week crowns, explained on screen first, priced before we start.",
+					"order": 4,
+					"icon": "shield-check",
+					"photo": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/services/fillings-crowns/photo.jpg",
+							"filename": "service-fillings-crowns.jpg",
+							"alt": "A dentist walking a patient through her x-rays on a tablet before treatment."
+						}
+					},
+					"price": "Fillings $190 to $310. Crowns from $1,150. Insurance usually pays half or more.",
+					"duration": "45 to 90 minutes",
+					"steps": [
+						{
+							"title": "See it first",
+							"body": "We show you the tooth on screen and explain what a filling or crown would fix."
+						},
+						{
+							"title": "Price in writing",
+							"body": "You get the cost, and what your insurance should cover, before you book."
+						},
+						{
+							"title": "Numb, then wait",
+							"body": "We check the area is fully numb before we start. If it is not, we wait or top up."
+						},
+						{
+							"title": "Check the bite",
+							"body": "We adjust until your bite feels normal, then send you off with aftercare notes."
+						}
+					],
+					"faqs": [
+						{
+							"q": "Do you use silver fillings?",
+							"a": "No. We use tooth-coloured composite for fillings. It bonds to the tooth and matches its shade."
+						},
+						{
+							"q": "How long does a crown take?",
+							"a": "Two visits about a week apart. The first shapes the tooth and fits a temporary crown, the second fits the permanent one."
+						}
+					],
+					"content": [
+						{
+							"_type": "block",
+							"_key": "kb",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ka",
+									"text": "Nobody books a filling for fun. Our job is to make it quick, properly numb, and free of surprises on the bill.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "kd",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "kc",
+									"text": "Marcus does most of our restorative work and talks you through every step as he goes. Patients say it helps to know what the noises are.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "service-kids",
+				"slug": "kids",
+				"status": "published",
+				"data": {
+					"title": "Kids’ dentistry",
+					"summary": "First visits from age one, check-ups that feel like a game, and sealants that stop most cavities before they start.",
+					"order": 2,
+					"icon": "smiley",
+					"photo": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/services/kids/photo.jpg",
+							"filename": "service-kids.jpg",
+							"alt": "A young girl smiling up at a dentist from the chair while her mother sits beside her."
+						}
+					},
+					"price": "$120 for a check-up under age 12. Covered by most plans and Oregon Health Plan.",
+					"duration": "30 to 45 minutes",
+					"steps": [
+						{
+							"title": "Meet the chair",
+							"body": "Kids get a ride up and down in the chair and a look at the tools before anything goes in their mouth."
+						},
+						{
+							"title": "Count the teeth",
+							"body": "A quick look with a mirror, counted out loud. Many first visits stop here, and that is fine."
+						},
+						{
+							"title": "A quick clean",
+							"body": "A soft polish and fluoride if they are happy to keep going."
+						},
+						{
+							"title": "Parent debrief",
+							"body": "Five minutes with you on brushing, snacks and what to watch for next."
+						}
+					],
+					"faqs": [
+						{
+							"q": "When should my child first see a dentist?",
+							"a": "Around their first birthday, or six months after the first tooth comes in. Early visits are mostly about getting used to the place."
+						},
+						{
+							"q": "Can I stay in the room?",
+							"a": "Yes. Most parents sit right next to the chair. Some older kids prefer you in the waiting room, and we follow their lead."
+						},
+						{
+							"q": "What are sealants?",
+							"a": "A thin coating painted onto the back teeth to keep food out of the grooves. It takes a few minutes per tooth and does not involve any drilling."
+						}
+					],
+					"content": [
+						{
+							"_type": "block",
+							"_key": "kf",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ke",
+									"text": "Most adults who dread the dentist can trace it back to one bad visit as a kid. We try hard to make sure that visit never happens here.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "kh",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "kg",
+									"text": "First visits go at your child’s pace. If all they do is ride the chair and count their teeth, that counts as a good visit, and we book the next one.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "service-nervous-patients",
+				"slug": "nervous-patients",
+				"status": "published",
+				"data": {
+					"title": "Nervous patients",
+					"summary": "Longer appointments, a stop signal you control, and the option of nitrous oxide. No judgement about how long it has been.",
+					"order": 3,
+					"icon": "hand-heart",
+					"photo": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/services/nervous-patients/photo.jpg",
+							"filename": "service-nervous-patients.jpg",
+							"alt": "A young woman laughing with the dentist during her appointment."
+						}
+					},
+					"price": "No extra charge for longer slots. Nitrous oxide is $75 per visit.",
+					"duration": "We book double time",
+					"steps": [
+						{
+							"title": "Tell us on the form",
+							"body": "Tick the box when you book. We will not ask you to explain unless you want to."
+						},
+						{
+							"title": "A talk-only first visit",
+							"body": "Your first appointment can be just a conversation in our consult room, away from the chair."
+						},
+						{
+							"title": "Agree a stop signal",
+							"body": "Raise your left hand and we stop, every time, no questions."
+						},
+						{
+							"title": "Go at your pace",
+							"body": "We split treatment across shorter visits if that is easier."
+						}
+					],
+					"faqs": [
+						{
+							"q": "It has been years since I saw a dentist. Will I get a lecture?",
+							"a": "No. A lot of our patients come to us after five or ten years away. We start from where you are today."
+						},
+						{
+							"q": "Do you offer sedation?",
+							"a": "We offer nitrous oxide (laughing gas), which wears off in minutes so you can drive home. For deeper sedation we refer to a specialist we trust."
+						},
+						{
+							"q": "Can I bring someone with me?",
+							"a": "Yes. A friend or partner is welcome in the room."
+						}
+					],
+					"content": [
+						{
+							"_type": "block",
+							"_key": "kj",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ki",
+									"text": "If you feel anxious about the dentist, you are in good company. About a third of our patients tell us so on their first form.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "kl",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "kk",
+									"text": "We book you double time, explain each step before it happens, and stop the moment you raise your hand. You are in charge of the pace.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "service-whitening",
+				"slug": "whitening",
+				"status": "published",
+				"data": {
+					"title": "Whitening",
+					"summary": "Custom take-home trays that whiten safely over two weeks, with less sensitivity than the shop-bought kind.",
+					"order": 7,
+					"icon": "sun",
+					"photo": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/services/whitening/photo.jpg",
+							"filename": "service-whitening.jpg",
+							"alt": "A woman in the dental chair smiling at her teeth in a hand mirror."
+						}
+					},
+					"price": "$350 for custom trays and gel. Top-up gel $40.",
+					"duration": "Two short visits",
+					"steps": [
+						{
+							"title": "Check first",
+							"body": "We make sure there is no decay or gum problem that whitening would aggravate."
+						},
+						{
+							"title": "Fit your trays",
+							"body": "Trays made from a scan of your teeth, so the gel stays where it should."
+						},
+						{
+							"title": "Two weeks at home",
+							"body": "About 30 minutes a day. Most people see the change within the first week."
+						}
+					],
+					"faqs": [
+						{
+							"q": "Does whitening hurt?",
+							"a": "Some people feel mild sensitivity for a day or two. Custom trays and a lower-strength gel keep it to a minimum."
+						},
+						{
+							"q": "Will it whiten my crowns or fillings?",
+							"a": "No. Whitening only works on natural enamel. We will tell you at your check if that affects your result."
+						}
+					],
+					"content": [
+						{
+							"_type": "block",
+							"_key": "kn",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "km",
+									"text": "Whitening is optional and we will never push it. If you want it, custom trays are the safest way to do it at home, and the trays last for years of top-ups.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"journal": [
+			{
+				"id": "post-brushing-habits-that-stick",
+				"slug": "brushing-habits-that-stick",
+				"status": "published",
+				"data": {
+					"title": "The two-minute rule, and brushing habits that stick",
+					"excerpt": "Small changes that get kids, and their parents, brushing properly without a nightly fight.",
+					"publish_date": "2026-07-16T00:00:00.000Z",
+					"author": "$ref:team-marcus-oyelaran",
+					"category": "Kids",
+					"featured_image": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/journal/brushing-habits-that-stick/cover.jpg",
+							"filename": "journal-brushing-habits-that-stick.jpg",
+							"alt": "Two children brushing their teeth together at a sunny bathroom sink."
+						}
+					},
+					"content": [
+						{
+							"_type": "block",
+							"_key": "kp",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ko",
+									"text": "Most people brush for about 45 seconds. Two minutes feels long until you time it, and then it feels very long.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "kr",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "kq",
+									"text": "Use a timer you do not have to watch",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "kt",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ks",
+									"text": "A two-minute song works better than a sand timer. Electric brushes with a 30-second buzz are even better, because they also tell you when to move to the next quarter of your mouth.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "kv",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ku",
+									"text": "Brush together",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "kx",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "kw",
+									"text": "Kids copy. If they see you brush at the same time, they brush longer. It also means you can check their back teeth, which is where most kids’ cavities show up.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "kz",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "ky",
+									"text": "Keep the brush where they can see it",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k11",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k10",
+									"text": "Out of sight is out of mind. A cup by the sink, at their height, does a surprising amount of the work.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k13",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k12",
+									"text": "Do not rinse after",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k15",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k14",
+									"text": "Spit, do not rinse. Rinsing washes away the fluoride that keeps working after you stop brushing. It is the easiest change on this list.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "post-checkup-cost-without-insurance",
+				"slug": "checkup-cost-without-insurance",
+				"status": "published",
+				"data": {
+					"title": "What a check-up costs in Portland without insurance",
+					"excerpt": "Our prices, why they vary between practices, and how our membership plan works.",
+					"publish_date": "2026-08-07T00:00:00.000Z",
+					"author": "$ref:team-june-halvorsen",
+					"category": "Costs",
+					"featured_image": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/journal/checkup-cost-without-insurance/cover.jpg",
+							"filename": "journal-checkup-cost-without-insurance.jpg",
+							"alt": "A patient checking in at a wooden reception desk with a smiling coordinator."
+						}
+					},
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k17",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k16",
+									"text": "People call us every week asking this, often a little embarrassed to ask. You should not be. A price you can plan for is part of good care.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k19",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k18",
+									"text": "Our prices",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k1b",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1a",
+									"text": "A new-patient exam, x-rays and cleaning is $185 at Linden. A returning check-up and clean is $165. Kids under 12 are $120. Those are the full prices, with nothing added at the desk.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k1d",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1c",
+									"text": "Why prices vary",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k1f",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1e",
+									"text": "Across Portland you will see anything from about $150 to $400 for the same visit. The difference usually comes down to which x-rays are included, whether the cleaning is billed separately, and how long the appointment is. Ask any practice for the total, including x-rays, before you book.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k1h",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1g",
+									"text": "The membership plan",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k1j",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1i",
+									"text": "If you do not have insurance, our membership costs $29 a month for adults and $19 for kids. It covers two check-ups and cleanings a year, all routine x-rays, one emergency exam, and 15 percent off any treatment. Most members save money in the first year.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k1l",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1k",
+									"text": "What we promise",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k1n",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1m",
+									"text": "You will always get the price before treatment, in writing. If something changes partway through, we stop and tell you.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "post-do-you-need-to-floss",
+				"slug": "do-you-need-to-floss",
+				"status": "published",
+				"data": {
+					"title": "Do you need to floss?",
+					"excerpt": "A straight answer, and what to do instead if you know you will never floss.",
+					"publish_date": "2026-08-29T00:00:00.000Z",
+					"author": "$ref:team-ana-whitlock",
+					"category": "Everyday care",
+					"featured_image": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/journal/do-you-need-to-floss/cover.jpg",
+							"filename": "journal-do-you-need-to-floss.jpg",
+							"alt": "Three wooden toothbrushes standing in a white cup next to a sprig of greenery."
+						}
+					},
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k1p",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1o",
+									"text": "Short answer: you need to clean between your teeth. Floss is one way to do it, and for a lot of people it is not the best one.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k1r",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1q",
+									"text": "Why between the teeth matters",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k1t",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1s",
+									"text": "Your toothbrush cleans about 60 percent of each tooth’s surface. The rest is the sides, where teeth touch. That is where most adult cavities and nearly all gum disease start.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k1v",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1u",
+									"text": "If you hate flossing",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k1x",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1w",
+									"text": "Try interdental brushes. They are tiny bottle brushes that slide between teeth, and most patients find them faster and easier than floss. We will show you which sizes fit your gaps at your next check-up.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k1z",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k1y",
+									"text": "Water flossers are another option, especially if you have braces, bridges or implants. They are less thorough than brushes but far better than nothing.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k21",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k20",
+									"text": "How often",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k23",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k22",
+									"text": "Once a day, any time. Before bed is ideal, but the best time is whichever one you will stick to.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k25",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k24",
+									"text": "What we will not do",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k27",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k26",
+									"text": "Lecture you about it. If you are not cleaning between your teeth now, starting with three nights a week is a real improvement, and we will notice it at your next visit.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "post-first-visit-nervous-kid",
+				"slug": "first-visit-nervous-kid",
+				"status": "published",
+				"data": {
+					"title": "Getting a nervous kid through their first check-up",
+					"excerpt": "What we tell parents the week before, what to say in the car, and the one word to avoid.",
+					"publish_date": "2026-09-18T00:00:00.000Z",
+					"author": "$ref:team-danielle-okafor",
+					"category": "Kids",
+					"featured_image": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/journal/first-visit-nervous-kid/cover.jpg",
+							"filename": "journal-first-visit-nervous-kid.jpg",
+							"alt": "A young girl in the dental chair grinning at her teeth in a hand mirror."
+						}
+					},
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k29",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k28",
+									"text": "I see three or four first visits a week. The kids who do best are not the bravest ones. They are the ones whose parents kept it boring.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k2b",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k2a",
+									"text": "The week before",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k2d",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k2c",
+									"text": "Read a picture book about the dentist together, once or twice. Let them brush a stuffed animal’s teeth. That is enough preparation. More than that and the visit starts to feel like a big deal, which is the opposite of what you want.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k2f",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k2e",
+									"text": "In the car",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k2h",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k2g",
+									"text": "Keep it short and true. “We’re going to count your teeth and see the chair that goes up and down.” Kids handle plain facts far better than reassurance. If you say “it won’t hurt”, the first thing they hear is the word hurt.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k2j",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k2i",
+									"text": "The word to avoid",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k2l",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k2k",
+									"text": "Shot. Also needle, drill and pull. We have our own words for the tools, like the tooth counter and the water squirt, and we would love you to leave the explaining to us.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k2n",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k2m",
+									"text": "When it does not go to plan",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k2p",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k2o",
+									"text": "Some kids cry. Some refuse to open their mouth. We have seen it all, and it is fine. A visit where your child sits in the chair, holds the mirror and goes home is still a good first visit. We will book a short follow-up and try again.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k2r",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k2q",
+									"text": "After",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k2t",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k2s",
+									"text": "Make a fuss of it, but not with sweets. A trip to the park or picking the dinner works well. Next time, they will remember the park.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"reviews": [
+			{
+				"id": "review-1",
+				"slug": "review-1",
+				"status": "published",
+				"data": {
+					"quote": "My son asked when he can go back. I did not know that was possible with a dentist.",
+					"name": "Rachel M.",
+					"where": "Sellwood",
+					"order": 1
+				}
+			},
+			{
+				"id": "review-2",
+				"slug": "review-2",
+				"status": "published",
+				"data": {
+					"quote": "Eleven years without a check-up and not one raised eyebrow. They gave me a plan and a price, and that was it.",
+					"name": "Tomás R.",
+					"where": "Brooklyn",
+					"order": 2
+				}
+			},
+			{
+				"id": "review-3",
+				"slug": "review-3",
+				"status": "published",
+				"data": {
+					"quote": "Marcus explained every noise before it happened. Easiest filling I have ever had.",
+					"name": "Keisha D.",
+					"where": "Woodstock",
+					"order": 3
+				}
+			},
+			{
+				"id": "review-4",
+				"slug": "review-4",
+				"status": "published",
+				"data": {
+					"quote": "They quoted the full cost on the phone, x-rays included, and the bill matched to the dollar.",
+					"name": "Greg H.",
+					"where": "Eastmoreland",
+					"order": 4
+				}
+			},
+			{
+				"id": "review-5",
+				"slug": "review-5",
+				"status": "published",
+				"data": {
+					"quote": "Chipped a tooth on a Monday morning, fixed by lunch. June found me a slot in ten minutes.",
+					"name": "Priya S.",
+					"where": "Westmoreland",
+					"order": 5
+				}
+			},
+			{
+				"id": "review-6",
+				"slug": "review-6",
+				"status": "published",
+				"data": {
+					"quote": "Danielle let my four-year-old count her own teeth with the mirror. She still talks about it.",
+					"name": "Laura K.",
+					"where": "Milwaukie",
+					"order": 6
+				}
+			}
+		],
+		"home_page": [
+			{
+				"id": "home_page-main",
+				"slug": "main",
+				"status": "published",
+				"data": {
+					"hero_title": "The family dentist",
+					"hero_accent": "nobody dreads.",
+					"hero_lede": "Unhurried check-ups, gentle kids’ visits and same-week emergencies in Sellwood, Portland. Prices up front, no lectures.",
+					"hero_image": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/pages/home/heroImage.jpg",
+							"filename": "home-hero.jpg",
+							"alt": "A young girl smiling up at her dentist from the chair while her mother sits beside her."
+						}
+					},
+					"hero_card_title": "Open Saturday mornings",
+					"hero_card_text": "8 am to 1 pm, for school kids and nine-to-fivers.",
+					"manifesto": "Most people put off the dentist because the last one made them feel rushed or judged. Linden is built around the opposite. We book longer appointments, explain before we touch anything, stop when you raise a hand, and tell you the price before you agree to it.",
+					"manifesto_cta_label": "How we work",
+					"manifesto_cta_link": "/about/",
+					"services_title": "What we do",
+					"visit_title": "Your first visit, start to finish.",
+					"visit_lede": "Five steps, about an hour. Here is exactly what happens, so nothing comes as a surprise.",
+					"visit_steps": [
+						{
+							"title": "Book in two minutes",
+							"body": "Online or by phone. Tick the box if you are nervous and we book you double time."
+						},
+						{
+							"title": "Arrive to a quiet room",
+							"body": "No TV blaring, no clipboard pile. June has your paperwork ready and the kettle on.",
+							"image": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/pages/home/visitSteps/1/image.jpg",
+									"filename": "home-visit-step-2.jpg",
+									"alt": "A calm, sunlit treatment room with a single dental chair."
+								}
+							}
+						},
+						{
+							"title": "Talk before anything",
+							"body": "You stay sitting up while we talk through what is bothering you and what you want from the visit.",
+							"image": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/pages/home/visitSteps/2/image.jpg",
+									"filename": "home-visit-step-3.jpg",
+									"alt": "A dentist chatting with a patient before her exam."
+								}
+							}
+						},
+						{
+							"title": "A gentle check-up",
+							"body": "We explain each step before it happens and stop the moment you raise your hand.",
+							"image": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/pages/home/visitSteps/3/image.jpg",
+									"filename": "home-visit-step-4.jpg",
+									"alt": "A child smiling at her teeth in a hand mirror."
+								}
+							}
+						},
+						{
+							"title": "Leave with a written plan",
+							"body": "What we found, what can wait, and what anything would cost. No surprises on the bill.",
+							"image": {
+								"$media": {
+									"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/pages/home/visitSteps/4/image.jpg",
+									"filename": "home-visit-step-5.jpg",
+									"alt": "A dentist walking a patient through her x-rays on a tablet."
+								}
+							}
+						}
+					],
+					"team_title": "The same four faces, every visit.",
+					"team_text": "No rotating locums. The people who know your teeth are the people who see you.",
+					"team_cta_label": "Meet the team",
+					"team_cta_link": "/about/#team",
+					"reviews_title": "What patients tell us",
+					"reviews_label": "Patient reviews",
+					"journal_title": "Straight answers, written by the team.",
+					"journal_cta_label": "Read the journal",
+					"journal_cta_link": "/journal/",
+					"find_title": "Come and see us.",
+					"find_image": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/pages/home/findImage.jpg",
+							"filename": "home-find.jpg",
+							"alt": "A patient checking in at the wooden front desk with a smiling coordinator."
+						}
+					},
+					"insurance": "Most PPO plans, plus Oregon Health Plan for kids. No insurance? Membership is $29 a month.",
+					"parking": "Free parking behind the building on SE 15th.",
+					"access": "Step-free entrance and an accessible treatment room."
+				}
+			}
+		],
+		"about_page": [
+			{
+				"id": "about_page-main",
+				"slug": "main",
+				"status": "published",
+				"data": {
+					"title": "A small practice, on purpose.",
+					"lede": "Four people, two treatment rooms and appointments long enough to talk properly. That is the whole idea.",
+					"image": {
+						"$media": {
+							"url": "https://raw.githubusercontent.com/utsavk-afk/linden-dental-astro/b5c0e85d2386a26403d7403ce655ddb0c1060c79/src/assets/pages/about/image.jpg",
+							"filename": "about-hero.jpg",
+							"alt": "A calm, sunlit treatment room with a single dental chair."
+						}
+					},
+					"story_title": "Why Linden exists",
+					"story": [
+						{
+							"paragraph": "Ana spent nine years in a downtown group practice where every check-up was booked into fifteen minutes. She liked the people. She did not like watching patients leave confused about what had just happened in their own mouths."
+						},
+						{
+							"paragraph": "In 2016 she took over a tired single-chair surgery on SE Tacoma Street, knocked through to the empty shop next door, and opened Linden with a simple rule: book less, explain more."
+						},
+						{
+							"paragraph": "Ten years on, most new patients find us through a neighbour. A lot of them have not seen a dentist in years. We think that says more about how dentistry is usually delivered than about them."
+						}
+					],
+					"principles_title": "What you can hold us to",
+					"principles": [
+						{
+							"icon": "clock",
+							"title": "Longer appointments",
+							"body": "An hour for a check-up, double time for nervous patients. We see fewer people a day so nobody is rushed."
+						},
+						{
+							"icon": "wallet",
+							"title": "Prices before treatment",
+							"body": "You get the full cost in writing before you agree to anything, including what insurance should cover."
+						},
+						{
+							"icon": "hand-waving",
+							"title": "A stop signal you control",
+							"body": "Raise your left hand and we stop. Every time, no questions, no sighing."
+						},
+						{
+							"icon": "chat-circle",
+							"title": "Explain, never lecture",
+							"body": "We show you what we see on screen and tell you what can wait. Flossing guilt is not part of the service."
+						}
+					],
+					"team_title": "The team",
+					"cta_title": "Come and meet us.",
+					"cta_text": "New patients are welcome most weeks. Book online, or call June and ask her anything first."
+				}
+			}
+		],
+		"services_page": [
+			{
+				"id": "services_page-main",
+				"slug": "main",
+				"status": "published",
+				"data": {
+					"title": "Everything a family needs, in one place.",
+					"lede": "From a first visit at age one to a crown at seventy. Every price below is the full price.",
+					"cta_title": "Not sure what you need?",
+					"cta_text": "Call June and describe what is going on. She will tell you which appointment to book and what it costs.",
+					"detail_back_label": "All services",
+					"detail_cost_label": "Cost",
+					"detail_time_label": "Time",
+					"detail_steps_title": "What happens",
+					"detail_faq_title": "Questions people ask",
+					"detail_more_title": "Also at Linden",
+					"meta_title": "Dental services in Sellwood, Portland",
+					"meta_description": "Check-ups, kids’ dentistry, nervous patients, fillings and crowns, emergency care, clear aligners and whitening in Sellwood, Portland. Real prices listed."
+				}
+			}
+		],
+		"journal_page": [
+			{
+				"id": "journal_page-main",
+				"slug": "main",
+				"status": "published",
+				"data": {
+					"title": "Journal",
+					"lede": "Plain answers to the questions we hear most, written by the people who answer them in the chair.",
+					"read_label": "Read it",
+					"post_back_label": "Journal",
+					"post_author_line": "{role} at Linden.",
+					"post_next_title": "Keep reading",
+					"post_updated_label": "Updated",
+					"post_draft_banner": "Draft preview. This post is not on the live site yet.",
+					"meta_title": "Journal: straight answers about your teeth",
+					"meta_description": "Plain answers to the questions patients ask us most: costs, kids’ visits, flossing and more."
+				}
+			}
+		],
+		"book_page": [
+			{
+				"id": "book_page-main",
+				"slug": "main",
+				"status": "published",
+				"data": {
+					"intro_title": "Book a visit",
+					"intro_lede": "Tell us a little about the visit. June replies within one working day with a time and the full price.",
+					"intro_call_label": "In pain right now?",
+					"next_steps": [
+						{
+							"icon": "envelope-simple",
+							"lead": "We confirm by email",
+							"text": "with a time, the price, and what your insurance should cover."
+						},
+						{
+							"icon": "clipboard-text",
+							"lead": "One short form",
+							"text": "to fill in at home. No clipboard in the waiting room."
+						},
+						{
+							"icon": "coffee",
+							"lead": "Arrive five minutes early",
+							"text": "if you like. Tea, coffee and a quiet room."
+						}
+					],
+					"form_who_legend": "Who is the visit for?",
+					"form_who_me": "Me",
+					"form_who_child": "My child",
+					"form_who_family": "A few of us",
+					"form_name": "Full name",
+					"form_phone": "Phone",
+					"form_email": "Email",
+					"form_email_help": "We only use this to confirm your appointment.",
+					"form_reason": "Reason for the visit",
+					"form_reason_placeholder": "Choose one",
+					"form_days": "Times that usually work",
+					"form_nervous_lead": "I feel nervous about the dentist.",
+					"form_nervous_text": "We will book double time and go at your pace.",
+					"form_notes": "Anything else we should know?",
+					"form_optional": "(optional)",
+					"form_submit": "Send request",
+					"form_sending": "Sending",
+					"form_fine_staging": "Staging: requests are saved to the Linden demo backend. Please use test details only.",
+					"form_fine_concept": "This is a concept site, so requests are not sent anywhere.",
+					"options_reasons": [
+						{
+							"option": "Check-up and clean"
+						},
+						{
+							"option": "Kids’ check-up"
+						},
+						{
+							"option": "Toothache or something broken"
+						},
+						{
+							"option": "Filling or crown"
+						},
+						{
+							"option": "Clear aligners consult"
+						},
+						{
+							"option": "Whitening"
+						},
+						{
+							"option": "Not sure yet"
+						}
+					],
+					"options_days": [
+						{
+							"option": "Weekday mornings"
+						},
+						{
+							"option": "Weekday afternoons"
+						},
+						{
+							"option": "Saturday morning"
+						}
+					],
+					"messages_name": "Please tell us your name.",
+					"messages_email_missing": "We need an email to confirm your visit.",
+					"messages_email_invalid": "That email looks incomplete.",
+					"messages_phone_missing": "A phone number helps if we need to move things around.",
+					"messages_phone_pattern": "Use digits, for example 503 555 0142.",
+					"messages_reason": "Pick the closest reason. You can explain more below.",
+					"messages_field_invalid": "Please check this field.",
+					"messages_send_failed": "We could not send that just now.",
+					"messages_retry": "Please try again, or call us.",
+					"success_heading_prefix": "Thanks,",
+					"success_heading_suffix": ".",
+					"success_text": "June will email you within one working day with a time and the full price. If it is urgent, call {phone}.",
+					"success_link_label": "While you wait, read the journal",
+					"success_link_link": "/journal/",
+					"meta_title": "Book a visit",
+					"meta_description": "Request an appointment at Linden Dental Studio. We reply within one working day with a time and the full price."
+				}
+			}
+		],
+		"not_found_page": [
+			{
+				"id": "not_found_page-main",
+				"slug": "main",
+				"status": "published",
+				"data": {
+					"page_title": "Page not found",
+					"title": "This page has gone missing.",
+					"lede": "The link may be old, or the page may have moved. The rest of the site is still here.",
+					"primary_label": "Back to home",
+					"primary_link": "/",
+					"secondary_label": "See our services",
+					"secondary_link": "/services/"
+				}
+			}
+		],
+		"design_page": [
+			{
+				"id": "design_page-main",
+				"slug": "main",
+				"status": "published",
+				"data": {
+					"title": "Design language",
+					"lede": "Warm minimal, for a family dentist. Calm enough for a nervous adult, friendly enough for a four-year-old, and specific enough to feel like a real neighbourhood practice.",
+					"principles_title": "Principles",
+					"principles_items": [
+						{
+							"title": "Calm over clinical",
+							"text": "No hospital blue, no stock tooth renders. Paper tones, forest ink and real people."
+						},
+						{
+							"title": "Say the price",
+							"text": "Copy is plain and specific. Real prices, real times, no \"starting from\"."
+						},
+						{
+							"title": "Motion explains",
+							"text": "Every animation reveals order or depth. Nothing loops for show, and reduced motion turns it all off."
+						}
+					],
+					"colour_title": "Colour",
+					"colour_intro": "One accent. Bloom is a tint, used once per section at most, never on a control. Each theme is designed on its own terms.",
+					"colour_swatches": [
+						{
+							"token": "--bg",
+							"name": "Linden paper",
+							"use": "Page background. A pale, slightly green paper rather than cream."
+						},
+						{
+							"token": "--bg-2",
+							"name": "Sage wash",
+							"use": "Section tint, icon wells, footer."
+						},
+						{
+							"token": "--surface",
+							"name": "Surface",
+							"use": "Cards, form panel, review cards."
+						},
+						{
+							"token": "--ink",
+							"name": "Forest ink",
+							"use": "Headlines and body text."
+						},
+						{
+							"token": "--ink-2",
+							"name": "Moss",
+							"use": "Secondary text. Passes AA on every surface."
+						},
+						{
+							"token": "--accent",
+							"name": "Linden green",
+							"use": "The one accent. Buttons, links, active states."
+						},
+						{
+							"token": "--bloom",
+							"name": "Blossom",
+							"use": "Quiet tint for one highlight per section. Never on controls."
+						}
+					],
+					"type_title": "Type",
+					"type_intro": "Bricolage Grotesque for display: warm, slightly irregular, with optical sizes. Figtree for text: round and very readable. Emphasis uses colour, never italics.",
+					"type_specimens": [
+						{
+							"step": "--step-5",
+							"label": "Display",
+							"sample": "The family dentist"
+						},
+						{
+							"step": "--step-4",
+							"label": "Section",
+							"sample": "Come and see us."
+						},
+						{
+							"step": "--step-3",
+							"label": "Feature",
+							"sample": "Check-ups and cleanings"
+						},
+						{
+							"step": "--step-2",
+							"label": "Card",
+							"sample": "Leave with a written plan"
+						},
+						{
+							"step": "--step-1",
+							"label": "Lede",
+							"sample": "Prices up front, no lectures."
+						},
+						{
+							"step": "--step-0",
+							"label": "Body",
+							"sample": "We book longer appointments and explain before we touch anything."
+						}
+					],
+					"components_title": "Shape and components",
+					"components_intro": "Media and panels use soft corners (28px for photos, 18px for cards). Every interactive control is a pill. That rule holds on every page.",
+					"components_primary_button": "Book a visit",
+					"components_secondary_button": "Secondary",
+					"components_text_link": "Text link",
+					"motion_title": "Motion",
+					"motion_intro": "GSAP with ScrollTrigger and SplitText. Each effect is opt-in by data attribute, moves only position and opacity, and switches off for anyone who prefers reduced motion.",
+					"motion_items": [
+						{
+							"name": "Hero opening",
+							"why": "Draws the eye to the photo first, then the promise.",
+							"how": "clip-path inset to full frame, image eases from 1.28 to 1.08 scale, card lifts in last."
+						},
+						{
+							"name": "Line reveals",
+							"why": "Gives each section heading a clear arrival without moving body text.",
+							"how": "GSAP SplitText lines in a mask, once, on enter."
+						},
+						{
+							"name": "Manifesto fill",
+							"why": "Reads the core promise at the visitor's pace.",
+							"how": "Words go from 16% to 100% opacity, scrubbed to scroll."
+						},
+						{
+							"name": "First-visit pan",
+							"why": "Tells the appointment as a sequence, which is what nervous patients want to know.",
+							"how": "Section pins at the top; vertical scroll moves the track sideways. Swipeable list on touch screens."
+						},
+						{
+							"name": "Service preview",
+							"why": "Puts a face to each service without adding images to the list.",
+							"how": "A photo follows the cursor and swaps per row. Fine pointers only."
+						},
+						{
+							"name": "Parallax frames",
+							"why": "Adds depth to framed photos so the calm layout does not feel flat.",
+							"how": "Image drifts within its frame, about 5 to 8 percent."
+						},
+						{
+							"name": "Reading progress",
+							"why": "Shows how much of a journal post is left.",
+							"how": "A 3px bar under the nav, scrubbed to the article."
+						}
+					],
+					"inspiration_title": "Inspiration",
+					"inspiration_intro": "UK and US studios only. We studied each one and took a single idea from it.",
+					"inspiration_items": [
+						{
+							"who": "Havenise Studio",
+							"where": "United States",
+							"title": "Dental Website, Confidence Before the Appointment",
+							"url": "https://dribbble.com/shots/27731839-Dental-Website-Confidence-Before-the-Appointment",
+							"took": "Warm off-white base and a small card sitting on the hero photo. Ours carries opening hours instead of a booking widget."
+						},
+						{
+							"who": "Phenomenon Studio",
+							"where": "United States",
+							"title": "Bloom, mental health clinic",
+							"url": "https://dribbble.com/shots/26661884-Mental-Health-Clinic-Web-Design-Bloom",
+							"took": "The inset, rounded photo frame. It became the hero reveal: the frame opens out from an inset clip."
+						},
+						{
+							"who": "Phenomenon Studio",
+							"where": "United States",
+							"title": "Atelier Aesthetica, aesthetic clinic",
+							"url": "https://dribbble.com/shots/27705580-Aesthetic-Clinic-Website-Design-Atelier-Aesthetica",
+							"took": "Calm pacing, generous margins and short, declarative headlines."
+						},
+						{
+							"who": "Cuberto",
+							"where": "San Francisco, CA",
+							"title": "Website and motion concept for a dentist clinic",
+							"url": "https://dribbble.com/shots/20124844-Motion-design-concept-for-dentist-clinic",
+							"took": "Real, diverse faces and motion that feels playful without being loud. The cursor-follow photo on the services list comes from here."
+						},
+						{
+							"who": "Musemind",
+							"where": "New York City, NY",
+							"title": "Women's hormone clinic",
+							"url": "https://dribbble.com/shots/27787277-Healthcare-Website-UI-UX-Women-s-Hormone-Clinic-Web-Design",
+							"took": "A single reassuring sentence given the whole screen. That is our scroll-filled manifesto."
+						},
+						{
+							"who": "Nixtio",
+							"where": "New York City, NY",
+							"title": "Dental clinic landing page",
+							"url": "https://dribbble.com/shots/19948281-Dental-Clinic-Landing-Page",
+							"took": "Big confident type set against photography, and process explained as a sequence of image cards."
+						},
+						{
+							"who": "Phenomenon Studio",
+							"where": "United States",
+							"title": "Nova Dental, team page",
+							"url": "https://dribbble.com/shots/26633521-Nova-Dental-Team-Page-for-Dental-Website-UI-Design",
+							"took": "Large portraits with a human detail beside each one, which shaped our team bios."
+						}
+					],
+					"meta_description": "The design system behind the Linden Dental Studio concept site: colour, type, shape, motion and the UK/US work that inspired it."
+				}
+			}
+		],
+		"site_settings": [
+			{
+				"id": "site_settings-main",
+				"slug": "main",
+				"status": "published",
+				"data": {
+					"name": "Linden Dental Studio",
+					"logo_word": "Linden",
+					"logo_sub": "Dental Studio",
+					"tagline": "Family dentistry in Sellwood, Portland",
+					"phone": "(503) 555-0142",
+					"email": "hello@lindendental.example",
+					"address_line_1": "1504 SE Tacoma St",
+					"address_line_2": "Portland, OR 97202",
+					"map_link": "https://www.openstreetmap.org/search?query=SE%20Tacoma%20St%20Portland",
+					"hours": [
+						{
+							"days": "Mon to Thu",
+							"time": "7:30 am to 6:00 pm"
+						},
+						{
+							"days": "Friday",
+							"time": "7:30 am to 3:00 pm"
+						},
+						{
+							"days": "Saturday",
+							"time": "8:00 am to 1:00 pm"
+						}
+					],
+					"primary_cta_label": "Book a visit abc",
+					"primary_cta_link": "/book/",
+					"cta_band_title": "Ready when you are.",
+					"cta_band_text": "Book online in two minutes, or call June and she will find you a time that suits.",
+					"footer_intro": "Check-ups, kids’ visits and same-week emergencies, without the lecture.",
+					"footer_visit_heading": "Visit",
+					"footer_hours_heading": "Hours",
+					"footer_contact_heading": "Contact",
+					"footer_directions_label": "Get directions",
+					"footer_note": "A fictional practice. Concept site built with Astro and GSAP.",
+					"labels_skip_link": "Skip to content",
+					"labels_menu": "Menu",
+					"labels_theme_toggle": "Dark theme",
+					"labels_min_read": "min read",
+					"labels_step_of": "Step {n} of {total}",
+					"labels_pause": "Pause",
+					"labels_play": "Play",
+					"labels_main_nav": "Main",
+					"labels_home_link": "{name}, home",
+					"labels_portrait_alt": "Portrait of {name}",
+					"seo_default_title": "Linden Dental Studio | Family dentist in Sellwood, Portland",
+					"seo_title_suffix": "| Linden Dental Studio",
+					"seo_default_description": "Linden Dental Studio: friendly family dentistry in Sellwood, Portland. Check-ups, kids’ dentistry, emergencies and clear aligners, with prices up front."
+				}
+			}
+		]
+	}
+}

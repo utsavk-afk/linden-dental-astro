@@ -1,29 +1,28 @@
 ---
-import { url } from '../../lib/url';
-import { Image } from 'astro:assets';
-import { getCollection, render } from 'astro:content';
+import { url, publicPath } from '../../lib/url';
+import { getServices, getServicesPage } from '../../lib/cms';
 import { faqSchema, breadcrumbSchema } from '../../lib/seo';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import CtaBand from '../../components/CtaBand.astro';
-import { site } from '../../data/site';
-import { servicesPage as page } from '../../lib/content';
+import CmsImage from '../../components/CmsImage.astro';
+import RichText from '../../components/RichText.astro';
+import { getSite } from '../../data/site';
 
-export async function getStaticPaths() {
-  const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
-  return services.map((entry, i) => ({
-    params: { slug: entry.id },
-    props: { entry, others: [1, 2, 3].map((n) => services[(i + n) % services.length]) },
-  }));
-}
-const { entry, others } = Astro.props;
-const { Content } = await render(entry);
-const s = entry.data;
+// Rendered per request. One getServices() call serves both the page and "Also at Linden"
+// (the next three services in order, wrapping round).
+const slug = Astro.params.slug ?? '';
+const [services, page, site] = await Promise.all([getServices(), getServicesPage(), getSite()]);
+const i = services.findIndex((x) => x.id === slug);
+// Unknown slug: a null-body 404 makes Astro render src/pages/404.astro with status 404.
+if (i < 0) return new Response(null, { status: 404 });
+const s = services[i];
+const others = services.length > 1 ? [1, 2, 3].map((n) => services[(i + n) % services.length]) : [];
 const t = page.detail;
 const siteUrl = new URL(url('/'), Astro.site).href;
 const jsonLd = [
   faqSchema(s.faqs),
-  breadcrumbSchema([{ name: 'Home', url: siteUrl }, { name: 'Services', url: new URL(url('/services/'), Astro.site).href }, { name: s.title, url: new URL(Astro.url.pathname, Astro.site).href }]),
+  breadcrumbSchema([{ name: 'Home', url: siteUrl }, { name: 'Services', url: new URL(url('/services/'), Astro.site).href }, { name: s.title, url: new URL(publicPath(Astro.url.pathname), Astro.site).href }]),
 ];
 ---
 <Base title={s.seoTitle || s.title} description={s.seoDescription || s.summary} image={s.photo} jsonLd={jsonLd}>
@@ -42,13 +41,13 @@ const jsonLd = [
           <a class="btn btn--lg" href={site.cta.href}>{site.cta.label} <Icon name="arrow-right" /></a>
         </div>
       </div>
-      <div class="frame hero__img" data-parallax="6"><Image src={s.photo} alt={s.photoAlt} layout="full-width" loading="eager" /></div>
+      <div class="frame hero__img" data-parallax="6"><CmsImage image={s.photo} alt={s.photoAlt} layout="full-width" loading="eager" /></div>
     </div>
   </section>
 
   <section class="section">
     <div class="wrap detail">
-      <div class="detail__intro prose" data-reveal><Content /></div>
+      <div class="detail__intro prose" data-reveal><RichText value={s.body} /></div>
       {s.steps.length > 0 && (
       <div class="steps">
         <h2 class="steps__title" data-split>{t.stepsTitle}</h2>
@@ -81,6 +80,7 @@ const jsonLd = [
     </section>
   )}
 
+  {others.length > 0 && (
   <section class="section more">
     <div class="wrap">
       <h2 class="more__title">{t.moreTitle}</h2>
@@ -88,8 +88,8 @@ const jsonLd = [
         {others.map((o) => (
           <li data-reveal>
             <a href={url(`/services/${o.id}/`)}>
-              <span class="more__icon"><Icon name={o.data.icon} /></span>
-              <span><strong>{o.data.title}</strong><span class="muted">{o.data.duration}</span></span>
+              <span class="more__icon"><Icon name={o.icon} /></span>
+              <span><strong>{o.title}</strong><span class="muted">{o.duration}</span></span>
               <Icon name="arrow-right" class="more__go" />
             </a>
           </li>
@@ -97,6 +97,7 @@ const jsonLd = [
       </ul>
     </div>
   </section>
+  )}
 
   <CtaBand title={t.ctaTitle || undefined} body={t.ctaText || undefined} />
 </Base>

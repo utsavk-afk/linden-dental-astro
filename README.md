@@ -1,6 +1,6 @@
 # Linden Dental Studio concept site
 
-A concept website for Linden Dental Studio, a family dental practice in Sellwood, Portland, Oregon. The practice, its staff, its patients and their reviews are all fictional, and the footer of every page says so. The site is a static Astro build with hand-written CSS, GSAP scroll motion, light and dark themes, and a booking form that validates in the browser but sends nothing. Phone numbers use the reserved 555-01xx range.
+A concept website for Linden Dental Studio, a family dental practice in Sellwood, Portland, Oregon. The practice, its staff, its patients and their reviews are all fictional, and the footer of every page says so. The site is a server-rendered Astro app with the EmDash CMS, hand-written CSS, GSAP scroll motion, light and dark themes, and a booking form that validates in the browser and posts to a booking endpoint when one is configured (otherwise it only simulates a send). Phone numbers use the reserved 555-01xx range.
 
 The design language (colour, type, shape, motion, inspiration) is documented in [DESIGN.md](DESIGN.md) and rendered live at `/design/`.
 
@@ -10,24 +10,45 @@ You need Node 22.12 or newer.
 
 ```sh
 npm install
-npm run dev       # dev server at http://localhost:4321
-npm run build     # resizes photos (prebuild), then writes the static site to dist/
-npm run preview   # serves dist/ locally to check the production build
+npm run dev       # dev server at http://localhost:4321, CMS admin at http://localhost:4321/_emdash/admin
+npm run build     # resizes photos (prebuild), then builds the Node server to dist/
+npm run preview   # runs the built server locally to check the production build
 ```
 
 `npm run photos` runs the photo resize step on its own. It also runs automatically before every build.
+
+On first run, open `/_emdash/admin`. The setup wizard applies `seed/seed.json` (the content model plus all the site content) and asks you to create a passkey login. Seed media is downloaded from a pinned GitHub commit of this repo.
+
+**Certificate errors.** If seed media downloads fail with TLS or certificate errors (this corporate machine intercepts TLS), start the dev server with the system CA store and the `.env` file loaded:
+
+```sh
+node --use-system-ca --env-file=.env node_modules/astro/bin/astro.mjs dev --port 4321
+```
+
+### Local data and secrets
+
+| What | Default | Env var |
+| --- | --- | --- |
+| Content database (SQLite) | `./data/emdash.db` | `LINDEN_DB` |
+| Uploaded media | `./uploads` | `LINDEN_UPLOADS` |
+| Admin login sessions | `./data/sessions` | `LINDEN_SESSIONS` |
+
+These three paths are inlined at build time (EmDash serialises the config), so set them before `astro build`, not only when starting the server. `data/` and `uploads/` are gitignored.
+
+`EMDASH_ENCRYPTION_KEY` lives in `.env` (gitignored). Back it up, because the database depends on it and it is not stored anywhere else. The standalone production server does not read `.env`, so production needs it as a real environment variable. Production setup also needs `EMDASH_SITE_URL` (the public origin) at runtime.
 
 ## Stack
 
 | Part | What we use |
 | --- | --- |
-| Framework | Astro 6.4, static output |
-| Content | Content collections (glob loader): services and journal as Markdown, team and page copy as JSON. Edited in the Keystatic CMS (local mode) |
-| Images | `astro:assets` with responsive `srcset`, WebP output, default layout `constrained` |
+| Framework | Astro 6.4, server output (`output: 'server'`, `@astrojs/node` standalone) |
+| CMS | EmDash 1.3: content in SQLite, media on disk, admin at `/_emdash/admin`. Read at request time through EmDash live collections (`src/live.config.ts`) |
+| Images | EmDash media rendered with the `Image` component from `emdash/ui` (`src/components/CmsImage.astro`), default layout `constrained` |
+| Rich text | Portable Text, rendered with `PortableText` from `emdash/ui` (`src/components/RichText.astro`) |
 | Page changes | Astro `ClientRouter` view transitions, link prefetch on hover |
 | Motion | GSAP 3.15 with ScrollTrigger and SplitText |
 | Fonts | Self-hosted with `@fontsource-variable`: Bricolage Grotesque (display), Figtree (text) |
-| Icons | Phosphor (regular weight), inlined as SVG at build time by `src/components/Icon.astro` |
+| Icons | Phosphor (regular weight), inlined as SVG by `src/components/Icon.astro` |
 | CSS | No framework. Tokens and base rules in `src/styles/global.css`, component styles scoped in each `.astro` file |
 
 ## Pages
@@ -37,23 +58,30 @@ npm run preview   # serves dist/ locally to check the production build
 | `/` | `src/pages/index.astro` |
 | `/about/` | `src/pages/about.astro` |
 | `/services/` | `src/pages/services/index.astro` |
-| `/services/<slug>/` (7 pages) | `src/pages/services/[slug].astro` |
+| `/services/<slug>/` (one per service, 7 in the seed) | `src/pages/services/[slug].astro` |
 | `/journal/` | `src/pages/journal/index.astro` |
-| `/journal/<slug>/` (4 posts) | `src/pages/journal/[slug].astro` |
+| `/journal/<slug>/` (one per post, 4 in the seed) | `src/pages/journal/[slug].astro` |
 | `/book/` | `src/pages/book.astro` |
 | `/design/` | `src/pages/design.astro`, the living design-language page |
-| 404 | `src/pages/404.astro` |
+| `/sitemap.xml`, `/robots.txt`, `/rss.xml` | `src/pages/sitemap.xml.ts`, `robots.txt.ts`, `rss.xml.ts` (override EmDash's built-in versions so URLs carry the link prefix) |
+| 404 | `src/pages/404.astro`, rendered on demand for every unmatched route |
 
 ## Project structure
 
 ```text
 linden-dental-astro/
-├── astro.config.mjs          site URL (placeholder), prefetch, image layout
+├── astro.config.mjs          server output, EmDash (database, storage), sessions, prefetch
 ├── package.json
 ├── tsconfig.json
+├── emdash-env.d.ts           collection types, generated by EmDash on dev start
+├── .env                      EMDASH_ENCRYPTION_KEY (gitignored, back it up)
 ├── README.md
 ├── DESIGN.md                 design language for designers
 ├── AGENTS.md                 notes for coding agents
+├── seed/
+│   └── seed.json             content model, menus and all site content (applied by the setup wizard)
+├── data/                     local SQLite database and admin sessions (gitignored)
+├── uploads/                  local media library (gitignored)
 ├── public/
 │   └── favicon.svg
 ├── docs/
@@ -67,27 +95,27 @@ linden-dental-astro/
 │       ├── probe.mjs
 │       └── slots.json
 └── src/
-    ├── content.config.ts     collection schemas (services, journal, team)
-    ├── assets/photos/        19 web-sized JPEGs (committed)
+    ├── live.config.ts        EmDash live collection loader
+    ├── middleware.ts         X-Robots-Tag noindex header on staging
+    ├── assets/photos/        19 web-sized JPEGs (committed); hero-family.jpg is the default share image
     ├── components/
+    │   ├── CmsImage.astro    renders an EmDash image
     │   ├── CtaBand.astro     closing call-to-action band
     │   ├── Footer.astro
     │   ├── Icon.astro        Phosphor icon allow-list
     │   ├── Logo.astro        leaf mark + wordmark
-    │   └── Nav.astro         sticky header, theme toggle, mobile menu
-    ├── content/
-    │   ├── services/         7 Markdown files
-    │   ├── journal/          4 Markdown files
-    │   ├── team/             one JSON file per team member
-    │   ├── pages/            home, about and listing-page copy + SEO (CMS singletons)
-    │   ├── settings.json     practice details + SEO defaults
-    │   └── reviews.json      the review strip
+    │   ├── Nav.astro         sticky header, theme toggle, mobile menu
+    │   ├── RichText.astro    renders Portable Text content
+    │   └── RichTextLink.astro  adds the link prefix to internal links in rich text
     ├── data/
-    │   ├── design.ts         palette, inspirations, motion list (feeds /design/)
-    │   ├── reviews.ts        sample reviews (fictional)
-    │   └── site.ts           derives links from content/settings.json
+    │   ├── design.ts         palette hex values for /design/ (names and use text are in the CMS)
+    │   └── site.ts           derives links and practice details from Site settings
     ├── layouts/
-    │   └── Base.astro        head, skip link, theme and motion flags, nav, footer
+    │   └── Base.astro        head, SEO tags, skip link, theme and motion flags, nav, footer
+    ├── lib/
+    │   ├── cms.ts            all content reads (getSettings, getHomePage, getServices, getPosts...)
+    │   ├── seo.ts            JSON-LD builders
+    │   └── url.ts            link prefix helpers (url, href, publicPath)
     ├── pages/                see the table above
     ├── scripts/
     │   ├── motion.ts         GSAP motion layer (data-attribute API below)
@@ -96,57 +124,54 @@ linden-dental-astro/
         └── global.css        tokens, base type, buttons, frames, motion gating
 ```
 
-## Editing content (Keystatic CMS)
+## Editing content (EmDash CMS)
 
-Every piece of text, every photo and all SEO fields can be edited in a visual CMS. No code needed.
+Every piece of text, every photo and all SEO fields are edited in the EmDash admin at `/_emdash/admin` (locally <http://localhost:4321/_emdash/admin>, on staging <https://stanventures-psi.fly.dev/_emdash/admin>). No code needed. Sign in with your passkey, edit, and save or publish. Content changes go live immediately with no rebuild or deploy. Code and design changes still need a deploy (see Deploying).
 
-1. Run `npm run dev`.
-2. Open http://localhost:4321/keystatic.
-3. Edit and press **Save**. The change is written straight into the files in `src/content` (images into `src/assets`) and shows on http://localhost:4321 within a second.
-4. Publish: commit and push to GitHub, then run the staging deploy (see Deploying).
+The content model comes from `seed/seed.json`: 12 collections and 2 menus.
 
-The CMS runs on your machine only (Keystatic local mode). The published site stays fully static, so there is no admin login to secure on the live server. To edit from a browser on staging instead, Keystatic can switch to GitHub mode, which needs a small server and a GitHub App.
+| Admin screen | What it edits |
+| --- | --- |
+| Home page | Every heading, paragraph, button/link (text + URL) and photo, the first-visit steps, meta tags |
+| About page | H1, story, principles, team heading, call to action band, meta tags |
+| Services page | Listing H1/intro plus every label on service detail pages |
+| Journal page | Listing H1/intro plus the labels on every post (back link, author line, updated, draft banner) |
+| Book a visit page | Every word of the booking page: labels, options, error messages, success message |
+| Page not found (404) | Page not found copy and buttons |
+| Design language page | The words on /design/ |
+| Site settings and SEO | Practice details, hours, booking button, footer, default CTA band, accessibility labels, default meta tags |
+| Services | One page per service: excerpt, price, length, steps, FAQs, content, featured image |
+| Journal (blog posts) | H1, excerpt, author, category, dates, featured image, rich-text content |
+| Team | Name, role, portrait, bio, outside-work line |
+| Reviews | The scrolling review strip |
+| Menus > primary, footer | Header navigation and the extra footer links |
+| Redirects | Old URL to new URL, for changed slugs |
+| Media library | Every uploaded photo |
 
-| CMS screen | What it edits | File(s) |
-|---|---|---|
-| Pages > Home page | Every heading, paragraph, button/link (text + URL) and photo, the first-visit steps, meta tags | `src/content/pages/home.json` |
-| Pages > About page | H1, story, principles, team heading, call to action band, meta tags | `src/content/pages/about.json` |
-| Pages > Services page | Listing H1/intro/banner plus every label on service detail pages | `src/content/pages/servicesPage.json` |
-| Pages > Journal page | Listing H1/intro plus the labels on every post (back link, author line, updated, draft banner) | `src/content/pages/journalPage.json` |
-| Pages > Book a visit page | Every word of the booking page: labels, options, error messages, success message | `src/content/pages/bookPage.json` |
-| Pages > 404 page | Page not found copy and buttons | `src/content/pages/notFound.json` |
-| Pages > Design page | The whole /design/ page | `src/content/pages/designPage.json` |
-| Content > Services | One page per service: excerpt, price, steps, FAQs, content, featured image, meta tags | `src/content/services/<slug>.md` |
-| Content > Journal | Blog posts: H1, excerpt, author, category, dates, featured image, rich-text content, meta tags | `src/content/journal/<slug>.md` |
-| Content > Team | Name, role, portrait, bio, outside-work line | `src/content/team/<slug>.json` |
-| Content > Reviews | The scrolling review strip | `src/content/reviews.json` |
-| Settings > Site settings | Practice details, hours, header menu, booking button, footer, default CTA band, accessibility labels, default meta tags | `src/content/settings.json` |
-| Settings > Redirects (301) | Old URL to new URL, for changed slugs | `src/content/redirects.json` |
+Each page (Home, About, Services page, Journal page, Book, 404, Design, Site settings) is its own collection with a single entry whose slug is `main`. Services, Journal, Team and Reviews are normal collections with one entry per item. Services and journal posts also get EmDash's built-in SEO panel per entry (meta title, meta description, OG image, canonical, noindex).
 
-Field labels follow WordPress / Yoast wording (H1 heading, Intro paragraph, Meta title, Meta description, Excerpt, Featured image alt text, Open Graph image). Required fields cannot be saved empty; optional ones fall back to sensible defaults (`src/lib/content.ts`). Every build runs `scripts/check-content.mjs`, which fails on raw `{% %}` tags, missing images or a post whose author is not a team member.
-
-All content is typed by the schemas in `src/content.config.ts`, so a missing or misspelled field fails the build with a clear message instead of shipping a broken page.
+Field labels follow WordPress / Yoast wording (H1 heading, Intro paragraph, Meta title, Meta description, Excerpt, Featured image alt text). Pages read content through `src/lib/cms.ts` (`getSettings`, `getHomePage`, `getAboutPage`, `getServices`, `getPosts` and the other page getters), which maps the CMS fields to the shapes the templates use. A missing or empty field falls back to a default, and a failed query logs an error and renders defaults instead of a 500.
 
 ### Writing a blog post
 
-In the CMS open **Journal (blog)** and choose **Create**. Type the title (the URL slug fills in from it), pick the author from the team list, upload a cover photo, write the article in the editor (headings, bold, links, lists and inline images all work), then Save.
+Open **Journal (blog posts)** and create an entry. Type the title (the slug fills in from it), pick the author from the team, upload a featured image, write the article in the rich-text editor (headings, bold, links, lists and inline images all work), then publish.
 
-- **Draft** keeps a post on your local preview only; it is left out of the published build, the sitemap and the journal list until you untick it.
+- Posts support drafts, revisions, scheduled publishing and preview. Drafts stay off the public journal list, the sitemap and the RSS feed. Staging sets `PUBLIC_SHOW_DRAFTS=1`, so drafts show there (with a draft banner) for review.
 - Read time is calculated from the article length. Use headings from level 2 down, because the title is the page's only h1.
-- Inline images in an article are saved under `src/assets/journal/<slug>/` and optimised by Astro like every other photo.
+- Internal links typed in an article (for example `/services/kids/`) get the link prefix automatically on staging.
 
 ### Services and team
 
-Service, post and team images live in one folder per entry, for example `src/assets/services/kids/photo.jpg`. That is the layout Keystatic expects; uploading a new photo in the CMS replaces the file there. Service icons come from the allow-list in `src/components/Icon.astro`. The home page team bento has exactly four grid areas, so a fifth person needs a small layout change in `index.astro`.
+Service icons come from the allow-list in `src/components/Icon.astro` (the Icon field is a select of those names). Order is set by the Menu order field. The home page team bento has exactly four grid areas, so a fifth person needs a small layout change in `index.astro`.
 
 ## SEO
 
-- **Per page:** every service and post has optional SEO title and SEO description fields. Home and About also take a social share image. Empty fields fall back to the page title and summary.
+- **Per page:** the Home, About, Services, Journal, Book and Design page collections have Meta title and Meta description fields, and Home and About also take a social share image. Services and posts use the SEO panel. Empty fields fall back to the page title and summary, then to the defaults in Site settings.
 - **Titles:** the site suffix (Site settings) is added automatically, for example "Kids’ dentistry | Linden Dental Studio".
-- **Social cards:** Open Graph and Twitter tags on every page, with the share image cropped to 1200 x 630.
+- **Social cards:** Open Graph and Twitter tags on every page. The default share image is `src/assets/photos/hero-family.jpg`, cropped to 1200 x 630; a CMS image is used as uploaded.
 - **Structured data (JSON-LD):** a `Dentist` listing on every page (name, address, phone, email, opening hours, all built from Site settings), `FAQPage` on service pages, `Article` on posts, and `BreadcrumbList` on detail pages.
-- **Sitemap and robots:** `@astrojs/sitemap` writes `sitemap-index.xml`; `robots.txt` points to it. Staging builds (`PUBLIC_NOINDEX=1`) add a noindex meta tag and a robots.txt that blocks everything, so staging never competes with the real site.
-- **Canonical URLs** come from `site` and `base` in `astro.config.mjs`. Set `LINDEN_SITE` to the real domain before launch.
+- **Sitemap, robots and RSS:** `/sitemap.xml` lists the fixed pages, every service and every published post; `/robots.txt` points to it; `/rss.xml` carries the journal. With `PUBLIC_NOINDEX=1` (staging) every page gets a noindex meta tag, `src/middleware.ts` sends an `X-Robots-Tag: noindex, nofollow` header on every response (pages, feeds and admin), and robots.txt blocks everything, so staging never competes with the real site.
+- **Canonical URLs** come from `site` in `astro.config.mjs`, which reads `EMDASH_SITE_URL` (or `LINDEN_SITE`) and falls back to `http://localhost:4321`. Set it to the real domain before launch.
 
 ## Photo pipeline
 
@@ -154,7 +179,7 @@ The 19 photos are licensed stock from Envato Elements, downloaded under the proj
 
 1. Licensed originals go in `docs/envato-downloads/`, named as in the shortlist (any extension). This folder is gitignored, so originals never reach the repo.
 2. `npm run photos` (also the `prebuild` step) runs `scripts/photos.mjs`. It resizes each original to fit within 2000px, rotates by EXIF, and writes a JPEG at quality 82 to `src/assets/photos/`. It skips files whose output is already newer than the original.
-3. Astro's `<Image>` generates responsive WebP sizes from those JPEGs at build time.
+3. On the site, photos come from the EmDash media library. The seed imports them from a pinned commit of this repo; new or replaced photos are uploaded in the admin. The committed `src/assets/photos/` copies supply the default share image.
 
 On a fresh clone the originals folder does not exist. The script exits without doing anything and the build uses the committed web copies.
 
@@ -185,7 +210,7 @@ Motion lives in `src/scripts/motion.ts`. Every effect is opt-in: add a data attr
 | `data-progress`, `data-article` | Reading progress bar under the nav, scrubbed to the article | Journal posts (`progress` prop on `Base.astro`) |
 | `data-nav` | Header tucks away while scrolling down and returns on any upward scroll | `Nav.astro` |
 
-UI behaviour in `src/scripts/ui.ts` uses the same pattern: `data-theme-toggle`, `data-menu-toggle` and `data-menu`, and `data-book-form` with `data-book-success` and `data-first-name`.
+UI behaviour in `src/scripts/ui.ts` uses the same pattern: `data-theme-toggle`, `data-menu-toggle` and `data-menu`, and `data-book-form` (with `data-endpoint`) with `data-book-success` and `data-first-name`.
 
 **Content is visible without JavaScript.** An inline script in `Base.astro` adds a `motion` class to `<html>` only when reduced motion is off. That class pre-hides reveal targets so they can animate in. If the motion module has not reported ready within three seconds, the class is removed and everything shows.
 
@@ -196,7 +221,7 @@ UI behaviour in `src/scripts/ui.ts` uses the same pattern: `data-theme-toggle`, 
 - A skip link is the first focusable element and jumps to `<main id="main">`.
 - Landmarks on every page: `header`, `nav` labelled "Main", `main`, `footer`. Each page has exactly one `h1`, and headings step down one level at a time with no gaps from `h1` through `h3`.
 - Every control shows a 2px accent outline on keyboard focus. Text fields swap to an accent border with a soft ring.
-- Content images carry written alt text from the content files. Decorative images (thumbnails beside a text label, the hover preview) use `alt=""`, and icons are `aria-hidden`.
+- Content images carry written alt text from the CMS. Decorative images (thumbnails beside a text label, the hover preview) use `alt=""`, and icons are `aria-hidden`.
 - The booking form uses visible `label` elements, fieldsets with legends for the radio and checkbox groups, `aria-invalid`, and error messages tied to fields with `aria-describedby`. On a failed submit, focus moves to the first field with an error. On success, focus moves to the confirmation.
 - The mobile menu button exposes `aria-expanded` and `aria-controls`, and Escape closes the menu. The current page is marked with `aria-current`.
 - Text and control colours meet WCAG AA in both themes. Ratios are in DESIGN.md.
@@ -212,18 +237,44 @@ Also handled:
 
 ## Deploying
 
-`npm run build` writes a fully static site to `dist/`, including `404.html`. Any static host works.
+The site is a Node server, not static files: it needs a host that runs Node 22 and a persistent disk for the database, media and sessions.
 
-Before you deploy, change `site` in `astro.config.mjs`. It is a placeholder (`https://linden-dental.example`) and is used for canonical URLs.
+### Staging (inside the PSI Monitor Fly app)
 
-| Host | Settings |
+Staging runs inside the existing PSI Monitor Fly app (`stanventures-psi`), so it adds no Fly cost.
+
+| What | URL |
 | --- | --- |
-| Netlify | Build command `npm run build`, publish directory `dist`, environment variable `NODE_VERSION=22` |
-| Vercel | Import the repo; the Astro preset fills in the build settings. Set Node to 22.x in project settings |
-| Cloudflare Pages | Framework preset Astro, build command `npm run build`, output `dist`, `NODE_VERSION=22` |
-| GitHub Pages | Use the official `withastro/action` workflow. If the site lives at `https://<user>.github.io/<repo>/`, also set `base: '/<repo>'` in `astro.config.mjs` |
+| Site | <https://stanventures-psi.fly.dev/linden-dental/> |
+| CMS admin | <https://stanventures-psi.fly.dev/_emdash/admin> |
+| Booking requests | <https://stanventures-psi.fly.dev/linden-admin> (HTTP Basic login) |
 
-The booking form has no backend. To make it send requests, replace the timeout in `bookingForm()` in `src/scripts/ui.ts` with a request to a form service or the practice's booking software.
+EmDash only works at the server root, so the site runs at root on `127.0.0.1:4321` inside the Fly machine, next to PSI. PSI (Next.js) proxies `/linden-dental/*` to it with the prefix stripped, and `/_emdash/*`, `/_astro/*` and `/_image` unchanged. `PUBLIC_LINK_PREFIX=/linden-dental` makes every site link carry the prefix (`src/lib/url.ts`).
+
+Staging environment:
+
+| Variable | Value | Effect |
+| --- | --- | --- |
+| `PUBLIC_LINK_PREFIX` | `/linden-dental` | Prefix on internal links, sitemap, RSS and canonical URLs |
+| `EMDASH_SITE_URL` | `https://stanventures-psi.fly.dev` | Public origin (`site`), required for production setup |
+| `LINDEN_DB`, `LINDEN_UPLOADS`, `LINDEN_SESSIONS` | under `/app/data/linden/` | Database, media and sessions on the Fly volume (set at build time) |
+| `PUBLIC_BOOKING_ENDPOINT` | `/api/linden/bookings` | The booking form posts here; PSI stores the requests |
+| `PUBLIC_NOINDEX` | `1` | noindex meta tag, `X-Robots-Tag` header, blocking robots.txt |
+| `PUBLIC_SHOW_DRAFTS` | `1` | Journal drafts are listed and viewable for review |
+| `EMDASH_ENCRYPTION_KEY` | Fly secret | Same value as in `.env` |
+
+To ship code or design changes, run:
+
+```powershell
+C:\Gemini\psi-monitor\deploy\deploy-linden-dental.ps1              # sync + fly deploy + checks
+C:\Gemini\psi-monitor\deploy\deploy-linden-dental.ps1 -VerifyOnly  # checks only
+```
+
+It syncs this repo into `psi-monitor/linden-site`, runs `fly deploy`, waits for `/linden-dental/` to answer, then checks the pages, the admin and the booking API. Content lives on the Fly volume at `/app/data/linden`, so a deploy never touches it, and CMS edits never need a deploy.
+
+### On a real client domain
+
+Run the server at the domain root and leave `PUBLIC_LINK_PREFIX` empty. Set `EMDASH_SITE_URL` to the real domain, point `LINDEN_DB`, `LINDEN_UPLOADS` and `LINDEN_SESSIONS` at a persistent disk before `astro build`, supply `EMDASH_ENCRYPTION_KEY`, and leave `PUBLIC_NOINDEX` and `PUBLIC_SHOW_DRAFTS` unset. Start the built server with `node dist/server/entry.mjs`. Set `PUBLIC_BOOKING_ENDPOINT` to a form service or the practice's booking software; without it the booking form only simulates a send.
 
 ## Credits and licences
 
@@ -231,6 +282,7 @@ The booking form has no backend. To make it send requests, replace the timeout i
 | --- | --- |
 | Practice, people and reviews | Fictional. Any resemblance to an existing practice is accidental. |
 | Photos | 19 stock photos from Envato Elements, licensed to the project owner's Envato account for this project. See the licence note above. |
+| CMS | EmDash. |
 | Fonts | Bricolage Grotesque and Figtree, both under the SIL Open Font License 1.1, installed from Fontsource. |
 | Icons | Phosphor Icons, MIT licence. |
 | Motion | GSAP by GreenSock (Webflow), under the standard no-charge GSAP licence, which includes ScrollTrigger and SplitText. |

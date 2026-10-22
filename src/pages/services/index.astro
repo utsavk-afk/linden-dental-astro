@@ -1,13 +1,12 @@
 ---
 import { url } from '../../lib/url';
-import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
-import { servicesPage as page } from '../../lib/content';
+import { getServices, getServicesPage } from '../../lib/cms';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import CtaBand from '../../components/CtaBand.astro';
+import CmsImage from '../../components/CmsImage.astro';
 
-const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const [services, page] = await Promise.all([getServices(), getServicesPage()]);
 // Cards show the headline price: the text up to the first full stop followed by a space
 // ("$185 without insurance. Usually covered..." -> "$185 without insurance."), so "$185.50" stays whole.
 const shortPrice = (price: string) => `${price.split(/\.\s/)[0].trim().replace(/\.$/, '')}.`;
@@ -24,11 +23,11 @@ const shortPrice = (price: string) => `${price.split(/\.\s/)[0].trim().replace(/
     <div class="wrap cards">
       {services.map((s, i) => (
         <a href={url(`/services/${s.id}/`)} class={`card card--${i}`} data-reveal>
-          <div class="frame card__img"><Image src={s.data.photo} alt={s.data.photoAlt} width={i === 0 || i === 6 ? 1100 : 640} height={640} /></div>
+          <div class="frame card__img"><CmsImage image={s.photo} alt={s.photoAlt} width={i === 0 || i === 6 ? 1100 : 640} height={640} /></div>
           <div class="card__body">
-            <h2 class="card__title"><Icon name={s.data.icon} /> {s.data.title}</h2>
-            <p class="muted">{s.data.summary}</p>
-            <p class="card__price">{shortPrice(s.data.price)}</p>
+            <h2 class="card__title"><Icon name={s.icon} /> {s.title}</h2>
+            <p class="muted">{s.summary}</p>
+            <p class="card__price">{shortPrice(s.price)}</p>
           </div>
         </a>
       ))}

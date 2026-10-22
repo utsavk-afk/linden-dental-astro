@@ -1,6 +1,6 @@
 # Linden Dental Studio: design language
 
-This is the design system behind the Linden Dental Studio concept site. It is written for designers. The same content is rendered live at `/design/`, and the source of truth for every value is `src/styles/global.css` (tokens) and `src/data/design.ts` (palette names, motion list, inspiration).
+This is the design system behind the Linden Dental Studio concept site. It is written for designers. The same content is rendered live at `/design/`. The source of truth for every value is `src/styles/global.css` (tokens), mirrored for the `/design/` palette by `src/data/design.ts` (hex values). The words on `/design/` (palette names and uses, principles, type specimens, motion list, inspiration) are edited in the EmDash CMS under Design language page.
 
 ## Design read
 

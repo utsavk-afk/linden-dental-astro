@@ -1,9 +1,10 @@
 ---
-import { url } from '../lib/url';
+import { url, publicPath } from '../lib/url';
 import Icon from './Icon.astro';
 import Logo from './Logo.astro';
-import { site, fill } from '../data/site';
-const path = Astro.url.pathname;
+import { getSite, fill } from '../data/site';
+const site = await getSite();
+const path = publicPath(Astro.url.pathname);
 const isCurrent = (href: string) => path.startsWith(href);
 ---
 <header class="nav" data-nav>

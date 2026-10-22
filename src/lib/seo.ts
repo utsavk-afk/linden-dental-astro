@@ -1,8 +1,20 @@
 // Structured data (schema.org JSON-LD) built from the CMS settings, so Google can show
 // the practice's address, phone, hours, FAQs and articles as rich results.
-import { settings } from './content';
+// Settings come from the CMS (getSettings() in src/lib/cms.ts, or getSite().settings) and are
+// passed in, because the CMS read is async.
 
 type Json = Record<string, unknown>;
+
+/** The settings fields the practice schema needs (a subset of getSettings()). */
+export interface PracticeSettings {
+  name: string;
+  phone: string;
+  email: string;
+  addressLine1: string;
+  addressLine2: string;
+  seoDefaultDescription: string;
+  hours: { days: string; time: string }[];
+}
 
 const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -33,7 +45,7 @@ function to24(t: string): string | null {
   return `${String(h).padStart(2, '0')}:${mins}`;
 }
 
-function openingHours() {
+function openingHours(settings: PracticeSettings) {
   return settings.hours.flatMap((h) => {
     const days = parseDays(h.days);
     const [o, c] = h.time.split(/\s+to\s+/i);
@@ -44,7 +56,7 @@ function openingHours() {
   });
 }
 
-function postalAddress() {
+function postalAddress(settings: PracticeSettings) {
   // "Portland, OR 97202"
   const m = settings.addressLine2.match(/^(.+?),\s*([A-Z]{2})\s+(\d{5})/);
   return {
@@ -56,7 +68,7 @@ function postalAddress() {
   };
 }
 
-export function dentistSchema(siteUrl: string, image?: string): Json {
+export function dentistSchema(siteUrl: string, image: string | undefined, settings: PracticeSettings): Json {
   return {
     '@context': 'https://schema.org',
     '@type': 'Dentist',
@@ -66,8 +78,8 @@ export function dentistSchema(siteUrl: string, image?: string): Json {
     url: siteUrl,
     telephone: settings.phone,
     email: settings.email,
-    address: postalAddress(),
-    openingHoursSpecification: openingHours(),
+    address: postalAddress(settings),
+    openingHoursSpecification: openingHours(settings),
     ...(image ? { image } : {}),
     priceRange: '$$',
   };

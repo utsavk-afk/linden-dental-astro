@@ -3,13 +3,21 @@
 
 /// <reference types="emdash/locals" />
 
-import type { BylineSummary, ContentBylineCredit, TaxonomyTerm, PortableTextBlock } from "emdash";
+import type { BylineSummary, ContentBylineCredit, TaxonomyTerm, PortableTextBlock, ReferencePage } from "emdash";
 
-export interface Page {
+export interface Service {
   id: string;
   slug: string | null;
   status: string;
   title: string;
+  summary: string;
+  order: number;
+  icon: "tooth" | "smiley" | "hand-heart" | "shield-check" | "first-aid-kit" | "sparkle" | "sun" | "clock" | "wallet" | "hand-waving" | "chat-circle" | "heartbeat" | "baby" | "leaf" | "calendar-blank";
+  photo: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  price: string;
+  duration: string;
+  steps?: { "title": string; "body": string }[];
+  faqs?: { "q": string; "a": string }[];
   content?: PortableTextBlock[];
   createdAt: Date;
   updatedAt: Date;
@@ -19,25 +27,349 @@ export interface Page {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
-export interface Post {
+export interface Journal {
   id: string;
   slug: string | null;
   status: string;
   title: string;
-  featured_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  excerpt: string;
+  publish_date: string;
+  updated_date?: string;
+  category: "Kids" | "Everyday care" | "Costs" | "Treatments" | "News";
+  featured_image: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
   content?: PortableTextBlock[];
-  excerpt?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
   byline?: BylineSummary | null;
   bylines?: ContentBylineCredit[];
   terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface Team {
+  id: string;
+  slug: string | null;
+  status: string;
+  name: string;
+  role: string;
+  photo: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  bio: string;
+  outside?: string;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface Review {
+  id: string;
+  slug: string | null;
+  status: string;
+  quote: string;
+  name: string;
+  where?: string;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface HomePage {
+  id: string;
+  slug: string | null;
+  status: string;
+  hero_title: string;
+  hero_accent: string;
+  hero_lede: string;
+  hero_image: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  hero_card_title: string;
+  hero_card_text: string;
+  manifesto: string;
+  manifesto_cta_label: string;
+  manifesto_cta_link: string;
+  services_title: string;
+  visit_title: string;
+  visit_lede: string;
+  visit_steps?: { "title": string; "body": string; "image"?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } } | null }[];
+  team_title: string;
+  team_text: string;
+  team_cta_label: string;
+  team_cta_link: string;
+  reviews_title: string;
+  reviews_label: string;
+  journal_title: string;
+  journal_cta_label: string;
+  journal_cta_link: string;
+  find_title: string;
+  find_image: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  insurance: string;
+  parking: string;
+  access: string;
+  meta_title?: string;
+  meta_description?: string;
+  og_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface AboutPage {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  lede: string;
+  image: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  story_title: string;
+  story?: { "paragraph": string }[];
+  principles_title: string;
+  principles?: { "icon": "tooth" | "smiley" | "hand-heart" | "shield-check" | "first-aid-kit" | "sparkle" | "sun" | "clock" | "wallet" | "hand-waving" | "chat-circle" | "heartbeat" | "baby" | "leaf" | "calendar-blank"; "title": string; "body": string }[];
+  team_title: string;
+  cta_title?: string;
+  cta_text?: string;
+  meta_title?: string;
+  meta_description?: string;
+  og_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface ServicesPage {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  lede?: string;
+  cta_title?: string;
+  cta_text?: string;
+  detail_back_label: string;
+  detail_cost_label: string;
+  detail_time_label: string;
+  detail_steps_title: string;
+  detail_faq_title: string;
+  detail_more_title: string;
+  detail_cta_title?: string;
+  detail_cta_text?: string;
+  meta_title?: string;
+  meta_description?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface JournalPage {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  lede?: string;
+  read_label: string;
+  post_back_label: string;
+  post_author_line: string;
+  post_next_title: string;
+  post_updated_label: string;
+  post_draft_banner: string;
+  post_cta_title?: string;
+  post_cta_text?: string;
+  meta_title?: string;
+  meta_description?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface BookPage {
+  id: string;
+  slug: string | null;
+  status: string;
+  intro_title: string;
+  intro_lede: string;
+  intro_call_label: string;
+  next_steps?: { "icon": "envelope-simple" | "clipboard-text" | "coffee" | "armchair" | "phone" | "map-pin" | "car" | "wheelchair" | "tooth" | "smiley" | "hand-heart" | "shield-check" | "first-aid-kit" | "sparkle" | "sun" | "clock" | "wallet" | "hand-waving" | "chat-circle" | "heartbeat" | "baby" | "leaf" | "calendar-blank"; "lead": string; "text": string }[];
+  form_who_legend: string;
+  form_who_me: string;
+  form_who_child: string;
+  form_who_family: string;
+  form_name: string;
+  form_phone: string;
+  form_email: string;
+  form_email_help: string;
+  form_reason: string;
+  form_reason_placeholder: string;
+  form_days: string;
+  form_nervous_lead: string;
+  form_nervous_text: string;
+  form_notes: string;
+  form_optional: string;
+  form_submit: string;
+  form_sending: string;
+  form_fine_staging: string;
+  form_fine_concept: string;
+  options_reasons?: { "option": string }[];
+  options_days?: { "option": string }[];
+  messages_name: string;
+  messages_email_missing: string;
+  messages_email_invalid: string;
+  messages_phone_missing: string;
+  messages_phone_pattern: string;
+  messages_reason: string;
+  messages_field_invalid: string;
+  messages_send_failed: string;
+  messages_retry: string;
+  success_heading_prefix: string;
+  success_heading_suffix?: string;
+  success_text: string;
+  success_link_label: string;
+  success_link_link: string;
+  meta_title?: string;
+  meta_description?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface NotFoundPage {
+  id: string;
+  slug: string | null;
+  status: string;
+  page_title?: string;
+  title: string;
+  lede?: string;
+  primary_label: string;
+  primary_link: string;
+  secondary_label?: string;
+  secondary_link?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface DesignPage {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  lede?: string;
+  principles_title: string;
+  principles_items?: { "title": string; "text": string }[];
+  colour_title: string;
+  colour_intro?: string;
+  colour_swatches?: { "token": "--bg" | "--bg-2" | "--surface" | "--ink" | "--ink-2" | "--accent" | "--bloom"; "name"?: string | null; "use"?: string | null }[];
+  type_title: string;
+  type_intro?: string;
+  type_specimens?: { "step": "--step-5" | "--step-4" | "--step-3" | "--step-2" | "--step-1" | "--step-0"; "label": string; "sample": string }[];
+  components_title: string;
+  components_intro?: string;
+  components_primary_button: string;
+  components_secondary_button: string;
+  components_text_link: string;
+  motion_title: string;
+  motion_intro?: string;
+  motion_items?: { "name": string; "why": string; "how": string }[];
+  inspiration_title: string;
+  inspiration_intro?: string;
+  inspiration_items?: { "who": string; "where"?: string | null; "title": string; "url": string; "took"?: string | null }[];
+  meta_title?: string;
+  meta_description?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface SiteSetting {
+  id: string;
+  slug: string | null;
+  status: string;
+  name: string;
+  logo_word: string;
+  logo_sub?: string;
+  tagline: string;
+  phone: string;
+  email: string;
+  address_line_1: string;
+  address_line_2: string;
+  map_link: string;
+  hours?: { "days": string; "time": string }[];
+  primary_cta_label: string;
+  primary_cta_link: string;
+  cta_band_title: string;
+  cta_band_text: string;
+  footer_intro?: string;
+  footer_visit_heading: string;
+  footer_hours_heading: string;
+  footer_contact_heading: string;
+  footer_directions_label: string;
+  footer_note?: string;
+  labels_skip_link: string;
+  labels_menu: string;
+  labels_theme_toggle: string;
+  labels_min_read: string;
+  labels_step_of: string;
+  labels_pause: string;
+  labels_play: string;
+  labels_main_nav: string;
+  labels_home_link: string;
+  labels_portrait_alt: string;
+  seo_default_title: string;
+  seo_title_suffix?: string;
+  seo_default_description: string;
+  twitter_handle?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface JournalReferences {
+  author: ReferencePage<Team>;
 }
 
 declare module "emdash" {
   interface EmDashCollections {
-    pages: Page;
-    posts: Post;
+    services: Service;
+    journal: Journal;
+    team: Team;
+    reviews: Review;
+    home_page: HomePage;
+    about_page: AboutPage;
+    services_page: ServicesPage;
+    journal_page: JournalPage;
+    book_page: BookPage;
+    not_found_page: NotFoundPage;
+    design_page: DesignPage;
+    site_settings: SiteSetting;
+  }
+  interface EmDashCollectionReferences {
+    journal: JournalReferences;
   }
 }

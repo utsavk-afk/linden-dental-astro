@@ -1,18 +1,18 @@
 ---
 import { url, href } from '../lib/url';
-import { Image } from 'astro:assets';
-import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import { site, fill } from '../data/site';
-import { reviews } from '../lib/content';
-import { getPosts, readMinutes, formatDate as fmt } from '../lib/journal';
+import CmsImage from '../components/CmsImage.astro';
+import { getSite, fill } from '../data/site';
+import { getHomePage, getServices, getTeam, getReviews, getPosts } from '../lib/cms';
 
-// All copy and photos on this page are edited in the CMS: Keystatic > Home page.
-const page = (await getEntry('home', 'home'))!.data;
-const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
-const team = (await getCollection('team')).sort((a, b) => a.data.order - b.data.order);
-const [feature, ...more] = (await getPosts()).slice(0, 3);
+// All copy and photos on this page are edited in the CMS: EmDash > Home page.
+const [site, page, services, team, reviews, posts] = await Promise.all([
+  getSite(), getHomePage(), getServices(), getTeam(), getReviews(), getPosts(),
+]);
+const [feature, ...more] = posts.slice(0, 3);
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const steps = page.visitSteps;
 // The bento has four named slots; a fifth or later team member flows into extra rows below.
 const bentoAreas = ['ana', 'marcus', 'dani', 'june'];
@@ -33,7 +33,7 @@ const { labels } = site;
       </div>
       <div class="hero__media">
         <div class="frame hero__frame" data-hero-frame>
-          <Image src={page.heroImage} alt={page.heroImageAlt} layout="full-width" loading="eager" fetchpriority="high" />
+          <CmsImage image={page.heroImage} alt={page.heroImageAlt} layout="full-width" loading="eager" fetchpriority="high" />
         </div>
         <div class="hero__card" data-hero-card>
           <span class="hero__card-icon"><Icon name="clock" /></span>
@@ -60,17 +60,17 @@ const { labels } = site;
           {services.map((s) => (
             <li data-hover-row data-reveal>
               <a href={url(`/services/${s.id}/`)} class="svc">
-                <span class="svc__thumb frame"><Image src={s.data.photo} alt="" width={160} height={160} /></span>
-                <span class="svc__icon"><Icon name={s.data.icon} /></span>
-                <span class="svc__title">{s.data.title}</span>
-                <span class="svc__summary">{s.data.summary}</span>
+                <span class="svc__thumb frame"><CmsImage image={s.photo} alt="" width={160} height={160} /></span>
+                <span class="svc__icon"><Icon name={s.icon} /></span>
+                <span class="svc__title">{s.title}</span>
+                <span class="svc__summary">{s.summary}</span>
                 <span class="svc__go"><Icon name="arrow-right" /></span>
               </a>
             </li>
           ))}
         </ul>
         <div class="services__media" data-hover-media aria-hidden="true">
-          {services.map((s) => <Image src={s.data.photo} alt="" width={420} height={520} data-hover-img />)}
+          {services.map((s) => <CmsImage image={s.photo} alt="" width={420} height={520} data-hover-img />)}
         </div>
       </div>
     </div>
@@ -86,7 +86,7 @@ const { labels } = site;
       {steps.map((st, i) => (
         <article class={`visit__step ${st.image ? '' : 'visit__step--tint'}`} data-hpan-step>
           {st.image ? (
-            <div class="frame visit__img" data-hpan-in><Image src={st.image} alt={st.imageAlt || st.title} width={720} height={540} /></div>
+            <div class="frame visit__img" data-hpan-in><CmsImage image={st.image} alt={st.imageAlt || st.title} width={720} height={540} /></div>
           ) : (
             <div class="visit__icon" data-hpan-in><Icon name="calendar-blank" size="2.4rem" /></div>
           )}
@@ -109,8 +109,8 @@ const { labels } = site;
       </div>
       {team.map((m, i) => (
         <figure class={`team__cell team__cell--${bentoAreas[i] ?? 'extra'}`} data-reveal>
-          <div class="frame team__img" data-parallax="5"><Image src={m.data.photo} alt={fill(site.labels.portraitAlt, { name: m.data.name })} width={640} height={800} /></div>
-          <figcaption><strong>{m.data.name}</strong><span>{m.data.role}</span></figcaption>
+          <div class="frame team__img" data-parallax="5"><CmsImage image={m.photo} alt={fill(site.labels.portraitAlt, { name: m.name })} width={640} height={800} /></div>
+          <figcaption><strong>{m.name}</strong><span>{m.role}</span></figcaption>
         </figure>
       ))}
     </div>
@@ -146,18 +146,18 @@ const { labels } = site;
       </div>
       <div class="journal__grid">
         <a class="post post--feature" href={url(`/journal/${feature.id}/`)} data-reveal>
-          <div class="frame post__img"><Image src={feature.data.cover} alt={feature.data.coverAlt} width={960} height={720} /></div>
-          <p class="post__meta">{feature.data.tag} <span aria-hidden="true">/</span> {readMinutes(feature)} {labels.minRead}</p>
-          <h3>{feature.data.title}</h3>
-          <p class="muted">{feature.data.description}</p>
+          <div class="frame post__img"><CmsImage image={feature.cover} alt={feature.coverAlt} width={960} height={720} /></div>
+          <p class="post__meta">{feature.tag} <span aria-hidden="true">/</span> {feature.readMinutes} {labels.minRead}</p>
+          <h3>{feature.title}</h3>
+          <p class="muted">{feature.description}</p>
         </a>
         <div class="journal__more">
           {more.map((p) => (
             <a class="post post--row" href={url(`/journal/${p.id}/`)} data-reveal>
-              <div class="frame post__thumb"><Image src={p.data.cover} alt={p.data.coverAlt} width={360} height={360} /></div>
+              <div class="frame post__thumb"><CmsImage image={p.cover} alt={p.coverAlt} width={360} height={360} /></div>
               <div>
-                <p class="post__meta">{p.data.tag} <span aria-hidden="true">/</span> {fmt(p.data.date)}</p>
-                <h3>{p.data.title}</h3>
+                <p class="post__meta">{p.tag} <span aria-hidden="true">/</span> {fmt(p.date)}</p>
+                <h3>{p.title}</h3>
               </div>
             </a>
           ))}
@@ -170,7 +170,7 @@ const { labels } = site;
   <!-- VISIT US -->
   <section class="section find" aria-labelledby="find-title">
     <div class="wrap find__grid">
-      <div class="frame find__img" data-parallax="7"><Image src={page.findImage} alt={page.findImageAlt} width={1100} height={1200} /></div>
+      <div class="frame find__img" data-parallax="7"><CmsImage image={page.findImage} alt={page.findImageAlt} width={1100} height={1200} /></div>
       <div class="find__copy">
         <h2 id="find-title" data-split>{page.findTitle}</h2>
         <address data-reveal>{site.address.map((l) => <span>{l}</span>)}</address>

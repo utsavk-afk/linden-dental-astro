@@ -1,0 +1,15 @@
+---
+// Renders a Portable Text value (services and journal content) with emdash/ui's PortableText.
+// No wrapper element: blocks are direct children of the caller's container (e.g. .prose).
+// Internal links ("/services/kids/") get the site prefix through RichTextLink.
+import { PortableText } from 'emdash/ui';
+import RichTextLink from './RichTextLink.astro';
+
+interface Props {
+  value: unknown;
+}
+
+const { value } = Astro.props;
+const blocks = Array.isArray(value) ? value : [];
+---
+{blocks.length > 0 && <PortableText value={blocks as never} components={{ mark: { link: RichTextLink } }} />}

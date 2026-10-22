@@ -1,7 +1,8 @@
 // Design language colour tokens, rendered on /design and mirrored in DESIGN.md.
 // Hex values mirror src/styles/global.css, so they stay in code. Each colour's name and
-// "use" text is edited in the CMS (Pages > Design language page > Colour), matched by token.
-// If you add a token here, add it to TOKENS in cms/singletons/designPage.ts too.
+// "use" text is edited in the CMS (EmDash, Design language page > Colour) and read through
+// getDesignPage() in src/lib/cms.ts, matched by token. If you add a token here, add a matching
+// swatch entry (same token) in the CMS so it gets a name and use text.
 export const palette = [
   { token: '--bg', light: '#f3f3ec', dark: '#0f1612' },
   { token: '--bg-2', light: '#e7eadf', dark: '#162019' },

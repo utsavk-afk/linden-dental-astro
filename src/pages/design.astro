@@ -4,7 +4,9 @@ import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import Logo from '../components/Logo.astro';
 import { palette } from '../data/design';
-import { designPage as page } from '../lib/content';
+import { getDesignPage } from '../lib/cms';
+
+const page = await getDesignPage();
 
 // Hex values come from code; each colour's name and use text come from the CMS, matched by token.
 const swatches = palette.map((c) => {

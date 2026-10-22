@@ -2,7 +2,12 @@
 import { href } from '../lib/url';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import { notFound as page } from '../lib/content';
+import { getNotFoundPage } from '../lib/cms';
+
+// Server output: Astro renders this page on demand (status 404) for every unmatched route.
+export const prerender = false;
+
+const page = await getNotFoundPage();
 ---
 <Base title={page.pageTitle || page.title}>
   <section class="nf">

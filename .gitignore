@@ -32,3 +32,6 @@ docs/walkthrough.html
 data/
 uploads/
 .env
+
+# EmDash build manifest
+.emdash/

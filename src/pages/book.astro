@@ -2,11 +2,12 @@
 import { href } from '../lib/url';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import { site } from '../data/site';
-import { bookPage as page } from '../lib/content';
+import { getSite } from '../data/site';
+import { getBookPage } from '../lib/cms';
 
+const [site, page] = await Promise.all([getSite(), getBookPage()]);
 const { intro, nextSteps, form: f, options, messages: m, success, seo } = page;
-// Set at build time for the staging backend; empty means the form only simulates a send.
+// PUBLIC_ env vars are inlined at build time; set for the staging backend. Empty means the form only simulates a send.
 const endpoint = import.meta.env.PUBLIC_BOOKING_ENDPOINT || '';
 const successText = success.text.replaceAll('{phone}', site.phone);
 ---

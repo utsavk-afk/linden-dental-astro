@@ -1,14 +1,13 @@
 ---
-import { Image } from 'astro:assets';
-import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import { site, fill } from '../data/site';
+import { getSite, fill } from '../data/site';
 import Icon from '../components/Icon.astro';
+import CmsImage from '../components/CmsImage.astro';
 import CtaBand from '../components/CtaBand.astro';
+import { getAboutPage, getTeam } from '../lib/cms';
 
-// All copy and photos on this page are edited in the CMS: Keystatic > About page.
-const page = (await getEntry('about', 'about'))!.data;
-const team = (await getCollection('team')).sort((a, b) => a.data.order - b.data.order);
+// All copy and photos on this page are edited in the CMS: EmDash > About page.
+const [site, page, team] = await Promise.all([getSite(), getAboutPage(), getTeam()]);
 const principles = page.principles;
 ---
 <Base title={page.seo.title || 'About us'} description={page.seo.description || 'Linden Dental Studio is a small family practice in Sellwood, Portland, built around longer appointments, clear prices and no judgement.'} image={page.seo.image ?? page.image}>
@@ -18,7 +17,7 @@ const principles = page.principles;
       <p class="lede" data-reveal>{page.lede}</p>
     </div>
     <div class="wrap">
-      <div class="frame intro__img" data-parallax="6"><Image src={page.image} alt={page.imageAlt} layout="full-width" loading="eager" /></div>
+      <div class="frame intro__img" data-parallax="6"><CmsImage image={page.image} alt={page.imageAlt} layout="full-width" loading="eager" /></div>
     </div>
   </section>
 
@@ -52,12 +51,12 @@ const principles = page.principles;
       <div class="people">
         {team.map((m) => (
           <article class="person" data-reveal>
-            <div class="frame person__img" data-parallax="4"><Image src={m.data.photo} alt={fill(site.labels.portraitAlt, { name: m.data.name })} width={720} height={860} /></div>
+            <div class="frame person__img" data-parallax="4"><CmsImage image={m.photo} alt={fill(site.labels.portraitAlt, { name: m.name })} width={720} height={860} /></div>
             <div class="person__copy">
-              <h3>{m.data.name}</h3>
-              <p class="person__role">{m.data.role}</p>
-              <p>{m.data.bio}</p>
-              {m.data.outside && <p class="person__outside"><Icon name="leaf" /> {m.data.outside}</p>}
+              <h3>{m.name}</h3>
+              <p class="person__role">{m.role}</p>
+              <p>{m.bio}</p>
+              {m.outside && <p class="person__outside"><Icon name="leaf" /> {m.outside}</p>}
             </div>
           </article>
         ))}

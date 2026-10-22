@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, sessionDrivers } from 'astro/config';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
 import emdash, { local } from 'emdash/astro';
@@ -41,6 +41,9 @@ export default defineConfig({
   base,
   output: 'server',
   adapter: node({ mode: 'standalone' }),
+  // EmDash keeps admin logins in Astro sessions. The adapter default lives in node_modules/.astro,
+  // which a redeploy wipes; on PSI this points at the volume (inlined at build time).
+  session: { driver: sessionDrivers.fsLite({ base: process.env.LINDEN_SESSIONS || './data/sessions' }) },
   prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   image: { layout: 'constrained' },
   markdown: { rehypePlugins: [rehypeBaseLinks] },
