@@ -1,38 +1,24 @@
 // @ts-check
-import fs from 'node:fs';
 import { defineConfig } from 'astro/config';
+import node from '@astrojs/node';
 import react from '@astrojs/react';
-import sitemap from '@astrojs/sitemap';
-import keystatic from '@keystatic/astro';
+import emdash, { local } from 'emdash/astro';
+import { sqlite } from 'emdash/db';
 
-// Default build: a standalone site at the domain root.
-// Staging builds (repo GitHub Action, or C:\Gemini\psi-monitor\deploy\deploy-linden-dental.ps1) set:
-//   LINDEN_BASE=/linden-dental  LINDEN_SITE=https://stanventures-psi.fly.dev
-//   PUBLIC_BOOKING_ENDPOINT=/api/linden/bookings  PUBLIC_NOINDEX=1  PUBLIC_SHOW_DRAFTS=1
-const base = process.env.LINDEN_BASE || '/';
-const basePrefix = base.replace(/\/+$/, '');
+// Linden Dental runs as a server-rendered Astro app with the EmDash CMS (https://emdashcms.com):
+// content lives in a SQLite database, media on disk, and the admin is at <base>/_emdash/admin.
+//
+// Local dev:  npm run dev  ->  http://localhost:4321/  (admin: /_emdash/admin)
+// In PSI:     built and started by psi-monitor (Dockerfile + scripts/start-linden.sh) with
+//   PUBLIC_LINK_PREFIX=/linden-dental  EMDASH_SITE_URL=https://stanventures-psi.fly.dev
+//   LINDEN_DB=/app/data/linden/emdash.db  LINDEN_UPLOADS=/app/data/linden/uploads
+//   PUBLIC_BOOKING_ENDPOINT=/api/linden/bookings  PUBLIC_NOINDEX=1
+// PSI proxies /linden-dental/* to this server with the prefix stripped, and /_emdash/*, /_astro/*
+// and /_image unchanged (EmDash only works at the server root).
+const base = '/'; // EmDash requires the server root; staging uses PUBLIC_LINK_PREFIX instead
+const basePrefix = (process.env.PUBLIC_LINK_PREFIX || '').replace(/\/+$/, '');
 
-// The Keystatic CMS (localhost:4321/keystatic) runs with `npm run dev` only. It edits the
-// files in src/content directly, so the published site stays 100% static.
-const isDev = process.argv.includes('dev');
-
-// Redirects are edited in the CMS (Settings > Redirects) and stored in src/content/redirects.json.
-// Static builds emit a redirect page per old URL (instant meta refresh + canonical to the new URL).
-/** @type {Record<string, string>} */
-const redirects = {};
-try {
-  const data = JSON.parse(fs.readFileSync(new URL('./src/content/redirects.json', import.meta.url), 'utf8'));
-  for (const r of data.items ?? []) {
-    const from = String(r.from ?? '').trim();
-    const to = String(r.to ?? '').trim();
-    if (!from.startsWith('/') || !to) continue;
-    redirects[from] = /^https?:\/\//i.test(to) ? to : basePrefix + (to.startsWith('/') ? to : `/${to}`);
-  }
-} catch {
-  /* no redirects file yet */
-}
-
-// Links typed inside CMS articles (e.g. "/services/kids/") need the base prefix on staging.
+// Links typed inside article content (e.g. "/services/kids/") need the base prefix on staging.
 function rehypeBaseLinks() {
   /** @param {any} tree */
   return (tree) => {
@@ -51,22 +37,25 @@ function rehypeBaseLinks() {
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.LINDEN_SITE || 'https://linden-dental.example',
+  site: process.env.EMDASH_SITE_URL || process.env.LINDEN_SITE || 'http://localhost:4321',
   base,
-  redirects,
+  output: 'server',
+  adapter: node({ mode: 'standalone' }),
   prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   image: { layout: 'constrained' },
   markdown: { rehypePlugins: [rehypeBaseLinks] },
   integrations: [
     react(),
-    sitemap({ filter: (page) => !page.endsWith('/404/') }),
-    ...(isDev ? [keystatic()] : []),
+    emdash({
+      database: sqlite({ url: `file:${process.env.LINDEN_DB || './data/emdash.db'}` }),
+      storage: local({
+        directory: process.env.LINDEN_UPLOADS || './uploads',
+        baseUrl: '/_emdash/api/media/file',
+      }),
+    }),
   ],
   vite: {
-    // Pre-bundle the CMS at startup so Vite never re-optimises it mid-session
-    // (that caused "504 Outdated Optimize Dep" and a blank /keystatic page).
-    optimizeDeps: { include: ['@keystatic/core', '@keystatic/core/ui', '@keystatic/astro/ui'] },
     // Build output and local docs are not source; watching them triggered reloads.
-    server: { watch: { ignored: ['**/dist/**', '**/dist-psi/**', '**/docs/**'] } },
+    server: { watch: { ignored: ['**/dist/**', '**/dist-psi/**', '**/docs/**', '**/data/**', '**/uploads/**'] } },
   },
 });

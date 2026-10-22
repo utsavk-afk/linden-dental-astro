@@ -27,3 +27,8 @@ pnpm-debug.log*
 docs/envato-downloads/
 dist-psi/
 docs/walkthrough.html
+
+# EmDash local data (database, uploads, secrets)
+data/
+uploads/
+.env
